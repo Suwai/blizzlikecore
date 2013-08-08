@@ -1,4 +1,17 @@
-UPDATE `version` SET `db_version` = 'BDB_20130805';
+UPDATE `version` SET `db_version` = 'BDB_20130808';
+
+-- Update equipment_id
+-- old `equipment_id` = '0'
+UPDATE `creature_template` SET `equipment_id` = '2213' WHERE `entry` = '20060'; -- Lord Sanguinar
+UPDATE `creature_template` SET `equipment_id` = '1803' WHERE `entry` = '20062'; -- Grand Astromancer Capernian
+UPDATE `creature_template` SET `equipment_id` = '2215' WHERE `entry` = '20063'; -- Master Engineer Telonicus
+UPDATE `creature_template` SET `equipment_id` = '2214' WHERE `entry` = '20064'; -- Thaladred the Darkener
+
+
+-- Al'ar Phoenix God Fix
+-- old `inhabitType` = '3'
+UPDATE `creature_template` SET `inhabitType` = '4' WHERE `entry` = '19514';
+
 
 -- Update spell_script_target
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (36717, 1, 21761);
