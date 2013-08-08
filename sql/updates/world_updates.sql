@@ -1,11 +1,15 @@
 UPDATE `version` SET `db_version` = 'BDB_20130808';
 
--- Update equipment_id
--- old `equipment_id` = '0'
-UPDATE `creature_template` SET `equipment_id` = '2213' WHERE `entry` = '20060'; -- Lord Sanguinar
-UPDATE `creature_template` SET `equipment_id` = '1803' WHERE `entry` = '20062'; -- Grand Astromancer Capernian
-UPDATE `creature_template` SET `equipment_id` = '2215' WHERE `entry` = '20063'; -- Master Engineer Telonicus
-UPDATE `creature_template` SET `equipment_id` = '2214' WHERE `entry` = '20064'; -- Thaladred the Darkener
+-- Update
+-- old `equipment_id` = '0' `mechanic_immune_mask` = '619659263', `flags_extra` = '2'
+-- Lord Sanguinar
+UPDATE `creature_template` SET `equipment_id` = '2213', `mechanic_immune_mask` = '653213695', `flags_extra` = '4259842' WHERE `entry` = '20060';
+-- Grand Astromancer Capernian
+UPDATE `creature_template` SET `equipment_id` = '2089', `mechanic_immune_mask` = '653213695', `flags_extra` = '4259842' WHERE `entry` = '20062';
+-- Master Engineer Telonicus
+UPDATE `creature_template` SET `equipment_id` = '2088', `mechanic_immune_mask` = '619659263', `flags_extra` = '4259842' WHERE `entry` = '20063';
+-- Thaladred the Darkener
+UPDATE `creature_template` SET `equipment_id` = '2091', `mechanic_immune_mask` = '619659263', `flags_extra` = '5308416' WHERE `entry` = '20064';
 
 
 -- Al'ar Phoenix God Fix
