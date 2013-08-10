@@ -13,30 +13,33 @@ EndScriptData */
 #include "ScriptPCH.h"
 #include "the_eye.h"
 
-#define SPELL_FLAME_BUFFET            34121 // Flame Buffet - every 1,5 secs in phase 1 if there is no victim in melee range and after Dive Bomb in phase 2 with same conditions
-#define SPELL_FLAME_QUILLS            34229 // Randomly after changing position in phase after watching tonns of movies, set probability 20%
-#define SPELL_REBIRTH                 34342 // Rebirth - beginning of second phase(after loose all health in phase 1)
-#define SPELL_REBIRTH_2               35369 // Rebirth(another, without healing to full HP) - after Dive Bomb in phase 2
-#define SPELL_MELT_ARMOR              35410 // Melt Armor - every 60 sec in phase 2
-#define SPELL_CHARGE                  35412 // Charge - 30 sec cooldown
-#define SPELL_DIVE_BOMB_VISUAL        35367 // Bosskillers says 30 sec cooldown, wowwiki says 30 sec colldown, DBM and BigWigs addons says ~47 sec
-#define SPELL_DIVE_BOMB               35181 // after watching tonns of movies, set cooldown to 40+rand()%5.
-#define SPELL_BERSERK                 45078 // 10 minutes after phase 2 starts(id is wrong, but proper id is unknown)
+enum Spells
+{
+    SPELL_FLAME_BUFFET           = 34121, // Flame Buffet - every 1, 5 secs in phase 1 if there is no victim in melee range and after Dive Bomb in phase 2 with same conditions
+    SPELL_FLAME_QUILLS           = 34229, // Randomly after changing position in phase after watching tons of movies, set probability 20%
+    SPELL_REBIRTH                = 34342, // Rebirth - beginning of second phase(after losing all health in phase 1)
+    SPELL_REBIRTH_2              = 35369, // Rebirth(another, without healing to full HP) - after Dive Bomb in phase 2
+    SPELL_MELT_ARMOR             = 35410, // Melt Armor - every 60 sec in phase 2
+    SPELL_CHARGE                 = 35412, // Charge - 30 sec cooldown
+    SPELL_DIVE_BOMB_VISUAL       = 35367, // Bosskillers says 30 sec cooldown, wowwiki says 30 sec colldown, DBM and BigWigs addons says ~47 sec
+    SPELL_DIVE_BOMB              = 35181, // after watching tonns of movies, set cooldown to 40+rand()%5.
+    SPELL_BERSERK                = 45078, // 10 minutes after phase 2 starts(id is wrong, but proper id is unknown)
 
-#define CREATURE_EMBER_OF_ALAR        19551 // Al'ar summons one Ember of Al'ar every position change in phase 1 and two after Dive Bomb. Also in phase 2 when Ember of Al'ar dies, boss loose 3% health.
-#define SPELL_EMBER_BLAST             34133 // When Ember of Al'ar dies, it casts Ember Blast
+    CREATURE_EMBER_OF_ALAR       = 19551, // Al'ar summons one Ember of Al'ar every position change in phase 1 and two after Dive Bomb. Also in phase 2 when Ember of Al'ar dies, boss loses 3% health.
+    SPELL_EMBER_BLAST            = 34133, // When Ember of Al'ar dies, it casts Ember Blast
 
-#define CREATURE_FLAME_PATCH_ALAR     20602 // Flame Patch - every 30 sec in phase 2
-#define SPELL_FLAME_PATCH             35380 //
+    CREATURE_FLAME_PATCH_ALAR    = 20602, // Flame Patch - every 30 sec in phase 2
+    SPELL_FLAME_PATCH            = 35380
+};
 
 static float waypoint[6][3] =
 {
-    {340.15f, 58.65f, 17.71f},
-    {388.09f, 31.54f, 20.18f},
-    {388.18f, -32.85f, 20.18f},
-    {340.29f, -60.19f, 17.72f},
-    {332, 0.01f, 39}, // better not use the same xy coord
-    {331, 0.01f, -2.39f}
+    {340.15f, 58.65f, 22.71f},
+    {388.09f, 31.54f, 25.18f},
+    {388.18f, -32.85f, 25.18f},
+    {340.29f, -60.19f, 22.72f},
+    {332.0f, 0.01f, 39.0f},
+    {331.0f, 0.01f, 3.39f}
 };
 
 enum WaitEventType
@@ -103,8 +106,6 @@ struct boss_alarAI : public ScriptedAI
 
         me->SetDisplayId(me->GetNativeDisplayId());
         me->SetSpeed(MOVE_RUN, DefaultMoveSpeedRate);
-        //me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
-        //me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
         me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
         me->SetUnitMovementFlags(MOVEFLAG_LEVITATING);
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -116,7 +117,7 @@ struct boss_alarAI : public ScriptedAI
         if (pInstance)
             pInstance->SetData(DATA_ALAREVENT, IN_PROGRESS);
 
-        me->SetUnitMovementFlags(MOVEFLAG_LEVITATING); // after enterevademode will be set walk movement
+        me->SetUnitMovementFlags(MOVEFLAG_LEVITATING);
         DoZoneInCombat();
         me->setActive(true);
     }
@@ -164,7 +165,6 @@ struct boss_alarAI : public ScriptedAI
         {
             me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
             me->SetDisplayId(11686);
-            //me->SendUpdateObjectToAllExcept(NULL);
         }
     }
 
@@ -180,7 +180,7 @@ struct boss_alarAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        if (!me->isInCombat()) // sometimes isincombat but !incombat, faction bug?
+        if (!me->isInCombat())
             return;
 
         if (Berserk_Timer <= diff)
@@ -266,13 +266,11 @@ struct boss_alarAI : public ScriptedAI
                         }
                     case WE_LAND:
                         WaitEvent = WE_SUMMON;
-                        WaitTimer = 4000;
-                        for (uint8 i = 0; i < 2; ++i)
-                            DoSpawnCreature(CREATURE_EMBER_OF_ALAR, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
+                        WaitTimer = 2000;
                         return;
                     case WE_SUMMON:
-                        //for (uint8 i = 0; i < 2; ++i)
-                            //DoSpawnCreature(CREATURE_EMBER_OF_ALAR, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
+                        for (uint8 i = 0; i < 2; ++i)
+                            DoSpawnCreature(CREATURE_EMBER_OF_ALAR, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
                         me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         me->SetDisplayId(me->GetNativeDisplayId());
@@ -302,14 +300,14 @@ struct boss_alarAI : public ScriptedAI
             {
                 if (cur_wp == 4)
                 {
-                    cur_wp = 0;
+                    cur_wp = urand(0, 1) ? 0 : 3;
                     WaitEvent = WE_PLATFORM;
                 }
                 else
                 {
-                    if (rand()%5) // next platform
+                    if (urand(0, 4)) // next platform
                     {
-                        DoSpawnCreature(CREATURE_EMBER_OF_ALAR, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
+                        DoSpawnCreature(CREATURE_EMBER_OF_ALAR, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
                         if (cur_wp == 3)
                             cur_wp = 0;
                         else
@@ -438,8 +436,7 @@ struct mob_ember_of_alarAI : public ScriptedAI
             me->CastSpell(me, SPELL_EMBER_BLAST, true);
             me->SetDisplayId(11686);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            //if (pInstance && pInstance->GetData(DATA_ALAREVENT) == 2)
-            if (pInstance && (pInstance->GetData(DATA_ALAREVENT) == 4 || pInstance->GetData(DATA_ALAREVENT) == 2))
+            if (pInstance && pInstance->GetData(DATA_ALAREVENT) == 2)
             {
                 if (Unit* Alar = Unit::GetUnit((*me), pInstance->GetData64(DATA_ALAR)))
                 {

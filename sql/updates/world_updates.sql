@@ -1,4 +1,4 @@
-UPDATE `version` SET `db_version` = 'BDB_20130808';
+UPDATE `version` SET `db_version` = 'BDB_20130810';
 
 -- Update
 -- old `equipment_id` = '0' `mechanic_immune_mask` = '619659263', `flags_extra` = '2'
@@ -17,6 +17,10 @@ UPDATE `creature_template` SET `equipment_id` = '0', `mechanic_immune_mask` = '6
 -- Al'ar Phoenix God Fix
 -- old `inhabitType` = '3'
 UPDATE `creature_template` SET `inhabitType` = '4' WHERE `entry` = '19514';
+
+-- Ember of Al'ar Fix
+-- old `inhabitType` = '3'
+UPDATE `creature_template` SET `inhabitType` = '4' WHERE `entry` = '19551';
 
 
 -- Update spell_script_target
