@@ -3,7 +3,7 @@ UPDATE `version` SET `db_version` = 'BDB_20130810';
 -- Update
 -- old `equipment_id` = '0' `mechanic_immune_mask` = '619659263', `flags_extra` = '2'
 -- Lord Sanguinar
-UPDATE `creature_template` SET `equipment_id` = '2213', `mechanic_immune_mask` = '653213695', `flags_extra` = '4259842' WHERE `entry` = '20060';
+UPDATE `creature_template` SET `equipment_id` = '2217', `mechanic_immune_mask` = '653213695', `flags_extra` = '4259842' WHERE `entry` = '20060';
 -- Grand Astromancer Capernian
 UPDATE `creature_template` SET `equipment_id` = '2089', `mechanic_immune_mask` = '653213695', `flags_extra` = '4259842' WHERE `entry` = '20062';
 -- Master Engineer Telonicus
