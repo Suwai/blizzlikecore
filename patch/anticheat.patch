@@ -21,7 +21,7 @@ index f56f163..bfb4852 100644
      // Use for not-in-offcial-sources patches
      //                                    10000-10999
 diff --git a/src/game/MovementHandler.cpp b/src/game/MovementHandler.cpp
-index 9c71841..eed60e6 100644
+index 9c71841..48ad318 100644
 --- a/src/game/MovementHandler.cpp
 +++ b/src/game/MovementHandler.cpp
 @@ -8,6 +8,7 @@
@@ -89,13 +89,11 @@ index 9c71841..eed60e6 100644
          recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
          return;
      }
-@@ -288,49 +311,422 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
+@@ -287,50 +310,420 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
+                     break;
                  }
              }
-         }
 +
-+        if (plMover && plMover->m_anti_transportGUID == 0 && movementInfo.t_guid != 0)
-+        {
 +            GameObject* obj = HashMapHolder<GameObject>::Find(movementInfo.t_guid);
 +            if (obj)
 +                plMover->m_anti_transportGUID = obj->GetDBTableGUIDLow();
@@ -106,7 +104,7 @@ index 9c71841..eed60e6 100644
 +                sLog.outBasic("Movement Anticheat: player %s on transport %d", plMover->GetName(), plMover->m_anti_transportGUID ? plMover->m_anti_transportGUID : 0);
 +
 +            plMover->m_anti_plskipanticheat = World::GetMvAnticheatDelay();
-+        }
+         }
      }
      else if (plMover && plMover->m_transport)               // if we were on a transport, leave
      {
@@ -152,7 +150,7 @@ index 9c71841..eed60e6 100644
 -        mover->SendMessageToSet(&data, false);
 +        if (opcode == MSG_MOVE_FALL_LAND && !plMover->isInFlight())
 +        {
-+            if (!World::GetEnableMvAnticheat() || (!plMover->m_anti_ontaxipath && !plMover->m_anti_flymounted && !plMover->m_anti_plskipanticheat))
++            if (!World::GetEnableMvAnticheat() || (!plMover->m_anti_ontaxipath && !plMover->m_anti_flymounted && !plMover->m_anti_plskipanticheat && plMover->isAlive()))
 +                plMover->HandleFallDamage(movementInfo); // fall damage generation
  
 -    mover->m_movementInfo = movementInfo;
@@ -185,8 +183,8 @@ index 9c71841..eed60e6 100644
 +
 +        if (World::GetMvAnticheatDebug())
 +        {
-+            sLog.outDebug("Movement Anticheat: player %s newcoord: tm:%d ftm:%d | %f, %f, %fo(%f) [%X][%s]| transport: %f, %f, %fo(%f)", plMover->GetName(), movementInfo.time, movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation(), movementInfo.GetMovementFlags(), LookupOpcodeName(opcode), movementInfo.GetTransportPos()->GetPositionX(), movementInfo.GetTransportPos()->GetPositionY(), movementInfo.GetTransportPos()->GetPositionZ(), movementInfo.GetTransportPos()->GetOrientation());
-+            sLog.outDebug("Transport: %d |  tguid: %d - %d", plMover->m_anti_transportGUID, GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid));
++            sLog.outDebug("Movement Anticheat: player %s newcoord: tm:%d ftm:%d | %f, %f, %fo(%f) [%X][%s] | transport: %f, %f, %fo(%f)", plMover->GetName(), movementInfo.time, movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation(), movementInfo.GetMovementFlags(), LookupOpcodeName(opcode), movementInfo.GetTransportPos()->GetPositionX(), movementInfo.GetTransportPos()->GetPositionY(), movementInfo.GetTransportPos()->GetPositionZ(), movementInfo.GetTransportPos()->GetOrientation());
++            sLog.outDebug("skipanticheat:%d | isAlive:%d", plMover->m_anti_plskipanticheat, plMover->isAlive());
 +        }
 +
 +        if (!movementInfo.HasMovementFlag(MOVEFLAG_MOVING) && !mover->HasUnitMovementFlag(MOVEFLAG_MOVING) && !(opcode == MSG_MOVE_FALL_LAND))
@@ -365,7 +363,10 @@ index 9c71841..eed60e6 100644
 +                plMover->m_anti_lastcheat = "Fly Hack";
 +                acpassed = false;
 +            }
-+
+ 
+-        // we should add the check only for class hunter
+-        if (plMover->isMovingOrTurning())
+-            plMover->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 +            // Anti-Water-Walk-Hack
 +            if (movementInfo.HasMovementFlag(MOVEFLAG_WATERWALKING)
 +                && !(plMover->HasAuraType(SPELL_AURA_WATER_WALK) | plMover->HasAuraType(SPELL_AURA_GHOST)))
@@ -483,10 +484,7 @@ index 9c71841..eed60e6 100644
 +                plMover->SetPosition(movementInfo.GetPos()->GetPositionX(), movementInfo.GetPos()->GetPositionY(), movementInfo.GetPos()->GetPositionZ(), movementInfo.GetPos()->GetOrientation());
 +
 +            plMover->m_movementInfo = movementInfo;
- 
--        // we should add the check only for class hunter
--        if (plMover->isMovingOrTurning())
--            plMover->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
++
 +            if (opcode == MSG_MOVE_FALL_LAND || plMover->m_lastFallTime > movementInfo.GetFallTime() || plMover->m_lastFallZ < movementInfo.GetPos()->GetPositionZ())
 +                plMover->SetFallInformation(movementInfo.GetFallTime(), movementInfo.GetPos()->GetPositionZ());
  
@@ -539,7 +537,7 @@ index 9c71841..eed60e6 100644
  }
  
  void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recv_data)
-@@ -355,6 +751,12 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recv_data)
+@@ -355,6 +748,12 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recv_data)
      // Save movement flags
      GetPlayer()->SetUnitMovementFlags(movementInfo.GetMovementFlags());
  
@@ -552,7 +550,7 @@ index 9c71841..eed60e6 100644
      // client ACK send one packet for mounted/run case and need skip all except last from its
      // in other cases anti-cheat check can be fail in false case
      UnitMoveType move_type;
-@@ -405,6 +807,12 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recv_data)
+@@ -405,6 +804,12 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recv_data)
          sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is " UI64FMTD " and should be " UI64FMTD, guid, _player->m_mover->GetGUID());
          GetPlayer()->SetMover(GetPlayer());
      }
@@ -565,7 +563,7 @@ index 9c71841..eed60e6 100644
  }
  
  void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recv_data)
-@@ -422,6 +830,12 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recv_data)
+@@ -422,6 +827,12 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recv_data)
          return;
  
      GetPlayer()->m_movementInfo = mi;
@@ -578,7 +576,7 @@ index 9c71841..eed60e6 100644
  }
  
  void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
-@@ -432,6 +846,12 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
+@@ -432,6 +843,12 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
      data << uint64(GetPlayer()->GetGUID());
  
      GetPlayer()->SendMessageToSet(&data, false);
@@ -591,7 +589,7 @@ index 9c71841..eed60e6 100644
  }
  
  void WorldSession::HandleMoveKnockBackAck(WorldPacket& recv_data)
-@@ -453,6 +873,12 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recv_data)
+@@ -453,6 +870,12 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recv_data)
  
      // Save movement flags
      GetPlayer()->SetUnitMovementFlags(movementInfo.GetMovementFlags());
@@ -604,7 +602,7 @@ index 9c71841..eed60e6 100644
  }
  
  void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
-@@ -469,6 +895,18 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
+@@ -469,6 +892,18 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
      recv_data.read_skip<uint32>();                          // unk2
  
      GetPlayer()->SetUnitMovementFlags(movementInfo.GetMovementFlags());
@@ -623,7 +621,7 @@ index 9c71841..eed60e6 100644
  }
  
  void WorldSession::HandleMoveHoverAck(WorldPacket& recv_data)
-@@ -484,6 +922,12 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recv_data)
+@@ -484,6 +919,12 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recv_data)
      recv_data >> movementInfo;
  
      recv_data.read_skip<uint32>();                          // unk2
@@ -636,7 +634,7 @@ index 9c71841..eed60e6 100644
  }
  
  void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recv_data)
-@@ -499,6 +943,12 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recv_data)
+@@ -499,6 +940,12 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recv_data)
      recv_data >> movementInfo;
      
      recv_data.read_skip<uint32>();                          // unk2
@@ -649,7 +647,7 @@ index 9c71841..eed60e6 100644
  }
  
  void WorldSession::HandleSummonResponseOpcode(WorldPacket& recv_data)
-@@ -512,5 +962,11 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recv_data)
+@@ -512,5 +959,11 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recv_data)
      recv_data >> agree;
  
      GetPlayer()->SummonIfPossible(agree);
@@ -662,7 +660,7 @@ index 9c71841..eed60e6 100644
  }
  
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index e78a935..ce0fdf6 100644
+index 35e85fa..9dcf97c 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -370,6 +370,23 @@ Player::Player (WorldSession *session): Unit()

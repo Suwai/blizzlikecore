@@ -1,4 +1,4 @@
-UPDATE `version` SET `db_version` = 'BDB_20130810';
+UPDATE `version` SET `db_version` = 'BDB_20130815';
 
 -- Update
 -- old `equipment_id` = '0' `mechanic_immune_mask` = '619659263', `flags_extra` = '2'
@@ -11,7 +11,7 @@ UPDATE `creature_template` SET `equipment_id` = '2088', `mechanic_immune_mask` =
 -- Thaladred the Darkener
 UPDATE `creature_template` SET `equipment_id` = '2091', `mechanic_immune_mask` = '619659263', `flags_extra` = '5308416' WHERE `entry` = '20064';
 -- Kael'thas Sunstrider
-UPDATE `creature_template` SET `equipment_id` = '0', `mechanic_immune_mask` = '617299963', `flags_extra` = '4259841' WHERE `entry` = '19622';
+UPDATE `creature_template` SET `equipment_id` = '0', `mechanic_immune_mask` = '617299803', `flags_extra` = '4259841' WHERE `entry` = '19622';
 
 
 -- Al'ar Phoenix God Fix

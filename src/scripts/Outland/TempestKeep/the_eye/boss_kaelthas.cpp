@@ -4,9 +4,9 @@
  */
 
 /* ScriptData
-Name: boss_Kaelthas
-Complete(%): 60
-Comment: Mind Control, Reset Event if Weapons despawn/reset
+Name: boss_kaelthas
+Complete(%): 80
+Comment:
 Category: Tempest Keep, The Eye
 EndScriptData */
 
@@ -91,7 +91,7 @@ EndScriptData */
 #define SPELL_BELLOWING_ROAR              40636
 
 //Grand Astromancer Capernian spells
-#define CAPERNIAN_DISTANCE                20                //she casts away from the target
+#define CAPERNIAN_DISTANCE                20     //she casts away from the target
 #define SPELL_CAPERNIAN_FIREBALL          36971
 #define SPELL_CONFLAGRATION               37018
 #define SPELL_ARCANE_EXPLOSION            36970
@@ -119,21 +119,21 @@ EndScriptData */
 //weapon id + position
 float KaelthasWeapons[7][5] =
 {
-    {21270, 794.38f, 15, 48.72f, 2.9f},                        //[Cosmic Infuser]
-    {21269, 785.47f, 12.12f, 48.72f, 3.14f},                    //[Devastation]
-    {21271, 781.25f, 4.39f, 48.72f, 3.14f},                     //[Infinity Blade]
-    {21273, 777.38f, -0.81f, 48.72f, 3.06f},                    //[Phaseshift Bulwark]
-    {21274, 781.48f, -6.08f, 48.72f, 3.9f},                     //[Staff of Disintegration]
-    {21272, 785.42f, -13.59f, 48.72f, 3.4f},                    //[Warp Slicer]
-    {21268, 793.06f, -16.61f, 48.72f, 3.10f}                    //[Netherstrand Longbow]
+    {21270, 794.38f, 15, 48.72f, 2.9f},       //[Cosmic Infuser]
+    {21269, 785.47f, 12.12f, 48.72f, 3.14f},  //[Devastation]
+    {21271, 781.25f, 4.39f, 48.72f, 3.14f},   //[Infinity Blade]
+    {21273, 777.38f, -0.81f, 48.72f, 3.06f},  //[Phaseshift Bulwark]
+    {21274, 781.48f, -6.08f, 48.72f, 3.9f},   //[Staff of Disintegration]
+    {21272, 785.42f, -13.59f, 48.72f, 3.4f},  //[Warp Slicer]
+    {21268, 793.06f, -16.61f, 48.72f, 3.10f}  //[Netherstrand Longbow]
 };
 
 #define GRAVITY_X 795.0f
 #define GRAVITY_Y 0.0f
 #define GRAVITY_Z 70.0f
 
-#define TIME_PHASE_2_3      120000
-#define TIME_PHASE_3_4      120000
+#define TIME_PHASE_2_3      125000 // Phase 2 ends approximately 2 minutes and 5 seconds
+#define TIME_PHASE_3_4      180000 // Phase 3 ends approximately 3 minutes
 
 #define KAEL_VISIBLE_RANGE  50.0f
 #define ROOM_BASE_Z 49.0f
@@ -704,7 +704,13 @@ struct boss_kaelthasAI : public ScriptedAI
                         Phase = 3;
                         PhaseSubphase = 0;
                     } else Phase_Timer -= diff;
-                    //FIXME: missing Resetcheck
+                    // Resetcheck TIME_PHASE_2_3
+                    bool weaponalive = false;
+                    for (uint32 i = 0; i < 7; ++i)
+                        if ((((Creature*)(Unit::GetUnit((*me), WeaponGuid[i])))->GetHealth()) > 0)
+                            weaponalive = true;
+                    if (!weaponalive)
+                        Phase_Timer = 0;
                 }
             }break;
 
@@ -746,6 +752,13 @@ struct boss_kaelthasAI : public ScriptedAI
                     }
                     Phase_Timer = 30000;
                 } else Phase_Timer -= diff;
+                // Resetcheck TIME_PHASE_3_4
+                bool advisoralive = false;
+                for (uint32 i = 0; i < 4; ++i)
+                    if ((((Creature*)(Unit::GetUnit((*me), AdvisorGuid[i])))->GetHealth()) > 0)
+                        advisoralive = true;
+                if (!advisoralive)
+                    Phase_Timer = 0;
             }
             break;
 

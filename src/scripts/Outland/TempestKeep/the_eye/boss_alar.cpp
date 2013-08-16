@@ -13,6 +13,9 @@ EndScriptData */
 #include "ScriptPCH.h"
 #include "the_eye.h"
 
+#define ASHTONGUE_RUSE                39527
+#define QUEST_RUSEOFTHEASHTONGUE      10946
+
 enum Spells
 {
     SPELL_FLAME_BUFFET           = 34121, // Flame Buffet - every 1, 5 secs in phase 1 if there is no victim in melee range and after Dive Bomb in phase 2 with same conditions
@@ -39,7 +42,7 @@ static float waypoint[6][3] =
     {388.18f, -32.85f, 25.18f},
     {340.29f, -60.19f, 22.72f},
     {332.0f, 0.01f, 39.0f},
-    {331.0f, 0.01f, 3.39f}
+    {331.0f, 0.01f, -2.59f}
 };
 
 enum WaitEventType
@@ -89,7 +92,7 @@ struct boss_alarAI : public ScriptedAI
 
     void Reset()
     {
-        if (pInstance)
+        if (pInstance && pInstance->GetData(DATA_ALAREVENT) != 4)
             pInstance->SetData(DATA_ALAREVENT, NOT_STARTED);
 
         Berserk_Timer = 1200000;
@@ -126,6 +129,14 @@ struct boss_alarAI : public ScriptedAI
     {
         if (pInstance)
             pInstance->SetData(DATA_ALAREVENT, DONE);
+
+        Map::PlayerList const &PlayerList = ((InstanceMap*)me->GetMap())->GetPlayers();
+        for(Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+        {
+            Player* i_pl = i->getSource();
+            if(i_pl && i_pl->HasAura(ASHTONGUE_RUSE,0) && i_pl->GetQuestStatus(QUEST_RUSEOFTHEASHTONGUE) == QUEST_STATUS_INCOMPLETE)
+                i_pl->AreaExploredOrEventHappens(QUEST_RUSEOFTHEASHTONGUE);
+        }
     }
 
     void JustSummoned(Creature* summon)
@@ -139,11 +150,11 @@ struct boss_alarAI : public ScriptedAI
 
     void DamageTaken(Unit* /*pKiller*/, uint32 &damage)
     {
-        if (damage >= me->GetHealth() && Phase1)
+        if (damage >= me->GetHealth())
         {
-            damage = 0;
-            if (!WaitEvent)
+            if (!WaitEvent && Phase1)
             {
+                damage = 0;
                 WaitEvent = WE_DIE;
                 WaitTimer = 0;
                 me->SetHealth(0);
@@ -153,9 +164,12 @@ struct boss_alarAI : public ScriptedAI
                 me->AttackStop();
                 me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
                 me->SetSpeed(MOVE_RUN, 5.0f);
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MovePoint(0, waypoint[5][0], waypoint[5][1], waypoint[5][2]);
+                ForceMove = true;
+                ForceTimer = 0;
+                cur_wp = 5;
             }
+            else
+                DoTeleportTo(331.0f, 0.01f, -2.59f);
         }
     }
 
@@ -417,14 +431,18 @@ struct mob_ember_of_alarAI : public ScriptedAI
     mob_ember_of_alarAI(Creature* c) : ScriptedAI(c)
     {
         pInstance = c->GetInstanceData();
-        me->SetUnitMovementFlags(MOVEFLAG_LEVITATING);
-        me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
     }
 
     ScriptedInstance* pInstance;
     bool toDie;
 
-    void Reset() {toDie = false;}
+    void Reset()
+    {
+        me->SetUnitMovementFlags(MOVEFLAG_LEVITATING);
+        me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
+        toDie = false;
+    }
+
     void Aggro(Unit* /*who*/) {DoZoneInCombat();}
     void EnterEvadeMode() {me->setDeathState(JUST_DIED);}
 
@@ -450,21 +468,16 @@ struct mob_ember_of_alarAI : public ScriptedAI
             toDie = true;
         }
     }
-
     void UpdateAI(const uint32 /*diff*/)
     {
         if (!UpdateVictim())
             return;
 
         if (toDie)
-        {
             me->DealDamage(me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-            //me->SetVisibility(VISIBILITY_OFF);
-        }
-
-        DoMeleeAttackIfReady();
+        else
+            DoMeleeAttackIfReady();
     }
-
 };
 
 CreatureAI* GetAI_mob_ember_of_alar(Creature* pCreature)
