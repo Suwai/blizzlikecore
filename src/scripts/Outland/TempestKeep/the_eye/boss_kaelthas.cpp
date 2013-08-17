@@ -14,129 +14,140 @@ EndScriptData */
 #include "the_eye.h"
 #include "WorldPacket.h"
 
- //kael'thas Speech
-#define SAY_INTRO                           -1550016
-#define SAY_INTRO_CAPERNIAN                 -1550017
-#define SAY_INTRO_TELONICUS                 -1550018
-#define SAY_INTRO_THALADRED                 -1550019
-#define SAY_INTRO_SANGUINAR                 -1550020
-#define SAY_PHASE2_WEAPON                   -1550021
-#define SAY_PHASE3_ADVANCE                  -1550022
-#define SAY_PHASE4_INTRO2                   -1550023
-#define SAY_PHASE5_NUTS                     -1550024
-#define SAY_SLAY1                           -1550025
-#define SAY_SLAY2                           -1550026
-#define SAY_SLAY3                           -1550027
-#define SAY_MINDCONTROL1                    -1550028
-#define SAY_MINDCONTROL2                    -1550029
-#define SAY_GRAVITYLAPSE1                   -1550030
-#define SAY_GRAVITYLAPSE2                   -1550031
-#define SAY_SUMMON_PHOENIX1                 -1550032
-#define SAY_SUMMON_PHOENIX2                 -1550033
-#define SAY_DEATH                           -1550034
+#define TIME_PHASE_2_3      125000 // Phase 2 ends approximately 2 minutes and 5 seconds
+#define TIME_PHASE_3_4      180000 // Phase 3 ends approximately 3 minutes
 
-//Thaladred the Darkener speech
-#define SAY_THALADRED_AGGRO                 -1550035
-#define SAY_THALADRED_DEATH                 -1550036
-#define EMOTE_THALADRED_GAZE                -1550037
+enum Yells
+{
+    //kael'thas Speech
+    SAY_INTRO                         = -1550016,
+    SAY_INTRO_CAPERNIAN               = -1550017,
+    SAY_INTRO_TELONICUS               = -1550018,
+    SAY_INTRO_THALADRED               = -1550019,
+    SAY_INTRO_SANGUINAR               = -1550020,
+    SAY_PHASE2_WEAPON                 = -1550021,
+    SAY_PHASE3_ADVANCE                = -1550022,
+    SAY_PHASE4_INTRO2                 = -1550023,
+    SAY_PHASE5_NUTS                   = -1550024,
+    SAY_SLAY1                         = -1550025,
+    SAY_SLAY2                         = -1550026,
+    SAY_SLAY3                         = -1550027,
+    SAY_MINDCONTROL1                  = -1550028,
+    SAY_MINDCONTROL2                  = -1550029,
+    SAY_GRAVITYLAPSE1                 = -1550030,
+    SAY_GRAVITYLAPSE2                 = -1550031,
+    SAY_SUMMON_PHOENIX1               = -1550032,
+    SAY_SUMMON_PHOENIX2               = -1550033,
+    SAY_DEATH                         = -1550034,
 
-//Lord Sanguinar speech
-#define SAY_SANGUINAR_AGGRO                 -1550038
-#define SAY_SANGUINAR_DEATH                 -1550039
+    //Thaladred the Darkener speech
+    SAY_THALADRED_AGGRO               = -1550035,
+    SAY_THALADRED_DEATH               = -1550036,
+    EMOTE_THALADRED_GAZE              = -1550037,
 
-//Grand Astromancer Capernian speech
-#define SAY_CAPERNIAN_AGGRO                 -1550040
-#define SAY_CAPERNIAN_DEATH                 -1550041
+    //Lord Sanguinar speech
+    SAY_SANGUINAR_AGGRO               = -1550038,
+    SAY_SANGUINAR_DEATH               = -1550039,
 
-//Master Engineer Telonicus speech
-#define SAY_TELONICUS_AGGRO                 -1550042
-#define SAY_TELONICUS_DEATH                 -1550043
+    //Grand Astromancer Capernian speech
+    SAY_CAPERNIAN_AGGRO               = -1550040,
+    SAY_CAPERNIAN_DEATH               = -1550041,
 
-//Phase 2 spells (Not used)
-#define SPELL_SUMMON_WEAPONS              36976
-#define SPELL_SUMMON_WEAPONA              36958
-#define SPELL_SUMMON_WEAPONB              36959
-#define SPELL_SUMMON_WEAPONC              36960
-#define SPELL_SUMMON_WEAPOND              36961
-#define SPELL_SUMMON_WEAPONE              36962
-#define SPELL_SUMMON_WEAPONF              36963
-#define SPELL_SUMMON_WEAPONG              36964
-#define SPELL_RES_VISUAL                  24171
-#define SPELL_WEAPON_SPAWN                41236
+    //Master Engineer Telonicus speech
+    SAY_TELONICUS_AGGRO               = -1550042,
+    SAY_TELONICUS_DEATH               = -1550043
+};
 
-//Phase 4 spells
-#define SPELL_FIREBALL                    36805
-#define SPELL_PYROBLAST                   36819
-#define SPELL_FLAME_STRIKE                36735
-#define SPELL_FLAME_STRIKE_VIS            36730
-#define SPELL_FLAME_STRIKE_DMG            36731
-#define SPELL_ARCANE_DISRUPTION           36834
-#define SPELL_SHOCK_BARRIER               36815
-#define SPELL_SUMMON_PHOENIX              36723
-#define SPELL_MIND_CONTROL                32830
+enum Spells
+{
+    //Phase 2 spells (Not used)
+    SPELL_SUMMON_WEAPONS              = 36976,
+    SPELL_SUMMON_WEAPONA              = 36958,
+    SPELL_SUMMON_WEAPONB              = 36959,
+    SPELL_SUMMON_WEAPONC              = 36960,
+    SPELL_SUMMON_WEAPOND              = 36961,
+    SPELL_SUMMON_WEAPONE              = 36962,
+    SPELL_SUMMON_WEAPONF              = 36963,
+    SPELL_SUMMON_WEAPONG              = 36964,
+    SPELL_RES_VISUAL                  = 24171,
+    SPELL_WEAPON_SPAWN                = 41236,
 
-//Phase 5 spells
-#define SPELL_EXPLODE                     36092
-#define SPELL_FULLPOWER                   36187
-#define SPELL_KNOCKBACK                   11027
-#define SPELL_GRAVITY_LAPSE               34480
-#define SPELL_GRAVITY_LAPSE_AURA          39432
-#define SPELL_NETHER_BEAM                 35873
+    //Phase 4 spells
+    SPELL_FIREBALL                    = 36805,
+    SPELL_PYROBLAST                   = 36819,
+    SPELL_FLAME_STRIKE                = 36735,
+    SPELL_FLAME_STRIKE_VIS            = 36730,
+    SPELL_FLAME_STRIKE_DMG            = 36731,
+    SPELL_ARCANE_DISRUPTION           = 36834,
+    SPELL_SHOCK_BARRIER               = 36815,
+    SPELL_SUMMON_PHOENIX              = 36723,
+    SPELL_MIND_CONTROL                = 32830,
 
-//Thaladred the Darkener spells
-#define SPELL_PSYCHIC_BLOW                10689
-#define SPELL_SILENCE                     30225
+    //Phase 5 spells
+    SPELL_EXPLODE                     = 36092,
+    SPELL_FULLPOWER                   = 36187,
+    SPELL_KNOCKBACK                   = 11027,
+    SPELL_GRAVITY_LAPSE               = 34480,
+    SPELL_GRAVITY_LAPSE_AURA          = 39432,
+    SPELL_NETHER_BEAM                 = 35873,
 
-//Lord Sanguinar spells
-#define SPELL_BELLOWING_ROAR              40636
+    //Thaladred the Darkener spells
+    SPELL_PSYCHIC_BLOW                = 10689,
+    SPELL_SILENCE                     = 30225,
 
-//Grand Astromancer Capernian spells
-#define CAPERNIAN_DISTANCE                20     //she casts away from the target
-#define SPELL_CAPERNIAN_FIREBALL          36971
-#define SPELL_CONFLAGRATION               37018
-#define SPELL_ARCANE_EXPLOSION            36970
+    //Lord Sanguinar spells
+    SPELL_BELLOWING_ROAR              = 40636,
 
-//Master Engineer Telonicus spells
-#define SPELL_BOMB                        37036
-#define SPELL_REMOTE_TOY                  37027
+    //Grand Astromancer Capernian spells
+    SPELL_CAPERNIAN_FIREBALL          = 36971,
+    SPELL_CONFLAGRATION               = 37018,
+    SPELL_ARCANE_EXPLOSION            = 36970,
 
-//Nether Vapor spell
-#define SPELL_NETHER_VAPOR                35859
+    //Master Engineer Telonicus spells
+    SPELL_BOMB                        = 37036,
+    SPELL_REMOTE_TOY                  = 37027,
 
-//Phoenix spell
-#define SPELL_BURN                          36720
-#define SPELL_EMBER_BLAST                   34341
-#define SPELL_REBIRTH                       41587
+    //Nether Vapor spell
+    SPELL_NETHER_VAPOR                = 35859,
 
-//Creature IDs
-#define PHOENIX                           21362
-#define PHOENIX_EGG                       21364
+    //Phoenix spell
+    SPELL_BURN                        = 36720,
+    SPELL_EMBER_BLAST                 = 34341,
+    SPELL_REBIRTH                     = 41587
+};
 
-//Phoenix egg and phoenix model
-#define PHOENIX_MODEL           19682
-#define PHOENIX_EGG_MODEL       20245
+enum Creatures
+{
+    //Creature IDs
+    PHOENIX                           = 21362,
+    PHOENIX_EGG                       = 21364
+};
+
+enum Models
+{
+    //Phoenix egg and phoenix model
+    PHOENIX_MODEL                     = 19682,
+    PHOENIX_EGG_MODEL                 = 20245
+};
+
+const float GRAVITY_X                 = 795.0f;
+const float GRAVITY_Y                 = 0.0f;
+const float GRAVITY_Z                 = 70.0f;
+const float KAEL_VISIBLE_RANGE        = 50.0f;
+const float ROOM_BASE_Z               = 49.0f;
+const float CAPERNIAN_DISTANCE        = 20.0f; //she casts away from the target
 
 //weapon id + position
 float KaelthasWeapons[7][5] =
 {
-    {21270, 794.38f, 15, 48.72f, 2.9f},       //[Cosmic Infuser]
-    {21269, 785.47f, 12.12f, 48.72f, 3.14f},  //[Devastation]
-    {21271, 781.25f, 4.39f, 48.72f, 3.14f},   //[Infinity Blade]
-    {21273, 777.38f, -0.81f, 48.72f, 3.06f},  //[Phaseshift Bulwark]
-    {21274, 781.48f, -6.08f, 48.72f, 3.9f},   //[Staff of Disintegration]
-    {21272, 785.42f, -13.59f, 48.72f, 3.4f},  //[Warp Slicer]
-    {21268, 793.06f, -16.61f, 48.72f, 3.10f}  //[Netherstrand Longbow]
+    {21270, 794.38f, 15, 48.72f, 2.9f},        //[Cosmic Infuser]
+    {21269, 785.47f, 12.12f, 48.72f, 3.14f},   //[Devastation]
+    {21271, 781.25f, 4.39f, 48.72f, 3.14f},    //[Infinity Blade]
+    {21273, 777.38f, -0.81f, 48.72f, 3.06f},   //[Phaseshift Bulwark]
+    {21274, 781.48f, -6.08f, 48.72f, 3.9f},    //[Staff of Disintegration]
+    {21272, 785.42f, -13.59f, 48.72f, 3.4f},   //[Warp Slicer]
+    {21268, 793.06f, -16.61f, 48.72f, 3.10f}   //[Netherstrand Longbow]
 };
-
-#define GRAVITY_X 795.0f
-#define GRAVITY_Y 0.0f
-#define GRAVITY_Z 70.0f
-
-#define TIME_PHASE_2_3      125000 // Phase 2 ends approximately 2 minutes and 5 seconds
-#define TIME_PHASE_3_4      180000 // Phase 3 ends approximately 3 minutes
-
-#define KAEL_VISIBLE_RANGE  50.0f
-#define ROOM_BASE_Z 49.0f
 
 //Base AI for Advisors
 struct advisorbase_ai : public ScriptedAI
@@ -705,12 +716,10 @@ struct boss_kaelthasAI : public ScriptedAI
                         PhaseSubphase = 0;
                     } else Phase_Timer -= diff;
                     // Resetcheck TIME_PHASE_2_3
-                    bool weaponalive = false;
-                    for (uint32 i = 0; i < 7; ++i)
-                        if ((((Creature*)(Unit::GetUnit((*me), WeaponGuid[i])))->GetHealth()) > 0)
-                            weaponalive = true;
-                    if (!weaponalive)
-                        Phase_Timer = 0;
+                    for (uint8 i = 0; i < 7; ++i)
+                        if (((Creature*)(Unit::GetUnit((*me), WeaponGuid[i])))->GetHealth())
+                            break;
+                        else if (i > 5) Phase_Timer = 0;
                 }
             }break;
 
@@ -753,12 +762,10 @@ struct boss_kaelthasAI : public ScriptedAI
                     Phase_Timer = 30000;
                 } else Phase_Timer -= diff;
                 // Resetcheck TIME_PHASE_3_4
-                bool advisoralive = false;
-                for (uint32 i = 0; i < 4; ++i)
-                    if ((((Creature*)(Unit::GetUnit((*me), AdvisorGuid[i])))->GetHealth()) > 0)
-                        advisoralive = true;
-                if (!advisoralive)
-                    Phase_Timer = 0;
+                for (uint8 i = 0; i < 4; ++i)
+                    if (((Creature*)(Unit::GetUnit((*me), AdvisorGuid[i])))->GetHealth())
+                        break;
+                    else if (i > 2) Phase_Timer = 0;
             }
             break;
 
