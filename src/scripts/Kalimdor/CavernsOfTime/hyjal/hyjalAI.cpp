@@ -631,7 +631,7 @@ void hyjalAI::Talk(uint32 id)
 
 void hyjalAI::UpdateWorldState(uint32 id, uint32 state)
 {
-    Map * map = me->GetMap();
+    Map* map = me->GetMap();
 
     if (!map->IsDungeon())
         return;

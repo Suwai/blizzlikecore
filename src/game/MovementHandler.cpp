@@ -53,7 +53,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     GetPlayer()->SetSemaphoreTeleportFar(false);
 
-    Map * oldMap = GetPlayer()->GetMap();
+    Map* oldMap = GetPlayer()->GetMap();
     ASSERT(oldMap);
     if (GetPlayer()->IsInWorld())
     {
@@ -62,10 +62,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     }
 
     // relocate the player to the teleport destination
-    Map * newMap = MapManager::Instance().CreateMap(loc.GetMapId(), GetPlayer(), 0);
-    // the CanEnter checks are done in TeleporTo but conditions may change
-    // while the player is in transit, for example the map may get full
-    if (!newMap || !newMap->CanEnter(GetPlayer()))
+    Map* newMap = MapManager::Instance().CreateMap(loc.GetMapId(), GetPlayer(), 0);
+    if (!newMap)
     {
         sLog.outError("Map %d could not be created for player %d, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUIDLow());
         GetPlayer()->TeleportToHomebind();

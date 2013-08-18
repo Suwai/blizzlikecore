@@ -449,7 +449,7 @@ void Transport::TeleportTransport(uint32 newMapid, float x, float y, float z)
     //player far teleport would try to create same instance, but we need it NOW for transport...
 
     ResetMap();
-    Map * newMap = MapManager::Instance().CreateMap(newMapid, this, 0);
+    Map* newMap = MapManager::Instance().CreateMap(newMapid, this, 0);
     SetMap(newMap);
     ASSERT(GetMap());
 

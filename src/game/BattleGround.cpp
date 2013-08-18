@@ -1544,7 +1544,7 @@ Creature* BattleGround::GetBGCreature(uint32 type)
 
 void BattleGround::SpawnBGObject(uint32 type, uint32 respawntime)
 {
-    Map * map = GetBgMap();
+    Map* map = GetBgMap();
     if (!map)
         return;
     if (respawntime == 0)
@@ -1573,7 +1573,7 @@ void BattleGround::SpawnBGObject(uint32 type, uint32 respawntime)
 
 Creature* BattleGround::AddCreature(uint32 entry, uint32 type, uint32 teamval, float x, float y, float z, float o, uint32 /*respawntime*/)
 {
-    Map * map = GetBgMap();
+    Map* map = GetBgMap();
     if (!map)
         return NULL;
 
@@ -1597,7 +1597,7 @@ Creature* BattleGround::AddCreature(uint32 entry, uint32 type, uint32 teamval, f
 /*
 void BattleGround::SpawnBGCreature(uint32 type, uint32 respawntime)
 {
-    Map * map = MapManager::Instance().FindMap(GetMapId(),GetInstanceId());
+    Map* map = MapManager::Instance().FindMap(GetMapId(),GetInstanceId());
     if (!map)
         return false;
 

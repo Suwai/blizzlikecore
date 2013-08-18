@@ -6538,7 +6538,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
         m_caster->GetClosePoint(fx, fy, fz, DEFAULT_WORLD_OBJECT_SIZE, dis);
     }
 
-    Map *cMap = m_caster->GetMap();
+    Map* cMap = m_caster->GetMap();
     if (goinfo->type == GAMEOBJECT_TYPE_FISHINGNODE)
     {
         LiquidData liqData;

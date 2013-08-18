@@ -708,10 +708,10 @@ class WorldObject : public Object, public WorldLocation
         // Low Level Packets
         void SendPlaySound(uint32 Sound, bool OnlySelf);
 
-        virtual void SetMap(Map * map);
+        virtual void SetMap(Map* map);
         virtual void ResetMap();
-        Map * GetMap() const { ASSERT(m_currMap); return m_currMap; }
-        Map * FindMap() const { return m_currMap; }
+        Map* GetMap() const { ASSERT(m_currMap); return m_currMap; }
+        Map* FindMap() const { return m_currMap; }
         //used to check all object's GetMap() calls when object is not in world!
 
         //this function should be removed in nearest time...
@@ -778,7 +778,7 @@ class WorldObject : public Object, public WorldLocation
         void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
 
     private:
-        Map * m_currMap;                                    //current object's Map location
+        Map* m_currMap;                                    //current object's Map location
 
         //uint32 m_mapId;                                     // object at map with map_id
         uint32 m_InstanceId;                                // in map copy with instance id

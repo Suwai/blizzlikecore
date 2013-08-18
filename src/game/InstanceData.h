@@ -79,7 +79,7 @@ class InstanceData : public ZoneScript
         explicit InstanceData(Map* map) : instance(map) {}
         virtual ~InstanceData() {}
 
-        Map *instance;
+        Map* instance;
 
         //On creation, NOT load.
         virtual void Initialize() {}

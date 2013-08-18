@@ -11823,7 +11823,7 @@ void Unit::Kill(Unit* pVictim, bool durabilityLoss)
         // Dungeon specific stuff, only applies to players killing creatures
         if (creature->GetInstanceId())
         {
-            Map *m = creature->GetMap();
+            Map* m = creature->GetMap();
             Player* creditedPlayer = GetCharmerOrOwnerPlayerOrPlayerItself();
             // TODO: do instance binding anyway if the charmer/owner is offline
 
@@ -11832,7 +11832,7 @@ void Unit::Kill(Unit* pVictim, bool durabilityLoss)
                 if (m->IsRaid() || m->IsHeroic())
                 {
                     if (creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
-                        ((InstanceMap *)m)->PermBindAllPlayers(creditedPlayer);
+                        ((InstanceMap*)m)->PermBindAllPlayers(creditedPlayer);
                 }
                 else
                 {

@@ -4,14 +4,17 @@
  */
 
 /* ScriptData
-Name: Boss_Magtheridon
-Complete(%): 60
+Name: boss_magtheridon
+Complete(%): 80
 Comment: In Development
 Category: Hellfire Citadel, Magtheridon's lair
 EndScriptData */
 
 #include "ScriptPCH.h"
 #include "magtheridons_lair.h"
+
+// count of clickers needed to interrupt blast nova
+#define CLICKERS_COUNT  5
 
 struct Yell
 {
@@ -25,55 +28,61 @@ static Yell RandomTaunt[]=
     {-1544002},
     {-1544003},
     {-1544004},
-    {-1544005},
+    {-1544005}
 };
 
-#define SAY_FREED                   -1544006
-#define SAY_AGGRO                   -1544007
-#define SAY_BANISH                  -1544008
-#define SAY_CHAMBER_DESTROY         -1544009
-#define SAY_PLAYER_KILLED           -1544010
-#define SAY_DEATH                   -1544011
+enum MagtheridonTexts
+{
+    SAY_FREED                  = -1544006,
+    SAY_AGGRO                  = -1544007,
+    SAY_BANISH                 = -1544008,
+    SAY_CHAMBER_DESTROY        = -1544009,
+    SAY_PLAYER_KILLED          = -1544010,
+    SAY_DEATH                  = -1544011
+};
 
-#define EMOTE_BERSERK               -1544012
-#define EMOTE_BLASTNOVA             -1544013
-#define EMOTE_BEGIN                 -1544014
+enum MagtheridonEmotes
+{
+    EMOTE_BERSERK              = -1544012,
+    EMOTE_BLASTNOVA            = -1544013,
+    EMOTE_BEGIN                = -1544014
+};
 
-#define MOB_MAGTHERIDON     17257
-#define MOB_ROOM            17516
-#define MOB_CHANNELLER      17256
-#define MOB_ABYSSAL         17454
+enum MagtheridonMobEntries
+{
+    MOB_MAGTHERIDON            = 17257,
+    MOB_ROOM                   = 17516,
+    MOB_CHANNELLER             = 17256,
+    MOB_ABYSSAL                = 17454,
+    MOB_MAGTHERIDON_TRIGGER    = 19703
+};
 
-#define SPELL_BLASTNOVA             30616
-#define SPELL_CLEAVE                30619
-#define SPELL_QUAKE_TRIGGER         30657 // must be cast with 30561 as the proc spell
-#define SPELL_QUAKE_KNOCKBACK       30571
-#define SPELL_BLAZE_TARGET          30541 // core bug, does not support target 7
-#define SPELL_BLAZE_TRAP            30542
-#define SPELL_DEBRIS_KNOCKDOWN      36449
-#define SPELL_DEBRIS_VISUAL         30632
-#define SPELL_DEBRIS_DAMAGE         30631 // core bug, does not support target 8
-#define SPELL_CAMERA_SHAKE          36455
-#define SPELL_BERSERK               27680
-
-#define SPELL_SHADOW_CAGE           30168
-#define SPELL_SHADOW_GRASP          30410
-#define SPELL_SHADOW_GRASP_VISUAL   30166
-#define SPELL_MIND_EXHAUSTION       44032   //Casted by the cubes when channeling ends
-
-#define SPELL_SHADOW_CAGE_C         30205
-#define SPELL_SHADOW_GRASP_C        30207
-
-#define SPELL_SHADOW_BOLT_VOLLEY    30510
-#define SPELL_DARK_MENDING          30528
-#define SPELL_FEAR                  30530 //39176
-#define SPELL_BURNING_ABYSSAL       30511
-#define SPELL_SOUL_TRANSFER         30531 // core bug, does not support target 7
-
-#define SPELL_FIRE_BLAST            37110
-
-// count of clickers needed to interrupt blast nova
-#define CLICKERS_COUNT              5
+enum Spells
+{
+    SPELL_BLASTNOVA            = 30616,
+    SPELL_CLEAVE               = 30619,
+    SPELL_QUAKE_TRIGGER        = 30657, //must be cast with 30561 as the proc spell
+    SPELL_QUAKE_KNOCKBACK      = 30571,
+    SPELL_BLAZE_TARGET         = 30541,
+    SPELL_BLAZE_TRAP           = 30542,
+    SPELL_DEBRIS_KNOCKDOWN     = 36449,
+    SPELL_DEBRIS_VISUAL        = 30632,
+    SPELL_DEBRIS_DAMAGE        = 30631, //core bug, does not support target 8
+    SPELL_CAMERA_SHAKE         = 36455,
+    SPELL_BERSERK              = 27680,
+    SPELL_SHADOW_CAGE          = 30168,
+    SPELL_SHADOW_GRASP         = 30410,
+    SPELL_SHADOW_GRASP_VISUAL  = 30166,
+    SPELL_MIND_EXHAUSTION      = 44032, //Casted by the cubes when channeling ends
+    SPELL_SHADOW_CAGE_C        = 30205,
+    SPELL_SHADOW_GRASP_C       = 30207,
+    SPELL_SHADOW_BOLT_VOLLEY   = 30510,
+    SPELL_DARK_MENDING         = 30528,
+    SPELL_FEAR                 = 30530, //39176
+    SPELL_BURNING_ABYSSAL      = 30511,
+    SPELL_SOUL_TRANSFER        = 30531, //core bug, does not support target 7
+    SPELL_FIRE_BLAST           = 37110,
+};
 
 typedef std::map<uint64, uint64> CubeMap;
 
@@ -187,6 +196,7 @@ struct boss_magtheridonAI : public ScriptedAI
     uint32 Cleave_Timer;
     uint32 BlastNova_Timer;
     uint32 Blaze_Timer;
+    uint32 Mob_Magtheridon;
     uint32 Debris_Timer;
     uint32 RandChat_Timer;
 
@@ -205,6 +215,7 @@ struct boss_magtheridonAI : public ScriptedAI
         Quake_Timer = 40000;
         Debris_Timer = 10000;
         Blaze_Timer = 10000+rand()%20000;
+        Mob_Magtheridon = 10000+rand()%20000;
         BlastNova_Timer = 60000;
         Cleave_Timer = 15000;
         RandChat_Timer = 90000;
@@ -241,7 +252,7 @@ struct boss_magtheridonAI : public ScriptedAI
     void NeedCheckCubeStatus()
     {
         uint32 ClickerNum = 0;
-        // now checking if every clicker has debuff from manticron(it is dispelable atm rev 6110 : S)
+        // now checking if every clicker has debuff from manticron
         // if not - apply mind exhaustion and delete from clicker's list
         for (CubeMap::iterator i = Cube.begin(); i != Cube.end(); ++i)
         {
@@ -262,7 +273,8 @@ struct boss_magtheridonAI : public ScriptedAI
         else if (ClickerNum < CLICKERS_COUNT && me->HasAura(SPELL_SHADOW_CAGE, 0))
             me->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE);
 
-        if (!ClickerNum) NeedCheckCube = false;
+        if (!ClickerNum)
+            NeedCheckCube = false;
     }
 
     void KilledUnit(Unit* /*victim*/)
@@ -354,7 +366,7 @@ struct boss_magtheridonAI : public ScriptedAI
             {
                 float x, y, z;
                 pTarget->GetPosition(x, y, z);
-                Creature* summon = me->SummonCreature(MOB_ABYSSAL, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                Creature* summon = me->SummonCreature(MOB_ABYSSAL, x, y, z, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
                 if (summon)
                 {
                     ((mob_abyssalAI*)summon->AI())->SetTrigger(2);
@@ -364,6 +376,15 @@ struct boss_magtheridonAI : public ScriptedAI
             }
             Blaze_Timer = 20000 + rand()%20000;
         } else Blaze_Timer -= diff;
+
+        if (Mob_Magtheridon <= diff)
+        {
+            if (Unit* pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0))
+            {
+                Creature* summon = me->SummonCreature(MOB_MAGTHERIDON_TRIGGER, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 7500);
+            }
+            Mob_Magtheridon = 20000 + rand()%20000;
+        } else Mob_Magtheridon -= diff;
 
         if (!Phase3 && me->GetHealth()*10 < me->GetMaxHealth()*3
             && !me->IsNonMeleeSpellCasted(false) // blast nova
@@ -401,7 +422,7 @@ struct mob_hellfire_channelerAI : public ScriptedAI
 {
     mob_hellfire_channelerAI(Creature* c) : ScriptedAI(c)
     {
-        pInstance =me->GetInstanceData();
+        pInstance = me->GetInstanceData();
     }
 
     ScriptedInstance* pInstance;
@@ -489,14 +510,51 @@ struct mob_hellfire_channelerAI : public ScriptedAI
     }
 };
 
-//Manticron Cube
-bool GOHello_go_Manticron_Cube(Player* player, GameObject* _GO)
+struct mob_magtheridon_triggerAI : public ScriptedAI
 {
-    ScriptedInstance* pInstance =_GO->GetInstanceData();
-    if (!pInstance) return true;
-    if (pInstance->GetData(DATA_MAGTHERIDON_EVENT) != IN_PROGRESS) return true;
-    Creature* Magtheridon =Unit::GetCreature(*_GO, pInstance->GetData64(DATA_MAGTHERIDON));
-    if (!Magtheridon || !Magtheridon->isAlive()) return true;
+    mob_magtheridon_triggerAI(Creature* c) : ScriptedAI(c)
+    {
+        pInstance = me->GetInstanceData();
+    }
+
+    ScriptedInstance* pInstance;
+
+    uint32 debrisTimer;
+
+    void JustRespawned()
+    {
+        me->CastSpell(me, SPELL_DEBRIS_VISUAL, true);
+        debrisTimer = 5000;
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if (debrisTimer)
+        {
+            if (debrisTimer <= diff)
+            {
+                me->CastSpell(me, SPELL_DEBRIS_DAMAGE, true);
+                debrisTimer = 0;
+            }
+            else
+                debrisTimer -= diff;
+        }
+    }
+};
+
+//Manticron Cube
+bool GOHello_go_Manticron_Cube(Player* player, GameObject* go)
+{
+    ScriptedInstance* pInstance = go->GetInstanceData();
+
+    if (!pInstance)
+        return true;
+
+    if (pInstance->GetData(DATA_MAGTHERIDON_EVENT) != IN_PROGRESS)
+        return true;
+    Creature* Magtheridon =Unit::GetCreature(*go, pInstance->GetData64(DATA_MAGTHERIDON));
+    if (!Magtheridon || !Magtheridon->isAlive())
+        return true;
 
     // if exhausted or already channeling return
     if (player->HasAura(SPELL_MIND_EXHAUSTION, 0) || player->HasAura(SPELL_SHADOW_GRASP, 1))
@@ -505,7 +563,7 @@ bool GOHello_go_Manticron_Cube(Player* player, GameObject* _GO)
     player->InterruptNonMeleeSpells(false);
     player->CastSpell(player, SPELL_SHADOW_GRASP, true);
     player->CastSpell(player, SPELL_SHADOW_GRASP_VISUAL, false);
-    ((boss_magtheridonAI*)Magtheridon->AI())->SetClicker(_GO->GetGUID(), player->GetGUID());
+    CAST_AI(boss_magtheridonAI, Magtheridon->AI())->SetClicker(go->GetGUID(), player->GetGUID());
     return true;
 }
 
@@ -522,6 +580,11 @@ CreatureAI* GetAI_mob_hellfire_channeler(Creature* pCreature)
 CreatureAI* GetAI_mob_abyssalAI(Creature* pCreature)
 {
     return new mob_abyssalAI(pCreature);
+}
+
+CreatureAI* GetAI_mob_magtheridon_triggerAI(Creature* pCreature)
+{
+    return new mob_magtheridon_triggerAI(pCreature);
 }
 
 void AddSC_boss_magtheridon()
@@ -547,5 +610,9 @@ void AddSC_boss_magtheridon()
     newscript->GetAI = &GetAI_mob_abyssalAI;
     newscript->RegisterSelf();
 
+    newscript = new Script;
+    newscript->Name = "mob_magtheridon_trigger";
+    newscript->GetAI = &GetAI_mob_magtheridon_triggerAI;
+    newscript->RegisterSelf();
 }
 

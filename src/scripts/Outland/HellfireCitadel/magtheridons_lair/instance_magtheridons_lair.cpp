@@ -4,7 +4,7 @@
  */
 
 /* ScriptData
-Name: Instance_Magtheridons_Lair
+Name: instance_magtheridons_lair
 Complete(%): 100
 Comment:
 Category: Hellfire Citadel, Magtheridon's lair
@@ -13,18 +13,21 @@ EndScriptData */
 #include "ScriptPCH.h"
 #include "magtheridons_lair.h"
 
-#define SPELL_SOUL_TRANSFER         30531 // core bug, does not support target 7
-#define SPELL_BLAZE_TARGET          30541 // core bug, does not support target 7
-
-#define CHAMBER_CENTER_X            -15.14f
-#define CHAMBER_CENTER_Y              1.8f
-#define CHAMBER_CENTER_Z             -0.4f
-
 #define ENCOUNTERS 2
+
+enum Spells
+{
+    SPELL_SOUL_TRANSFER        = 30531, // core bug, does not support target 7
+    SPELL_BLAZE_TARGET         = 30541, // core bug, does not support target 7
+};
+
+const float CHAMBER_CENTER_X           = -15.14f;
+const float CHAMBER_CENTER_Y           =   1.80f;
+const float CHAMBER_CENTER_Z           =  -0.40f;
 
 struct instance_magtheridons_lair : public ScriptedInstance
 {
-    instance_magtheridons_lair(Map *Map) : ScriptedInstance(Map)
+    instance_magtheridons_lair(Map* Map) : ScriptedInstance(Map)
     {
         Initialize();
     }

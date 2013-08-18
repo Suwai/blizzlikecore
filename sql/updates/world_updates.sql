@@ -1,4 +1,9 @@
-UPDATE `version` SET `db_version` = 'BDB_20130815';
+UPDATE `version` SET `db_version` = 'BDB_20130817';
+
+-- Update
+-- Mob Magtheridon
+UPDATE `creature_template` SET `ScriptName` = 'mob_magtheridon_trigger' WHERE `entry` = '19703';
+
 
 -- Update
 -- old `equipment_id` = '0' `mechanic_immune_mask` = '619659263', `flags_extra` = '2'
@@ -24,7 +29,9 @@ UPDATE `creature_template` SET `inhabitType` = '4' WHERE `entry` = '19551';
 
 
 -- Update spell_script_target
+REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (30631, 1, 17454);
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (36717, 1, 21761);
+
 
 
 -- Magtheridon

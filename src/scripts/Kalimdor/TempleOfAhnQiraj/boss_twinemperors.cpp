@@ -213,7 +213,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             float other_z = pOtherBoss->GetPositionZ();
             float other_o = pOtherBoss->GetOrientation();
 
-            Map *thismap = me->GetMap();
+            Map* thismap = me->GetMap();
             thismap->CreatureRelocation(pOtherBoss, me->GetPositionX(),
                 me->GetPositionY(),    me->GetPositionZ(), me->GetOrientation());
             thismap->CreatureRelocation(me, other_x, other_y, other_z, other_o);
