@@ -201,7 +201,7 @@ struct npc_grimstoneAI : public npc_escortAI
         case 5:
             if (pInstance)
             {
-                pInstance->SetData(TYPE_RING_OF_LAW,DONE);
+                pInstance->SetData(TYPE_RING_OF_LAW, DONE);
                 debug_log("BSCR: npc_grimstone: event reached end and set complete.");
             }
             break;
@@ -1208,7 +1208,7 @@ struct npc_rocknotAI : public npc_escortAI
 
                 //for later, this event(s) has alot more to it.
                 //optionally, DONE can trigger bar to go hostile.
-                pInstance->SetData(TYPE_BAR,DONE);
+                pInstance->SetData(TYPE_BAR, DONE);
 
                 BreakDoor_Timer = 0;
             } else BreakDoor_Timer -= diff;

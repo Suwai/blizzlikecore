@@ -4,8 +4,8 @@
  */
 
 /* ScriptData
-Name: Boss_Felblood_Kaelthas
-Complete(%): 80
+Name: boss_felblood_kaelthas
+Complete(%): 90
 Comment: Normal and Heroic Support. Issues: Arcane Spheres do not initially follow targets.
 Category: Magisters' Terrace
 EndScriptData */
@@ -53,6 +53,9 @@ EndScriptData */
 #define CREATURE_PHOENIX              24674
 #define CREATURE_PHOENIX_EGG          24675
 #define CREATURE_ARCANE_SPHERE        24708
+
+// Miscalenous
+#define SPELL_ESCAPE_TO_IOQD          46841
 
 /** Locations **/
 float KaelLocations[3][2]=
@@ -611,6 +614,18 @@ struct mob_arcane_sphereAI : public ScriptedAI
     }
 };
 
+bool GOUse_go_kael_orb(Player* player, GameObject* _GO)
+{
+    ScriptedInstance* pInstance = (ScriptedInstance*)_GO->GetInstanceData();
+    if (pInstance)
+    {
+        if(pInstance->GetData(DATA_KAELTHAS_EVENT) == 3)
+            player->TeleportTo(530, 12888.18, -6874.55, 9.06, 3.11);
+          //player->CastSpell(player, SPELL_ESCAPE_TO_IOQD, true);
+    }
+    return true;
+}
+
 CreatureAI* GetAI_boss_felblood_kaelthas(Creature* c)
 {
     return new boss_felblood_kaelthasAI(c);
@@ -663,5 +678,10 @@ void AddSC_boss_felblood_kaelthas()
     newscript = new Script;
     newscript->Name = "mob_felkael_flamestrike";
     newscript->GetAI = &GetAI_mob_felkael_flamestrike;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_kael_orb";
+    newscript->pGOHello = &GOUse_go_kael_orb;
     newscript->RegisterSelf();
 }

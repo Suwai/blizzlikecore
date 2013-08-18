@@ -295,7 +295,7 @@ struct instance_stratholme : public ScriptedInstance
                         }
                     }
 
-                    SetData(TYPE_BARON_RUN,DONE);
+                    SetData(TYPE_BARON_RUN, DONE);
                 }
             }
             if (data == DONE || data == NOT_STARTED)

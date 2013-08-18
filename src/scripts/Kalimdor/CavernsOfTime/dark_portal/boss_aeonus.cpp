@@ -75,8 +75,8 @@ struct boss_aeonusAI : public ScriptedAI
 
          if (pInstance)
          {
-             pInstance->SetData(TYPE_RIFT,DONE);
-             pInstance->SetData(TYPE_MEDIVH,DONE);//FIXME: later should be removed
+             pInstance->SetData(TYPE_RIFT, DONE);
+             pInstance->SetData(TYPE_MEDIVH, DONE);//FIXME: later should be removed
          }
     }
 
