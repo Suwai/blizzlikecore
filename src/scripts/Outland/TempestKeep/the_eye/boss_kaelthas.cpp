@@ -716,10 +716,11 @@ struct boss_kaelthasAI : public ScriptedAI
                         PhaseSubphase = 0;
                     } else Phase_Timer -= diff;
                     // Resetcheck TIME_PHASE_2_3
-                    for (uint8 i = 0; i < 7; ++i)
-                        if (((Creature*)(Unit::GetUnit((*me), WeaponGuid[i])))->GetHealth())
-                            break;
-                        else if (i > 5) Phase_Timer = 0;
+                    if (!(Phase_Timer%2000))
+                        for (uint8 i = 0; i < 7; ++i)
+                            if (((Creature*)(Unit::GetUnit((*me), WeaponGuid[i])))->GetHealth())
+                                break;
+                            else if (i > 5) Phase_Timer = 0;
                 }
             }break;
 
@@ -762,10 +763,11 @@ struct boss_kaelthasAI : public ScriptedAI
                     Phase_Timer = 30000;
                 } else Phase_Timer -= diff;
                 // Resetcheck TIME_PHASE_3_4
-                for (uint8 i = 0; i < 4; ++i)
-                    if (((Creature*)(Unit::GetUnit((*me), AdvisorGuid[i])))->GetHealth())
-                        break;
-                    else if (i > 2) Phase_Timer = 0;
+                if (!(Phase_Timer%2000))
+                    for (uint8 i = 0; i < 4; ++i)
+                        if (((Creature*)(Unit::GetUnit((*me), AdvisorGuid[i])))->GetHealth())
+                            break;
+                        else if (i > 2) Phase_Timer = 0;
             }
             break;
 

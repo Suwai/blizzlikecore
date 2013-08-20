@@ -13,9 +13,6 @@ EndScriptData */
 #include "ScriptPCH.h"
 #include "magtheridons_lair.h"
 
-// count of clickers needed to interrupt blast nova
-#define CLICKERS_COUNT  5
-
 struct Yell
 {
     int32 id;
@@ -83,8 +80,6 @@ enum Spells
     SPELL_SOUL_TRANSFER        = 30531, //core bug, does not support target 7
     SPELL_FIRE_BLAST           = 37110,
 };
-
-typedef std::map<uint64, uint64> CubeMap;
 
 struct mob_abyssalAI : public ScriptedAI
 {
@@ -187,8 +182,6 @@ struct boss_magtheridonAI : public ScriptedAI
         }
     }
 
-    CubeMap Cube;
-
     ScriptedInstance* pInstance;
 
     uint32 Berserk_Timer;
@@ -201,7 +194,6 @@ struct boss_magtheridonAI : public ScriptedAI
     uint32 RandChat_Timer;
 
     bool Phase3;
-    bool NeedCheckCube;
 
     void Reset()
     {
@@ -227,54 +219,6 @@ struct boss_magtheridonAI : public ScriptedAI
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
         me->addUnitState(UNIT_STAT_STUNNED);
         me->CastSpell(me, SPELL_SHADOW_CAGE_C, true);
-    }
-
-    void SetClicker(uint64 cubeGUID, uint64 clickerGUID)
-    {
-        // to avoid multiclicks from 1 cube
-        if (uint64 guid = Cube[cubeGUID])
-            DebuffClicker(Unit::GetUnit(*me, guid));
-        Cube[cubeGUID] = clickerGUID;
-        NeedCheckCube = true;
-    }
-
-    //function to interrupt channeling and debuff clicker with mind exh(used if second person clicks with same cube or after dispeling/ending shadow grasp DoT)
-    void DebuffClicker(Unit* clicker)
-    {
-        if (!clicker || !clicker->isAlive())
-            return;
-
-        clicker->RemoveAurasDueToSpell(SPELL_SHADOW_GRASP); // cannot interrupt triggered spells
-        clicker->InterruptNonMeleeSpells(false);
-        clicker->CastSpell(clicker, SPELL_MIND_EXHAUSTION, true);
-    }
-
-    void NeedCheckCubeStatus()
-    {
-        uint32 ClickerNum = 0;
-        // now checking if every clicker has debuff from manticron
-        // if not - apply mind exhaustion and delete from clicker's list
-        for (CubeMap::iterator i = Cube.begin(); i != Cube.end(); ++i)
-        {
-            Unit* clicker = Unit::GetUnit(*me, (*i).second);
-            if (!clicker || !clicker->HasAura(SPELL_SHADOW_GRASP, 1))
-            {
-                DebuffClicker(clicker);
-                (*i).second = 0;
-            } else ClickerNum++;
-        }
-
-        // if 5 clickers from other cubes apply shadow cage
-        if (ClickerNum >= CLICKERS_COUNT && !me->HasAura(SPELL_SHADOW_CAGE, 0))
-        {
-            DoScriptText(SAY_BANISH, me);
-            me->CastSpell(me, SPELL_SHADOW_CAGE, true);
-        }
-        else if (ClickerNum < CLICKERS_COUNT && me->HasAura(SPELL_SHADOW_CAGE, 0))
-            me->RemoveAurasDueToSpell(SPELL_SHADOW_CAGE);
-
-        if (!ClickerNum)
-            NeedCheckCube = false;
     }
 
     void KilledUnit(Unit* /*victim*/)
@@ -312,19 +256,16 @@ struct boss_magtheridonAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        if (!me->isInCombat())
+        if (!UpdateVictim())
         {
             if (RandChat_Timer <= diff)
             {
                 DoScriptText(RandomTaunt[rand()%6].id, me);
                 RandChat_Timer = 90000;
             } else RandChat_Timer -= diff;
-        }
 
-        if (!UpdateVictim())
             return;
-
-        if (NeedCheckCube) NeedCheckCubeStatus();
+        }
 
         if (Berserk_Timer <= diff)
         {
@@ -552,7 +493,7 @@ bool GOHello_go_Manticron_Cube(Player* player, GameObject* go)
 
     if (pInstance->GetData(DATA_MAGTHERIDON_EVENT) != IN_PROGRESS)
         return true;
-    Creature* Magtheridon =Unit::GetCreature(*go, pInstance->GetData64(DATA_MAGTHERIDON));
+    Creature* Magtheridon = Unit::GetCreature(*go, pInstance->GetData64(DATA_MAGTHERIDON));
     if (!Magtheridon || !Magtheridon->isAlive())
         return true;
 
@@ -560,10 +501,15 @@ bool GOHello_go_Manticron_Cube(Player* player, GameObject* go)
     if (player->HasAura(SPELL_MIND_EXHAUSTION, 0) || player->HasAura(SPELL_SHADOW_GRASP, 1))
         return true;
 
+    Unit * owner = go->GetOwner();
+
+    if (owner && owner->HasAura(SPELL_SHADOW_GRASP, 0))
+        owner->InterruptNonMeleeSpells(false);
+
+    go->SetOwnerGUID(player->GetGUID());
+
     player->InterruptNonMeleeSpells(false);
-    player->CastSpell(player, SPELL_SHADOW_GRASP, true);
-    player->CastSpell(player, SPELL_SHADOW_GRASP_VISUAL, false);
-    CAST_AI(boss_magtheridonAI, Magtheridon->AI())->SetClicker(go->GetGUID(), player->GetGUID());
+    player->CastSpell((Unit*)NULL, SPELL_SHADOW_GRASP, false);
     return true;
 }
 

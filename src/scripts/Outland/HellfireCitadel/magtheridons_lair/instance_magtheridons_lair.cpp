@@ -174,7 +174,14 @@ struct instance_magtheridons_lair : public ScriptedInstance
                         data = IN_PROGRESS;
                         break;
                     }
-                }break;
+                }
+                Creature* Magtheridon = instance->GetCreature(MagtheridonGUID);
+                if (data == DONE && Magtheridon && Magtheridon->isAlive())
+                {
+                    Magtheridon->clearUnitState(UNIT_STAT_STUNNED);
+                    Magtheridon->AI()->AttackStart(Magtheridon->SelectNearestTarget(999));
+                }
+                break;
             }
             Encounters[1] = data;
             break;
