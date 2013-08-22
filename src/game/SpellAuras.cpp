@@ -1637,7 +1637,7 @@ void Aura::TriggerSpell()
                     // Eye of Grillok
                     case 38495:
                     {
-                        m_target->CastSpell(m_target, 38530, true);
+                        caster->CastSpell((Unit*)NULL, 38530, true);
                         return;
                     }
                     // Absorb Eye of Grillok (Zezzak's Shard)
@@ -1648,9 +1648,11 @@ void Aura::TriggerSpell()
 
                         caster->CastSpell(caster, 38495, true);
 
-                        Creature* creatureTarget = m_target->ToCreature();
+                        Creature* creatureTarget = (Creature*)m_target;
 
-                        creatureTarget->ForcedDespawn();
+                        creatureTarget->setDeathState(JUST_DIED);
+                        creatureTarget->RemoveCorpse();
+                        creatureTarget->SetHealth(0);       // just for nice GM-mode view
                         return;
                     }
 //                    // Magic Sucker Device timer

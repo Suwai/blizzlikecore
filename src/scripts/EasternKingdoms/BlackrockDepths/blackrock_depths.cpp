@@ -1253,10 +1253,6 @@ bool ChooseReward_npc_rocknot(Player* /*pPlayer*/, Creature* pCreature, const Qu
     return true;
 }
 
-/*######
-##
-######*/
-
 void AddSC_blackrock_depths()
 {
     Script* newscript;
