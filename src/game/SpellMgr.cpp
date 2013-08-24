@@ -726,6 +726,10 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
                 case SPELL_AURA_GHOST:
                 case SPELL_AURA_PERIODIC_LEECH:
                 case SPELL_AURA_MOD_PACIFY_SILENCE:
+                    //       wisp costume                bat costume
+                    if (spellproto->Id == 24740 || spellproto->Id == 24732)
+                        return true;
+                    return false;
                 case SPELL_AURA_MOD_STALKED:
                 case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
                     return false;

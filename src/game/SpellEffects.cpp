@@ -5026,27 +5026,13 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
 
                     switch (urand(0, 6))
                     {
-                        case 0:
-                            spellId = unitTarget->getGender() == GENDER_MALE ? 24708 : 24709;
-                            break;
-                        case 1:
-                            spellId = unitTarget->getGender() == GENDER_MALE ? 24711 : 24710;
-                            break;
-                        case 2:
-                            spellId = unitTarget->getGender() == GENDER_MALE ? 24712 : 24713;
-                            break;
-                        case 3:
-                            spellId = 24723;
-                            break;
-                        case 4:
-                            spellId = 24732;
-                            break;
-                        case 5:
-                            spellId = unitTarget->getGender() == GENDER_MALE ? 24735 : 24736;
-                            break;
-                        case 6:
-                            spellId = 24740;
-                            break;
+                        case 0: spellId = 24717; break; // Pirate Costume
+                        case 1: spellId = 24741; break; // Wisp Costume
+                        case 2: spellId = 24724; break; // Skeleton Costume
+                        case 3: spellId = 24719; break; // Leper Gnome Costume
+                        case 4: spellId = 24718; break; // Ninja Costume
+                        case 5: spellId = 24737; break; // Ghost Costume
+                        case 6: spellId = 24733; break; // Bat Costume
                     }
 
                     m_caster->CastSpell(unitTarget, spellId, true);
