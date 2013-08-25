@@ -147,6 +147,11 @@ bool TargetedMovementGenerator<T>::_setTargetLocation(T &owner)
         // caster chase
         i_target->GetContactPoint(&owner, x, y, z, i_offset * urand(80, 95) * 0.01f);
     }
+    else if (owner.isInCombat())
+    {
+        // owner is in combat
+        i_target->GetClosePoint(x, y, z, (owner.GetObjectSize() - sWorld.getRate(RATE_TARGET_POS_RECALCULATION_RANGE)), i_offset, i_angle);
+    }
     else
     {
         // to at i_offset distance from target and i_angle from target facing
@@ -176,9 +181,7 @@ bool TargetedMovementGenerator<T>::_setTargetLocation(T &owner)
         bool forceDest = false;
         // generating paths to be able to reach thier target.
         if (owner.GetTypeId() == TYPEID_UNIT &&
-            (owner.hasUnitState(UNIT_STAT_FOLLOW) ||
-            owner.hasUnitState(UNIT_STAT_ATTACK_PLAYER) ||
-            owner.hasUnitState(UNIT_STAT_MELEE_ATTACKING)))
+            (owner.hasUnitState(UNIT_STAT_FOLLOW) || owner.isInCombat()))
             forceDest = true;
 
         bool newPathCalculated = true;

@@ -124,9 +124,10 @@ struct mob_ashtongue_channelerAI : public ScriptedAI
 
     void Reset()
     {
-        me->setActive(true);
         me->RemoveAurasDueToSpell(SPELL_SHADE_SOUL_CHANNEL);
+        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_channel = true;
+        me->setActive(true);
     }
 
     void JustDied(Unit* /*killer*/);
@@ -181,6 +182,8 @@ struct mob_ashtongue_defenderAI : public ScriptedAI
         m_debilStrikeTimer = 10000;
         m_shieldBashTimer = 1000;
         m_checkTimer = 10000;
+
+        me->setActive(true);
     }
 
     void EnterCombat(Unit* pWho)
@@ -274,6 +277,8 @@ struct mob_ashtongue_spiritbinderAI : public ScriptedAI
         m_spiritHealTimer = urand(7000, 10000);
         m_spiritMendTimer = urand(14000, 20000);
         m_checkTimer = 5000;
+
+        me->setActive(true);
     }
 
     void MoveInLineOfSight(Unit* pWho)
@@ -414,6 +419,8 @@ struct mob_ashtongue_elementalistAI : public ScriptedAI
         m_rainofFireTimer  = urand(5000, 18000);
         m_lightningBoltTimer = urand(2000, 4000);
         m_checkTimer = 5000;
+
+        me->setActive(true);
     }
 
     void MoveInLineOfSight(Unit* pWho)
@@ -504,6 +511,7 @@ struct mob_ashtongue_rogueAI : public ScriptedAI
         m_eviscerateTimer = urand(2000, 7000);
         m_checkTimer = 5000;
 
+        me->setActive(true);
         DoCast(me, SPELL_DUAL_WIELD);
     }
 
@@ -601,9 +609,8 @@ struct mob_ashtongue_sorcererAI : public ScriptedAI
             Creature* Shade = Unit::GetCreature((*me), ShadeGUID);
             if (Shade && Shade->isAlive() && me->isAlive())
             {
-                if (me->IsWithinDist(Shade, 20,false))
+                if (me->IsWithinDist(Shade, 20, false))
                 {
-                    me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MoveIdle();
                     DoCast(Shade, SPELL_SHADE_SOUL_CHANNEL, true);
                     DoCast(Shade, SPELL_SHADE_SOUL_CHANNEL_2, true);
@@ -622,7 +629,7 @@ struct boss_shade_of_akamaAI : public ScriptedAI
     {
         pInstance = c->GetInstanceData();
         AkamaGUID = pInstance ? pInstance->GetData64(DATA_AKAMA_SHADE) : 0;
-        me->setActive(true);//if view distance is too low
+        me->setActive(true); //if view distance is too low
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
         me->ApplySpellImmune(0, IMMUNITY_EFFECT,SPELL_EFFECT_ATTACK_ME, true);
     }
@@ -666,9 +673,8 @@ struct boss_shade_of_akamaAI : public ScriptedAI
             {
                 Akama->Respawn();//respawn akama if dead
                 Akama->AI()->EnterEvadeMode();
+                Akama->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);//turn gossip on so players can restart the event
             }
-
-            Akama->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);//turn gossip on so players can restart the event
         }
         SorcererCount = 0;
         DeathCount = 0;
@@ -682,7 +688,7 @@ struct boss_shade_of_akamaAI : public ScriptedAI
         HasKilledAkama = false;
 
         me->SetVisibility(VISIBILITY_ON);
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STUN);
 
         if (pInstance && me->isAlive())
@@ -732,7 +738,6 @@ struct boss_shade_of_akamaAI : public ScriptedAI
                         {
                             Channeler->CastSpell(me, SPELL_SHADE_SOUL_CHANNEL, true);
                             Channeler->CastSpell(me, SPELL_SHADE_SOUL_CHANNEL_2, true);
-                            Channeler->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             GridSearcherSucceeded = true;
                         }
                     }
@@ -745,7 +750,8 @@ struct boss_shade_of_akamaAI : public ScriptedAI
 
     void AttackStart(Unit* who)
     {
-        if (!who || IsBanished) return;
+        if (!who || IsBanished)
+            return;
 
         if (who->isTargetableForAttack() && who != me)
             DoStartMovement(who);
@@ -813,7 +819,7 @@ struct boss_shade_of_akamaAI : public ScriptedAI
     void FindChannelers()
     {
         std::list<Creature*> ChannelerList;
-        me->GetCreatureListWithEntryInGrid(ChannelerList,CREATURE_CHANNELER,50.0f);
+        me->GetCreatureListWithEntryInGrid(ChannelerList,CREATURE_CHANNELER, 50.0f);
 
         if (!ChannelerList.empty())
         {
@@ -825,19 +831,6 @@ struct boss_shade_of_akamaAI : public ScriptedAI
             }
         }
         else error_log("BSCR ERROR: Grid Search was unable to find any channelers. Shade of Akama encounter will be buggy");
-    }
-
-    void SetSelectableChannelers()
-    {
-        if (Channelers.empty())
-        {
-            error_log("BSCR ERROR: Channeler List is empty, Shade of Akama encounter will be buggy");
-            return;
-        }
-
-        for (std::list<uint64>::iterator itr = Channelers.begin(); itr != Channelers.end(); ++itr)
-            if (Creature* Channeler = (Unit::GetCreature(*me, *itr)))
-                Channeler->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
 
     void SetAkamaGUID(uint64 guid) { AkamaGUID = guid; }
@@ -895,9 +888,7 @@ struct boss_shade_of_akamaAI : public ScriptedAI
                     if (Akama && Akama->isAlive())
                     {
                         IsBanished = false;
-                        me->GetMotionMaster()->Clear(false);
                         me->GetMotionMaster()->MoveChase(Akama);
-                        Akama->GetMotionMaster()->Clear();
                         // Shade should move to Akama, not the other way around
                         Akama->GetMotionMaster()->MoveIdle();
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -944,9 +935,9 @@ struct boss_shade_of_akamaAI : public ScriptedAI
                     return;
                 } else ResetTimer -= diff;
             }
-
-            DoMeleeAttackIfReady();
         }
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -1062,7 +1053,6 @@ struct npc_akamaAI : public ScriptedAI
             // Prevent players from trying to restart event
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             CAST_AI(boss_shade_of_akamaAI, Shade->AI())->SetAkamaGUID(me->GetGUID());
-            CAST_AI(boss_shade_of_akamaAI, Shade->AI())->SetSelectableChannelers();
             CAST_AI(boss_shade_of_akamaAI, Shade->AI())->StartCombat = true;
             Shade->AddThreat(me, 1000000.0f);
             Shade->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
@@ -1165,6 +1155,7 @@ struct npc_akamaAI : public ScriptedAI
                     {
                         ShadeHasDied = true;
                         WayPointId = 0;
+                        me->CombatStop();
                         me->SetUnitMovementFlags(MOVEFLAG_WALK_MODE);
                         me->GetMotionMaster()->MovePoint(WayPointId, AkamaWP[0].x, AkamaWP[0].y, AkamaWP[0].z);
                     }
