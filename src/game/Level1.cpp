@@ -1503,10 +1503,10 @@ bool ChatHandler::HandleModifyASpeedCommand(const char* args)
     if (needReportToTarget(target))
         ChatHandler(target).PSendSysMessage(LANG_YOURS_ASPEED_CHANGED, GetName(), modSpeed);
 
-    target->UpdateSpeed(MOVE_WALK,   true, modSpeed);
-    target->UpdateSpeed(MOVE_RUN,    true, modSpeed);
-    target->UpdateSpeed(MOVE_SWIM,   true, modSpeed);
-    //target->UpdateSpeed(MOVE_TURN,   true, modSpeed);
+    target->UpdateSpeed(MOVE_WALK, true, modSpeed);
+    target->UpdateSpeed(MOVE_RUN, true, modSpeed);
+    target->UpdateSpeed(MOVE_SWIM, true, modSpeed);
+    //target->UpdateSpeed(MOVE_TURN, true, modSpeed);
     target->UpdateSpeed(MOVE_FLIGHT, true, modSpeed);
     return true;
 }

@@ -71,18 +71,18 @@ static Location BrokenWP[]=
 
 enum Spells
 {
-    SPELL_VERTEX_SHADE_BLACK   = 39833,
+ // SPELL_VERTEX_SHADE_BLACK   = 39833,
 
     SPELL_SHADE_SOUL_CHANNEL   = 40401,
     SPELL_SHADE_SOUL_CHANNEL_2 = 40520,
 
     SPELL_DESTRUCTIVE_POISON   = 40874,
-    SPELL_CHAIN_LIGHTNING      = 40536,
+ // SPELL_CHAIN_LIGHTNING      = 40536,
 
     SPELL_AKAMA_SOUL_CHANNEL   = 40447,
     SPELL_AKAMA_SOUL_RETRIEVE  = 40902,
 
-    AKAMA_SOUL_EXPEL           = 40855,
+ // AKAMA_SOUL_EXPEL           = 40855,
     SPELL_DEBILITATIG_STRIKE   = 41178,
     SPELL_SHIELD_BASH          = 41180,
     SPELL_HEROIC_STRIKE        = 41975,
@@ -120,13 +120,11 @@ struct mob_ashtongue_channelerAI : public ScriptedAI
 
     ScriptedInstance* pInstance;
     uint64 ShadeGUID;
-    bool m_channel;
 
     void Reset()
     {
         me->RemoveAurasDueToSpell(SPELL_SHADE_SOUL_CHANNEL);
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_channel = true;
+        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         me->setActive(true);
     }
 
@@ -138,9 +136,6 @@ struct mob_ashtongue_channelerAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        if (!m_channel)
-            return;
-
         if (ShadeGUID)
         {
             if (!me->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT))
@@ -819,7 +814,7 @@ struct boss_shade_of_akamaAI : public ScriptedAI
     void FindChannelers()
     {
         std::list<Creature*> ChannelerList;
-        me->GetCreatureListWithEntryInGrid(ChannelerList,CREATURE_CHANNELER, 50.0f);
+        me->GetCreatureListWithEntryInGrid(ChannelerList, CREATURE_CHANNELER, 50.0f);
 
         if (!ChannelerList.empty())
         {
@@ -831,6 +826,18 @@ struct boss_shade_of_akamaAI : public ScriptedAI
             }
         }
         else error_log("BSCR ERROR: Grid Search was unable to find any channelers. Shade of Akama encounter will be buggy");
+    }
+
+    void SetSelectableChannelers()
+    {
+        FindChannelers();
+
+        if (Channelers.empty() || pInstance->GetData(DATA_SHADEOFAKAMAEVENT) == NOT_STARTED)
+            return;
+
+        for (std::list<uint64>::iterator itr = Channelers.begin(); itr != Channelers.end(); ++itr)
+            if (Creature* Channeler = (Unit::GetCreature(*me, *itr)))
+                Channeler->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
 
     void SetAkamaGUID(uint64 guid) { AkamaGUID = guid; }
@@ -1052,6 +1059,7 @@ struct npc_akamaAI : public ScriptedAI
             pInstance->SetData(DATA_SHADEOFAKAMAEVENT, IN_PROGRESS);
             // Prevent players from trying to restart event
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            CAST_AI(boss_shade_of_akamaAI, Shade->AI())->SetSelectableChannelers();
             CAST_AI(boss_shade_of_akamaAI, Shade->AI())->SetAkamaGUID(me->GetGUID());
             CAST_AI(boss_shade_of_akamaAI, Shade->AI())->StartCombat = true;
             Shade->AddThreat(me, 1000000.0f);
@@ -1332,6 +1340,7 @@ bool GossipHello_npc_akama(Player* player, Creature* pCreature)
     {
         player->ADD_GOSSIP_ITEM(0, GOSSIP_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
     }
+
     player->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
     return true;
 }

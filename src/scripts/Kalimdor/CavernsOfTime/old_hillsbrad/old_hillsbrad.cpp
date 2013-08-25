@@ -385,12 +385,12 @@ struct npc_thrall_old_hillsbradAI : public npc_escortAI
     void DoMount()
     {
         me->Mount(SKARLOC_MOUNT_MODEL);
-        me->SetSpeed(MOVE_RUN,SPEED_MOUNT);
+        me->SetSpeed(MOVE_RUN, SPEED_MOUNT);
     }
     void DoUnmount()
     {
         me->Unmount();
-        me->SetSpeed(MOVE_RUN,SPEED_RUN);
+        me->SetSpeed(MOVE_RUN, SPEED_RUN);
     }
     void EnterCombat(Unit*)
     {

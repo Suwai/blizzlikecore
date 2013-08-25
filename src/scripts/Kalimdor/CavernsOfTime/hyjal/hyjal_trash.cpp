@@ -1298,7 +1298,7 @@ struct mob_gargoyleAI : public hyjal_trashAI
             {
                 Unit* pTarget = SelectUnit(SELECT_TARGET_RANDOM, 0);
                 if (pTarget)
-                    me->Attack(pTarget,false);
+                    me->Attack(pTarget, false);
             }
             if (MoveTimer <= diff)
             {

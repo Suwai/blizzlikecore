@@ -399,7 +399,7 @@ struct boss_headless_horsemanAI : public ScriptedAI
         me->SetVisibility(VISIBILITY_OFF);
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         me->AddUnitMovementFlag(MOVEFLAG_ONTRANSPORT | MOVEFLAG_LEVITATING);
-        me->SetSpeed(MOVE_WALK,5.0f,true);
+        me->SetSpeed(MOVE_WALK, 5.0f, true);
         wp_reached = false;
         count = 0;
         say_timer = 3000;

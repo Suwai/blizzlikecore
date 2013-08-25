@@ -586,8 +586,8 @@ struct mob_enchanted_elementalAI : public ScriptedAI
 
     void Reset()
     {
-        me->SetSpeed(MOVE_WALK,0.6f);//walk
-        me->SetSpeed(MOVE_RUN,0.6f);//run
+        me->SetSpeed(MOVE_WALK, 0.6f);//walk
+        me->SetSpeed(MOVE_RUN, 0.6f);//run
         move = 0;
         phase = 1;
 

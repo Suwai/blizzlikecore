@@ -227,7 +227,7 @@ struct mob_lesser_doomguardAI : public hyjal_trashAI
         if (me->IsWithinDist(who, 50) && !me->isInCombat() && me->IsHostileTo(who))
         {
             me->AddThreat(who,0.0f);
-            me->Attack(who,false);
+            me->Attack(who, false);
         }
     }
 

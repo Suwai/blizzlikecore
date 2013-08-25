@@ -259,7 +259,7 @@ struct mob_towering_infernalAI : public ScriptedAI
     void MoveInLineOfSight(Unit* who)
     {
         if (me->IsWithinDist(who, 50) && !me->isInCombat() && me->IsHostileTo(who))
-            me->Attack(who,false);
+            me->Attack(who, false);
     }
 
     void UpdateAI(const uint32 diff)
