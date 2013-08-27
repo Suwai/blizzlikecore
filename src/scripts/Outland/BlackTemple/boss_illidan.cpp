@@ -13,110 +13,33 @@ EndScriptData */
 #include "ScriptPCH.h"
 #include "black_temple.h"
 
-#define GETGO(obj, guid)      GameObject* obj = GameObject::GetGameObject(*me, guid)
-#define GETUNIT(unit, guid)   Unit* unit = Unit::GetUnit(*me, guid)
-#define GETCRE(cre, guid)     Creature* cre = Unit::GetCreature(*me, guid)
-#define HPPCT(unit)           unit->GetHealth()*100 / unit->GetMaxHealth()
-
 /************* Quotes and Sounds ***********************/
-// Gossip for when a player clicks Akama
-#define GOSSIP_ITEM           "We are ready to face Illidan"
 
 // Yells for/by Akama
-#define SAY_AKAMA_BEWARE      "Be wary friends, The Betrayer meditates in the court just beyond."
-#define SOUND_AKAMA_BEWARE    11388
-#define SAY_AKAMA_MINION      "Come, my minions. Deal with this traitor as he deserves!"
-#define SOUND_AKAMA_MINION    11465
-#define SAY_AKAMA_LEAVE       "I'll deal with these mongrels. Strike now, friends! Strike at the betrayer!"
-#define SOUND_AKAMA_LEAVE     11390
+const char*  SAY_AKAMA_BEWARE     = "Be wary friends, The Betrayer meditates in the court just beyond.";
+const char*  SAY_AKAMA_MINION     = "Come, my minions. Deal with this traitor as he deserves!";
+const char*  SAY_AKAMA_LEAVE      = "I'll deal with these mongrels. Strike now, friends! Strike at the betrayer!";
+const char*  SAY_KILL1            = "Who shall be next to taste my blades?!";
+const char*  SAY_KILL2            = "This is too easy!";
+const char*  SAY_TAKEOFF          = "I will not be touched by rabble such as you!";
+const char*  SAY_SUMMONFLAMES     = "Behold the flames of Azzinoth!";
+const char*  SAY_EYE_BLAST        = "Stare into the eyes of the Betrayer!";
+const char*  SAY_MORPH            = "Behold the power... of the demon within!";
+const char*  SAY_ENRAGE           = "You've wasted too much time mortals, now you shall fall!";
 
-// Self explanatory
-const char*  SAY_KILL1        = "Who shall be next to taste my blades?!";
-#define SOUND_KILL1           11473
-const char*  SAY_KILL2        = "This is too easy!";
-#define SOUND_KILL2           11472
-
-// I think I'll fly now and let my subordinates take you on
-#define SAY_TAKEOFF           "I will not be touched by rabble such as you!"
-#define SOUND_TAKEOFF         11479
-#define SAY_SUMMONFLAMES      "Behold the flames of Azzinoth!"
-#define SOUND_SUMMONFLAMES    11480
-
-// When casting Eye Blast. Demon Fire will be appear on places that he casts this
-#define SAY_EYE_BLAST         "Stare into the eyes of the Betrayer!"
-#define SOUND_EYE_BLAST       11481
-
-// kk, I go big, dark and demon on you.
-#define SAY_MORPH             "Behold the power... of the demon within!"
-#define SOUND_MORPH           11475
-
-// I KILL!
-#define SAY_ENRAGE            "You've wasted too much time mortals, now you shall fall!"
-#define SOUND_ENRAGE          11474
-
-/************** Spells *************/
-// Normal Form
-#define SPELL_SHEAR                     37335 // 41032 is bugged, cannot be block/dodge/parry// Reduces Max. Health by 60% for 7 seconds. Can stack 19 times. 1.5 second cast
-#define SPELL_FLAME_CRASH               40832 // Summons an invis/unselect passive mob that has an aura of flame in a circle around him.
-#define SPELL_DRAW_SOUL                 40904 // 5k Shadow Damage in front of him. Heals Illidan for 100k health (script effect)
-#define SPELL_PARASITIC_SHADOWFIEND     41917 // DoT of 3k Shadow every 2 seconds. Lasts 10 seconds. (Script effect: Summon 2 parasites once the debuff has ticked off)
-#define SPELL_PARASITIC_SHADOWFIEND2    41914 // Used by Parasitic
-#define SPELL_SUMMON_PARASITICS         41915 // Summons 2 Parasitic Shadowfiends on the target. It's supposed to be cast as soon as the Parasitic Shadowfiend debuff is gone, but the spells aren't linked :(
-#define SPELL_AGONIZING_FLAMES          40932 // 4k fire damage initial to target and anyone w/i 5 yards. PHASE 3 ONLY
-#define SPELL_ENRAGE                    40683 // Increases damage by 50% and attack speed by 30%. 20 seconds, PHASE 5 ONLY
-// Flying (Phase 2)
-#define SPELL_THROW_GLAIVE              39635 // Throws a glaive on the ground
-#define SPELL_THROW_GLAIVE2             39849 // Animation for the above spell
-#define SPELL_GLAIVE_RETURNS            39873 // Glaive flies back to Illidan
-#define SPELL_FIREBALL                  40598 // 2.5k-3.5k damage in 10 yard radius. 2 second cast time.
-#define SPELL_DARK_BARRAGE              40585 // 10 second channeled spell, 3k shadow damage per second.
-// Demon Form
-#define SPELL_DEMON_TRANSFORM_1         40511 // First phase of animations for transforming into Dark Illidan (fall to ground)
-#define SPELL_DEMON_TRANSFORM_2         40398 // Second phase of animations (kneel)
-#define SPELL_DEMON_TRANSFORM_3         40510 // Final phase of animations (stand up and roar)
-#define SPELL_DEMON_FORM                40506 // Transforms into Demon Illidan. Has an Aura of Dread on him.
-#define SPELL_SHADOW_BLAST              41078 // 8k - 11k Shadow Damage. Targets highest threat. Has a splash effect, damaging anyone in 20 yards of the target.
-#define SPELL_FLAME_BURST               41126 // Hurls fire at entire raid for ~3.5k damage every 10 seconds. Resistable. (Does not work: Script effect)
-#define SPELL_FLAME_BURST_EFFECT        41131 // The actual damage. Have each player cast it on itself (workaround)
-// Other Illidan spells
-#define SPELL_KNEEL                     39656 // Before beginning encounter, this is how he appears (talking to skully).
-#define SPELL_SHADOW_PRISON             40647 // Illidan casts this spell to immobilize entire raid when he summons Maiev.
-#define SPELL_DEATH                     41220 // This spell doesn't do anything except stun Illidan and set him on his knees.
-#define SPELL_BERSERK                   45078 // Damage increased by 500%, attack speed by 150%
-#define SPELL_DUAL_WIELD                42459
-//Phase Normal spells
-#define SPELL_FLAME_CRASH_EFFECT        40836 // Firey blue ring of circle that the other flame crash summons
-#define SPELL_SUMMON_SHADOWDEMON        41117 // Summon four shadowfiends
-#define SPELL_SHADOWFIEND_PASSIVE       41913 // Passive aura for shadowfiends
-#define SPELL_SHADOW_DEMON_PASSIVE      41079 // Adds the "shadowform" aura to Shadow Demons.
-#define SPELL_CONSUME_SOUL              41080 // Once the Shadow Demons reach their target, they use this to kill them
-#define SPELL_PARALYZE                  41083 // Shadow Demons cast this on their target
-#define SPELL_PURPLE_BEAM               39123 // Purple Beam connecting Shadow Demon to their target
-//Phase Flight spells
-#define SPELL_AZZINOTH_CHANNEL          39857 // Glaives cast it on Flames. Not sure if this is the right spell.
-#define SPELL_EYE_BLAST_TRIGGER         40017 // This summons Demon Form every few seconds and deals ~20k damage in its radius
-#define SPELL_EYE_BLAST                 39908 // This does the blue flamey animation.
-#define SPELL_BLAZE_EFFECT              40610 // Green flame on the ground, triggers damage (5k) every few seconds
-#define SPELL_BLAZE_SUMMON              40637 // Summons the Blaze creature
-#define SPELL_DEMON_FIRE                40029 // Blue fire trail left by Eye Blast. Deals 2k per second if players stand on it.
-#define SPELL_FLAME_BLAST               40631 // Flames of Azzinoth use this. Frontal cone AoE 7k-9k damage.
-#define SPELL_CHARGE                    41581 //40602 // Flames of Azzinoth charges whoever is too far from them. They enrage after this. For simplicity, we'll use the same enrage as Illidan.
-#define SPELL_FLAME_ENRAGE              45078
-//Akama spells
-#define SPELL_AKAMA_DOOR_CHANNEL        41268 // Akama's channel spell on the door before the Temple Summit
-#define SPELL_DEATHSWORN_DOOR_CHANNEL   41269 // Olum and Udalo's channel spell on the door before the Temple Summit
-#define SPELL_AKAMA_DOOR_FAIL           41271 // Not sure where this is really used...
-#define SPELL_HEALING_POTION            40535 // Akama uses this to heal himself to full.
-#define SPELL_CHAIN_LIGHTNING           40536 // 6938 to 8062 for 5 targets
-//Maiev spells
-#define SPELL_CAGE_TRAP_DUMMY           40761 // Put this in DB for cage trap GO.
-#define SPELL_CAGED                     40695 // Caged Trap triggers will cast this on Illidan if he is within 3 yards
-#define SPELL_CAGE_TRAP_SUMMON          40694 // Summons a Cage Trap GO (bugged) on the ground along with a Cage Trap Disturb Trigger mob (working)
-#define SPELL_CAGE_TRAP_BEAM            40713 // 8 Triggers on the ground in an octagon cast spells like this on Illidan 'caging him'
-#define SPELL_TELEPORT_VISUAL           41232 // Teleport visual for Maiev
-#define SPELL_SHADOW_STRIKE             40685 // 4375 to 5625 every 3 seconds for 12 seconds
-#define SPELL_THROW_DAGGER              41152 // 5400 to 6600 damage, need dagger
-#define SPELL_FAN_BLADES                39954 // bugged visual
+enum Sounds
+{
+    SOUND_AKAMA_BEWARE   = 11388,
+    SOUND_AKAMA_MINION   = 11465,
+    SOUND_AKAMA_LEAVE    = 11390,
+    SOUND_KILL1          = 11473,
+    SOUND_KILL2          = 11472,
+    SOUND_TAKEOFF        = 11479,
+    SOUND_SUMMONFLAMES   = 11480,
+    SOUND_EYE_BLAST      = 11481,
+    SOUND_MORPH          = 11475,
+    SOUND_ENRAGE         = 11474
+};
 
 // Other defines
 #define CENTER_X            676.740f
@@ -125,6 +48,84 @@ const char*  SAY_KILL2        = "This is too easy!";
 
 #define FLAME_ENRAGE_DISTANCE   30
 #define FLAME_CHARGE_DISTANCE   50
+
+#define EMOTE_SETS_GAZE_ON      "sets its gaze on $N!"
+#define EMOTE_UNABLE_TO_SUMMON  "is unable to summon Maiev Shadowsong and enter Phase 4. Resetting Encounter."
+
+#define GETGO(obj, guid)      GameObject* obj = GameObject::GetGameObject(*me, guid)
+#define GETUNIT(unit, guid)   Unit* unit = Unit::GetUnit(*me, guid)
+#define GETCRE(cre, guid)     Creature* cre = Unit::GetCreature(*me, guid)
+#define HPPCT(unit)           unit->GetHealth()*100 / unit->GetMaxHealth()
+
+// Gossip for when a player clicks Akama
+#define GOSSIP_ITEM  "We are ready to face Illidan"
+
+/************** Spells *************/
+enum Spells
+{
+    // Normal Form
+    SPELL_SHEAR                   =   37335, // 41032 is bugged, cannot be block/dodge/parry// Reduces Max. Health by 60% for 7 seconds. Can stack 19 times. 1.5 second cast
+    SPELL_FLAME_CRASH             =   40832, // Summons an invis/unselect passive mob that has an aura of flame in a circle around him.
+    SPELL_DRAW_SOUL               =   40904, // 5k Shadow Damage in front of him. Heals Illidan for 100k health (script effect)
+    SPELL_PARASITIC_SHADOWFIEND   =   41917, // DoT of 3k Shadow every 2 seconds. Lasts 10 seconds. (Script effect: Summon 2 parasites once the debuff has ticked off)
+    SPELL_PARASITIC_SHADOWFIEND2  =   41914, // Used by Parasitic
+    SPELL_SUMMON_PARASITICS       =   41915, // Summons 2 Parasitic Shadowfiends on the target. It's supposed to be cast as soon as the Parasitic Shadowfiend debuff is gone, but the spells aren't linked :(
+    SPELL_AGONIZING_FLAMES        =   40932, // 4k fire damage initial to target and anyone w/i 5 yards. PHASE 3 ONLY
+    SPELL_ENRAGE                  =   40683, // Increases damage by 50% and attack speed by 30%. 20 seconds, PHASE 5 ONLY
+    // Flying (Phase 2)
+    SPELL_THROW_GLAIVE            =   39635, // Throws a glaive on the ground
+    SPELL_THROW_GLAIVE2           =   39849, // Animation for the above spell
+    SPELL_GLAIVE_RETURNS          =   39873, // Glaive flies back to Illidan
+    SPELL_FIREBALL                =   40598, // 2.5k-3.5k damage in 10 yard radius. 2 second cast time.
+    SPELL_DARK_BARRAGE            =   40585, // 10 second channeled spell, 3k shadow damage per second.
+    // Demon Form
+    SPELL_DEMON_TRANSFORM_1       =   40511, // First phase of animations for transforming into Dark Illidan (fall to ground)
+    SPELL_DEMON_TRANSFORM_2       =   40398, // Second phase of animations (kneel)
+    SPELL_DEMON_TRANSFORM_3       =   40510, // Final phase of animations (stand up and roar)
+    SPELL_DEMON_FORM              =   40506, // Transforms into Demon Illidan. Has an Aura of Dread on him.
+    SPELL_SHADOW_BLAST            =   41078, // 8k - 11k Shadow Damage. Targets highest threat. Has a splash effect, damaging anyone in 20 yards of the target.
+    SPELL_FLAME_BURST             =   41126, // Hurls fire at entire raid for ~3.5k damage every 10 seconds. Resistable. (Does not work: Script effect)
+    SPELL_FLAME_BURST_EFFECT      =   41131, // The actual damage. Have each player cast it on itself (workaround)
+    // Other Illidan spells
+    SPELL_KNEEL                   =   39656, // Before beginning encounter, this is how he appears (talking to skully).
+    SPELL_SHADOW_PRISON           =   40647, // Illidan casts this spell to immobilize entire raid when he summons Maiev.
+    SPELL_DEATH                   =   41220, // This spell doesn't do anything except stun Illidan and set him on his knees.
+    SPELL_BERSERK                 =   45078, // Damage increased by 500%, attack speed by 150%
+    SPELL_DUAL_WIELD              =   42459,
+    //Phase Normal spells
+    SPELL_FLAME_CRASH_EFFECT      =   40836, // Firey blue ring of circle that the other flame crash summons
+    SPELL_SUMMON_SHADOWDEMON      =   41117, // Summon four shadowfiends
+    SPELL_SHADOWFIEND_PASSIVE     =   41913, // Passive aura for shadowfiends
+    SPELL_SHADOW_DEMON_PASSIVE    =   41079, // Adds the "shadowform" aura to Shadow Demons.
+    SPELL_CONSUME_SOUL            =   41080, // Once the Shadow Demons reach their target, they use this to kill them
+    SPELL_PARALYZE                =   41083, // Shadow Demons cast this on their target
+    SPELL_PURPLE_BEAM             =   39123, // Purple Beam connecting Shadow Demon to their target
+    //Phase Flight spells
+    SPELL_AZZINOTH_CHANNEL        =   39857, // Glaives cast it on Flames. Not sure if this is the right spell.
+    SPELL_EYE_BLAST_TRIGGER       =   40017, // This summons Demon Form every few seconds and deals ~20k damage in its radius
+    SPELL_EYE_BLAST               =   39908, // This does the blue flamey animation.
+    SPELL_BLAZE_EFFECT            =   40610, // Green flame on the ground, triggers damage (5k) every few seconds
+    SPELL_BLAZE_SUMMON            =   40637, // Summons the Blaze creature
+    SPELL_DEMON_FIRE              =   40029, // Blue fire trail left by Eye Blast. Deals 2k per second if players stand on it.
+    SPELL_FLAME_BLAST             =   40631, // Flames of Azzinoth use this. Frontal cone AoE 7k-9k damage.
+    SPELL_CHARGE                  =   41581, // 40602 Flames of Azzinoth charges whoever is too far from them. They enrage after this. For simplicity, we'll use the same enrage as Illidan.
+    SPELL_FLAME_ENRAGE            =   45078,
+    //Akama spells
+    SPELL_AKAMA_DOOR_CHANNEL      =   41268, // Akama's channel spell on the door before the Temple Summit
+    SPELL_DEATHSWORN_DOOR_CHANNEL =   41269, // Olum and Udalo's channel spell on the door before the Temple Summit
+    SPELL_AKAMA_DOOR_FAIL         =   41271, // Not sure where this is really used...
+    SPELL_HEALING_POTION          =   40535, // Akama uses this to heal himself to full.
+    SPELL_CHAIN_LIGHTNING         =   40536, // 6938 to 8062 for 5 targets
+    //Maiev spells
+    SPELL_CAGE_TRAP_DUMMY         =   40761, // Put this in DB for cage trap GO.
+    SPELL_CAGED                   =   40695, // Caged Trap triggers will cast this on Illidan if he is within 3 yards
+    SPELL_CAGE_TRAP_SUMMON        =   40694, // Summons a Cage Trap GO (bugged) on the ground along with a Cage Trap Disturb Trigger mob (working)
+    SPELL_CAGE_TRAP_BEAM          =   40713, // 8 Triggers on the ground in an octagon cast spells like this on Illidan 'caging him'
+    SPELL_TELEPORT_VISUAL         =   41232, // Teleport visual for Maiev
+    SPELL_SHADOW_STRIKE           =   40685, // 4375 to 5625 every 3 seconds for 12 seconds
+    SPELL_THROW_DAGGER            =   41152, // 5400 to 6600 damage, need dagger
+    SPELL_FAN_BLADES              =   39954  // bugged visual
+};
 
 /**** Creature Summon and Recognition IDs ****/
 enum CreatureEntry
@@ -312,7 +313,7 @@ static Locations AkamaWP[]=
     {762.60f, 361.06f, 353.60f}, // Top of the third stairs
     {756.35f, 360.52f, 353.27f}, // Before the door-thingy
     {743.82f, 342.21f, 353.00f}, // Somewhere further
-    {732.69f, 305.13f, 353.00f}, // In front of Illidan - (8)
+    {713.74f, 311.75f, 353.30f}, // In front of Illidan - (8)
     {738.11f, 365.44f, 353.00f}, // in front of the door-thingy (the other one!)
     {792.18f, 366.62f, 341.42f}, // Down the first flight of stairs
     {796.84f, 304.89f, 319.76f}, // Down the second flight of stairs
@@ -344,9 +345,6 @@ static Animation DemonTransformation[]=
     {SPELL_DEMON_TRANSFORM_3, SPELL_DEMON_TRANSFORM_2, 3500, 0, 0, 6, true},
     {0, SPELL_DEMON_TRANSFORM_3, 0, 0, 0, 8, true}
 };
-
-#define EMOTE_SETS_GAZE_ON     "sets its gaze on $N!"
-#define EMOTE_UNABLE_TO_SUMMON "is unable to summon Maiev Shadowsong and enter Phase 4. Resetting Encounter."
 
 /************************************** Illidan's AI ***************************************/
 struct boss_illidan_stormrageAI : public ScriptedAI
