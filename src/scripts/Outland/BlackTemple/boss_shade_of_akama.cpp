@@ -77,12 +77,12 @@ enum Spells
     SPELL_SHADE_SOUL_CHANNEL_2 = 40520,
 
     SPELL_DESTRUCTIVE_POISON   = 40874,
- // SPELL_CHAIN_LIGHTNING      = 40536,
+    SPELL_CHAIN_LIGHTNING      = 40536,
 
     SPELL_AKAMA_SOUL_CHANNEL   = 40447,
     SPELL_AKAMA_SOUL_RETRIEVE  = 40902,
 
- // AKAMA_SOUL_EXPEL           = 40855,
+    AKAMA_SOUL_EXPEL           = 40855,
     SPELL_DEBILITATIG_STRIKE   = 41178,
     SPELL_SHIELD_BASH          = 41180,
     SPELL_HEROIC_STRIKE        = 41975,
@@ -129,7 +129,6 @@ struct mob_ashtongue_channelerAI : public ScriptedAI
     }
 
     void JustDied(Unit* /*killer*/);
-    void OnAuraRemove(Aura* aura, bool stackRemove);
     void EnterCombat(Unit* /*who*/) {}
     void AttackStart(Unit* /*who*/) {}
     void MoveInLineOfSight(Unit* /*who*/) {}
@@ -298,48 +297,6 @@ struct mob_ashtongue_spiritbinderAI : public ScriptedAI
             AttackStart(pAkama);
     }
 
-    /*Unit* FindSpiritHealTarget()
-    {
-        Unit* pTarget = NULL;
-
-        std::list<Creature*> m_sorcerrers = FindAllCreaturesWithEntry(CREATURE_SORCERER, 100.0f);
-        std::list<Creature*> m_channelers = FindAllCreaturesWithEntry(CREATURE_CHANNELER, 100.0f);
-
-        if (!m_sorcerrers.empty())
-        {
-            pTarget = *m_sorcerrers.begin();
-
-            for (std::list<Creature*>::iterator i = m_sorcerrers.begin(); i != m_sorcerrers.end(); i++)
-            {
-                if (!(*i)->isAlive())
-                    continue;
-
-                if ((*i)->GetHealth() < pTarget->GetHealth())
-                    pTarget = *i;
-            }
-        }
-
-        if (!m_channelers.empty())
-        {
-            if(!pTarget)
-                pTarget = *m_sorcerrers.begin();
-
-            for (std::list<Creature*>::iterator i = m_sorcerrers.begin(); i != m_sorcerrers.end(); i++)
-            {
-                if (!(*i)->isAlive())
-                    continue;
-
-                if ((*i)->GetHealth() < pTarget->GetHealth())
-                    pTarget = *i;
-            }
-        }
-
-        if (pTarget->isAlive() && pTarget->IsInWorld())
-            return pTarget;
-        else
-            return NULL;
-    }*/
-
     void UpdateAI(const uint32 diff)
     {
         if (!UpdateVictim())
@@ -363,13 +320,8 @@ struct mob_ashtongue_spiritbinderAI : public ScriptedAI
 
         if (m_spiritHealTimer < diff)
         {
-            //if(Unit* pFriend = FindSpiritHealTarget())
-            //{
-                DoCast(NULL, SPELL_SSPIRIT_HEAL, false);
-                m_spiritHealTimer = 10000;
-            //}
-            //else
-                //m_spiritHealTimer = 5000;
+            DoCast(NULL, SPELL_SSPIRIT_HEAL, false);
+            m_spiritHealTimer = 10000;
         }
         else
             m_spiritHealTimer -= diff;
@@ -641,7 +593,7 @@ struct boss_shade_of_akamaAI : public ScriptedAI
     uint32 ReduceHealthTimer;
     uint32 SummonTimer;
     uint32 ResetTimer;
-    uint32 DefenderTimer;                                   // They are on a flat 15 second timer, independant of the other summon creature timer.
+    uint32 DefenderTimer; // They are on a flat 15 second timer, independant of the other summon creature timer.
 
     bool IsBanished;
     bool HasKilledAkama;
@@ -752,7 +704,7 @@ struct boss_shade_of_akamaAI : public ScriptedAI
             DoStartMovement(who);
     }
 
-    void IncrementDeathCount(uint64 guid = 0)               // If guid is set, will remove it from list of sorcerer
+    void IncrementDeathCount(uint64 guid = 0) // If guid is set, will remove it from list of sorcerer
     {
         if (reseting)
             return;
@@ -956,15 +908,6 @@ void mob_ashtongue_channelerAI::JustDied(Unit* /*killer*/)
     else error_log("BSCR ERROR: Channeler dead but unable to increment DeathCount for Shade of Akama.");
 }
 
-void mob_ashtongue_channelerAI::OnAuraRemove(Aura* aura, bool stackRemove)
-{
-    if (aura->GetSpellProto()->Id == SPELL_SHADE_SOUL_CHANNEL)
-    {
-        if (Unit* shade = me->GetUnit(*me, ShadeGUID))
-            shade->RemoveSingleAuraFromStack(SPELL_SHADE_SOUL_CHANNEL_2, 0);
-    }
-}
-
 void mob_ashtongue_sorcererAI::JustDied(Unit* /*killer*/)
 {
     Creature* Shade = (Unit::GetCreature((*me), ShadeGUID));
@@ -998,7 +941,7 @@ struct npc_akamaAI : public ScriptedAI
     uint64 ShadeGUID;
 
     uint32 DestructivePoisonTimer;
-    uint32 LightningBoltTimer;
+    uint32 LightningChainTimer;
     uint32 CheckTimer;
     uint32 CastSoulRetrieveTimer;
     uint32 SoulRetrieveTimer;
@@ -1018,7 +961,7 @@ struct npc_akamaAI : public ScriptedAI
     void Reset()
     {
         DestructivePoisonTimer = 15000;
-        LightningBoltTimer = 10000;
+        LightningChainTimer = 10000;
         CheckTimer = 2000;
 
         if (!EventBegun)
@@ -1242,8 +1185,7 @@ struct npc_akamaAI : public ScriptedAI
                     {
                         for (std::list<uint64>::iterator itr = BrokenList.begin(); itr != BrokenList.end(); ++itr)
                             if (Creature* pUnit = Unit::GetCreature(*me, *itr))
-                                // This is the incorrect spell, but can't seem to find the right one.
-                                pUnit->CastSpell(pUnit, 39656, true);
+                                pUnit->CastSpell(pUnit, 39656, true); // This is an optional spell.
                     }
                     ++EndingTalkCount;
                     SoulRetrieveTimer = 5000;
@@ -1258,7 +1200,13 @@ struct npc_akamaAI : public ScriptedAI
                     SoulRetrieveTimer = 0;
                     break;
                 }
-            } else SoulRetrieveTimer -= diff;
+            }
+            else
+            {
+                SoulRetrieveTimer -= diff;
+                if (!EndingTalkCount && !(SoulRetrieveTimer%3000))
+                    DoCast(me, AKAMA_SOUL_EXPEL, false);
+            }
 
         if (!UpdateVictim())
             return;
@@ -1271,11 +1219,11 @@ struct npc_akamaAI : public ScriptedAI
             DestructivePoisonTimer = 15000;
         } else DestructivePoisonTimer -= diff;
 
-        if (LightningBoltTimer <= diff)
+        if (LightningChainTimer <= diff)
         {
-            DoCast(me->getVictim(), SPELL_LIGHTNING_BOLT);
-            LightningBoltTimer = 10000;
-        } else LightningBoltTimer -= diff;
+            DoCast(me->getVictim(), SPELL_CHAIN_LIGHTNING);
+            LightningChainTimer = 10000;
+        } else LightningChainTimer -= diff;
 
         DoMeleeAttackIfReady();
     }
@@ -1323,7 +1271,7 @@ CreatureAI* GetAI_npc_akama_shade(Creature* pCreature)
 
 bool GossipSelect_npc_akama(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
 {
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)               //Fight time
+    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1) //Fight time
     {
         pPlayer->CLOSE_GOSSIP_MENU();
         CAST_AI(npc_akamaAI, pCreature->AI())->BeginEvent(pPlayer);

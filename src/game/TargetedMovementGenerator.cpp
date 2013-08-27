@@ -147,11 +147,6 @@ bool TargetedMovementGenerator<T>::_setTargetLocation(T &owner)
         // caster chase
         i_target->GetContactPoint(&owner, x, y, z, i_offset * urand(80, 95) * 0.01f);
     }
-    else if (owner.isInCombat())
-    {
-        // owner is in combat
-        i_target->GetClosePoint(x, y, z, (owner.GetObjectSize() - sWorld.getRate(RATE_TARGET_POS_RECALCULATION_RANGE)), i_offset, i_angle);
-    }
     else
     {
         // to at i_offset distance from target and i_angle from target facing
@@ -320,8 +315,12 @@ bool TargetedMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
                 PathNode end_point = i_path->getEndPosition();
                 next_point = i_path->getNextPosition();
 
-                //More distance let have better performance, less distance let have more sensitive reaction at target move.
-                float dist = owner.GetCombatReach() + sWorld.getRate(RATE_TARGET_POS_RECALCULATION_RANGE);
+                float dist;
+
+                if (owner.isInCombat())
+                    dist = owner.GetCombatReach() + 0.2f;
+                else //More distance let have better performance, less distance let have more sensitive reaction at target move.
+                    dist = owner.GetCombatReach() + sWorld.getRate(RATE_TARGET_POS_RECALCULATION_RANGE);
 
                 needNewDest = i_destinationHolder.HasArrived() && (!i_path->inRange(next_point, i_path->getActualEndPosition(), dist, dist) || !owner.IsWithinLOSInMap(i_target.getTarget()));
 
