@@ -413,6 +413,7 @@ CreatureAI* GetAI_npc_isla_starmaneAI(Creature* pCreature)
 /*######
 ## go_skull_pile
 ######*/
+
 #define GOSSIP_S_DARKSCREECHER_AKKARAI   "Summon Darkscreecher Akkarai"
 #define GOSSIP_S_KARROG                  "Summon Karrog"
 #define GOSSIP_S_GEZZARAK_THE_HUNTRESS   "Summon Gezzarak the Huntress"

@@ -281,7 +281,7 @@ void Spell::EffectEnvironmentalDMG(SpellEffIndex effIndex)
     // Note: this hack with damage replace required until GO casting not implemented
     // environment damage spells already have around enemies targeting but this not help in case not existed GO casting support
     // currently each enemy selected explicitly and self cast damage, we prevent apply self casted spell bonuses/etc
-    damage = m_spellInfo->EffectBasePoints[effIndex]+m_spellInfo->EffectBaseDice[effIndex];
+    damage = m_spellInfo->EffectBasePoints[effIndex] + m_spellInfo->EffectBaseDice[effIndex];
 
     m_caster->CalcAbsorbResist(m_caster, GetSpellSchoolMask(m_spellInfo), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
 

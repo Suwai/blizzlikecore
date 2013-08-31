@@ -619,7 +619,7 @@ bool GOUse_go_kael_orb(Player* player, GameObject* _GO)
     ScriptedInstance* pInstance = (ScriptedInstance*)_GO->GetInstanceData();
     if (pInstance)
     {
-        if(pInstance->GetData(DATA_KAELTHAS_EVENT) == 3)
+        if(pInstance->GetData(DATA_KAELTHAS_EVENT) == DONE)
             player->TeleportTo(530, 12888.18, -6874.55, 9.06, 3.11);
           //player->CastSpell(player, SPELL_ESCAPE_TO_IOQD, true);
     }
