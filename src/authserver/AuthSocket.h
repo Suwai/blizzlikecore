@@ -1,7 +1,24 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+/// \addtogroup authserver
+/// @{
+/// \file
 
 #ifndef _AUTHSOCKET_H
 #define _AUTHSOCKET_H
@@ -13,7 +30,7 @@
 
 #include "BufferedSocket.h"
 
-// Handle login commands
+/// Handle login commands
 class AuthSocket: public BufferedSocket
 {
     public:
@@ -22,10 +39,10 @@ class AuthSocket: public BufferedSocket
         AuthSocket();
         ~AuthSocket();
 
-        void OnAccept();
-        void OnRead();
+        void OnAccept() override;
+        void OnRead() override;
         void SendProof(Sha1Hash sha);
-        void LoadRealmlist(ByteBuffer &pkt, uint32 acctid);
+        void LoadRealmlist(ByteBuffer& pkt, uint32 acctid);
 
         bool _HandleLogonChallenge();
         bool _HandleLogonProof();
@@ -63,4 +80,4 @@ class AuthSocket: public BufferedSocket
         void InitPatch();
 };
 #endif
-
+/// @}

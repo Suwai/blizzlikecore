@@ -1,6 +1,19 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include "Threading.h"
@@ -30,7 +43,7 @@ ThreadPriority::ThreadPriority()
         pr_iter.next();
     }
 
-    ASSERT (!_tmp.empty());
+    BLIZZLIKE_ASSERT(!_tmp.empty());
 
     if (_tmp.size() >= MAXPRIORITYNUM)
     {
@@ -46,10 +59,10 @@ ThreadPriority::ThreadPriority()
             }
         }
 
-        //since we have only 7(seven) values in enum Priority
-        //and 3 we know already (Idle, Normal, Realtime) so
-        //we need to split each list [Idle...Normal] and [Normal...Realtime]
-        //into ¹ piesces
+        // since we have only 7(seven) values in enum Priority
+        // and 3 we know already (Idle, Normal, Realtime) so
+        // we need to split each list [Idle...Normal] and [Normal...Realtime]
+        // into ¹ piesces
         const size_t _divider = 4;
         size_t _div = (norm_pos - min_pos) / _divider;
         if (_div == 0)
@@ -82,11 +95,14 @@ int ThreadPriority::getPriority(Priority p) const
     return m_priority[p];
 }
 
-#define THREADFLAG (THR_NEW_LWP | THR_SCHED_DEFAULT| THR_JOINABLE)
+#ifndef __sun__
+# define THREADFLAG (THR_NEW_LWP | THR_JOINABLE | THR_SCHED_DEFAULT)
+#else
+# define THREADFLAG (THR_NEW_LWP | THR_JOINABLE)
+#endif
 
 Thread::Thread() : m_iThreadId(0), m_hThreadHandle(0), m_task(0)
 {
-
 }
 
 Thread::Thread(Runnable* instance) : m_iThreadId(0), m_hThreadHandle(0), m_task(instance)
@@ -96,19 +112,19 @@ Thread::Thread(Runnable* instance) : m_iThreadId(0), m_hThreadHandle(0), m_task(
         m_task->incReference();
 
     bool _start = start();
-    ASSERT (_start);
+    BLIZZLIKE_ASSERT(_start);
 }
 
 Thread::~Thread()
 {
-    //Wait();
+    // Wait();
 
     // deleted runnable object (if no other references)
     if (m_task)
         m_task->decReference();
 }
 
-//initialize Thread's class static member
+// initialize Thread's class static member
 Thread::ThreadStorage Thread::m_ThreadStorage;
 ThreadPriority Thread::m_TpEnum;
 
@@ -164,9 +180,9 @@ void Thread::resume()
     ACE_Thread::resume(m_hThreadHandle);
 }
 
-ACE_THR_FUNC_RETURN Thread::ThreadTask(void * param)
+ACE_THR_FUNC_RETURN Thread::ThreadTask(void* param)
 {
-    Runnable * _task = (Runnable*)param;
+    Runnable* _task = (Runnable*)param;
     _task->run();
 
     // task execution complete, free referecne added at
@@ -188,18 +204,17 @@ ACE_hthread_t Thread::currentHandle()
     return _handle;
 }
 
-Thread * Thread::current()
+Thread* Thread::current()
 {
-    Thread * _thread = m_ThreadStorage.ts_object();
+    Thread* _thread = m_ThreadStorage.ts_object();
     if (!_thread)
     {
         _thread = new Thread();
         _thread->m_iThreadId = Thread::currentId();
         _thread->m_hThreadHandle = Thread::currentHandle();
 
-        Thread * _oldValue = m_ThreadStorage.ts_object(_thread);
-        if (_oldValue)
-            delete _oldValue;
+        Thread* _oldValue = m_ThreadStorage.ts_object(_thread);
+        delete _oldValue;
     }
 
     return _thread;
@@ -207,14 +222,15 @@ Thread * Thread::current()
 
 void Thread::setPriority(Priority type)
 {
+#ifndef __sun__
     int _priority = m_TpEnum.getPriority(type);
     int _ok = ACE_Thread::setprio(m_hThreadHandle, _priority);
-    //remove this ASSERT in case you don't want to know is thread priority change was successful or not
-    ASSERT (_ok == 0);
+    // remove this ASSERT in case you don't want to know is thread priority change was successful or not
+    BLIZZLIKE_ASSERT(_ok == 0);
+#endif
 }
 
 void Thread::Sleep(unsigned long msecs)
 {
     ACE_OS::sleep(ACE_Time_Value(0, 1000 * msecs));
 }
-

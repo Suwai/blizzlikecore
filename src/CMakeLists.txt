@@ -1,26 +1,40 @@
-# This file is part of the BlizzLikeCore Project.
-# See CREDITS and LICENSE files for Copyright information.
+#
+# This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
 
-if( SERVERS )
-  set(sources_Debugging
-    ${CMAKE_SOURCE_DIR}/src/shared/Debugging/WheatyExceptionReport.cpp
-    ${CMAKE_SOURCE_DIR}/src/shared/Debugging/WheatyExceptionReport.h
+if(WIN32)
+  link_directories(
+    ${CMAKE_BINARY_DIR}/src/worldserver/${CMAKE_CFG_INTDIR}
   )
-  add_subdirectory(genrev)
-  add_subdirectory(framework)
-  add_subdirectory(shared)
-  add_subdirectory(authserver)
-  add_subdirectory(worldserver)
-  add_subdirectory(collision)
-  add_subdirectory(game)
+  include_directories(
+    ${CMAKE_SOURCE_DIR}/dep/include # For Win32
+  )
+endif()
+
+add_subdirectory(shared)
+add_subdirectory(framework)
+add_subdirectory(game)
+add_subdirectory(authserver)
+add_subdirectory(worldserver)
+
+if(USE_SCRIPTS)
   add_subdirectory(scripts)
-else()
-  if( TOOLS )
-    add_subdirectory(framework)
-    add_subdirectory(collision)
-  endif()
 endif()
 
 if(TOOLS)
   add_subdirectory(tools)
-endif(TOOLS)
+endif()

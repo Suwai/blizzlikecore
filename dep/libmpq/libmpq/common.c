@@ -20,6 +20,7 @@
 
 /* generic includes. */
 #include <ctype.h>
+#include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -100,7 +101,7 @@ int32_t libmpq__decrypt_block(uint32_t *in_buf, uint32_t in_size, uint32_t seed)
 }
 
 /* function to detect decryption key. */
-int32_t libmpq__decrypt_key(uint8_t *in_buf, uint32_t in_size, uint32_t block_size, uint32_t *key) {
+int32_t libmpq__decrypt_key(uint8_t *in_buf, uint32_t in_size, uint32_t block_size) {
 
 	/* some common variables. */
 	uint32_t saveseed1;
@@ -148,8 +149,7 @@ int32_t libmpq__decrypt_key(uint8_t *in_buf, uint32_t in_size, uint32_t block_si
 		if ((ch - ch2) <= block_size) {
 
 			/* file seed found, so return it. */
-			*key = saveseed1;
-			return LIBMPQ_SUCCESS;
+			return saveseed1;
 		}
 	}
 

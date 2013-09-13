@@ -1,7 +1,7 @@
 /*
  *  wave.h -- header file for WAVe unplode functions used by mpq-tools.
  *
- *  Copyright (C) 2013 Maik Broemme <mbroemme@plusserver.de>
+ *  Copyright (C) 2003 Maik Broemme <mbroemme@plusserver.de>
  *
  *  This source was adepted from the C++ version of wave.h included
  *  in stormlib. The C++ version belongs to the following authors,
@@ -27,11 +27,12 @@
 #ifndef _WAVE_H
 #define _WAVE_H
 
-typedef union {
-	unsigned short	*pw;
-	unsigned char	*pb;
+typedef union
+{
+    unsigned short*  pw;
+    unsigned char*   pb;
 } byte_and_short;
 
-int libmpq_wave_decompress(unsigned char *out_buf, int out_length, unsigned char *in_buf, int in_length, int channels);
+int libmpq_wave_decompress(unsigned char* out_buf, int out_length, unsigned char* in_buf, int in_length, int channels);
 
-#endif					/* _WAVE_H */
+#endif                  /* _WAVE_H */

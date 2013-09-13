@@ -1,12 +1,26 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef BLIZZLIKE_GRIDLOADER_H
 #define BLIZZLIKE_GRIDLOADER_H
 
-/*
+/**
+  @class GridLoader
   The GridLoader is working in conjuction with the Grid and responsible
   for loading and unloading object-types (one or more) when objects
   enters a grid.  Unloading is scheduled and might be canceled if
@@ -23,39 +37,36 @@
 template
 <
 class ACTIVE_OBJECT,
-class WORLD_OBJECT_TYPES,
-class GRID_OBJECT_TYPES
->
-class GridLoader
+      class WORLD_OBJECT_TYPES,
+      class GRID_OBJECT_TYPES
+      >
+class BLIZZLIKE_DLL_DECL GridLoader
 {
     public:
 
-        // Loads the grid
+        /** Loads the grid
+         */
         template<class LOADER>
-            void Load(Grid<ACTIVE_OBJECT,WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> &grid, LOADER &loader)
+        void Load(Grid<ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES>& grid, LOADER& loader)
         {
-            grid.LockGrid();
             loader.Load(grid);
-            grid.UnlockGrid();
         }
 
-        // Stop the grid
+        /** Stop the grid
+         */
         template<class STOPER>
-            void Stop(Grid<ACTIVE_OBJECT,WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> &grid, STOPER &stoper)
+        void Stop(Grid<ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES>& grid, STOPER& stoper)
         {
-            grid.LockGrid();
             stoper.Stop(grid);
-            grid.UnlockGrid();
         }
 
-        // Unloads the grid
+        /** Unloads the grid
+         */
         template<class UNLOADER>
-            void Unload(Grid<ACTIVE_OBJECT,WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES> &grid, UNLOADER &unloader)
+        void Unload(Grid<ACTIVE_OBJECT, WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES>& grid, UNLOADER& unloader)
         {
-            grid.LockGrid();
             unloader.Unload(grid);
-            grid.UnlockGrid();
         }
 };
-#endif
 
+#endif

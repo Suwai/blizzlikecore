@@ -1,23 +1,76 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef BLIZZLIKECORE_ERRORS_H
-#define BLIZZLIKECORE_ERRORS_H
+#ifndef BLIZZLIKESERVER_ERRORS_H
+#define BLIZZLIKESERVER_ERRORS_H
 
 #include "Common.h"
 
-#ifdef HAVE_ACE_STACK_TRACE_H                               // old versions ACE not have Stack_Trace.h but used at some oS for better compatibility
-#define WPAssert( assertion ) { if (!(assertion)) { ACE_Stack_Trace st; fprintf( stderr, "\n%s:%i in %s ASSERTION FAILED:\n  %s\n%s\n", __FILE__, __LINE__,__FUNCTION__,  #assertion, st.c_str()); assert( #assertion &&0 ); } }
+#ifndef HAVE_CONFIG_H
+#  define HAVE_ACE_STACK_TRACE_H 1
+#endif
+
+#ifdef HAVE_ACE_STACK_TRACE_H
+#  include "ace/Stack_Trace.h"
+#endif
+
+#ifdef HAVE_ACE_STACK_TRACE_H
+// Normal assert.
+#define WPError(CONDITION) \
+if (!(CONDITION)) \
+{ \
+    ACE_Stack_Trace st; \
+    printf("%s:%i: Error: Assertion in %s failed: %s\nStack Trace:\n%s", \
+        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION), st.c_str()); \
+    assert(STRINGIZE(CONDITION) && 0); \
+}
+
+// Just warn.
+#define WPWarning(CONDITION) \
+if (!(CONDITION)) \
+{ \
+    ACE_Stack_Trace st; \
+    printf("%s:%i: Warning: Assertion in %s failed: %s\nStack Trace:\n%s",\
+        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION), st.c_str()); \
+}
 #else
-#define WPAssert( assertion ) { if (!(assertion)) { fprintf( stderr, "\n%s:%i in %s ASSERTION FAILED2:\n  %s\n", __FILE__, __LINE__,__FUNCTION__,  #assertion); assert( #assertion &&0 ); } }
+// Normal assert.
+#define WPError(CONDITION) \
+if (!(CONDITION)) \
+{ \
+    printf("%s:%i: Error: Assertion in %s failed: %s", \
+        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION)); \
+    assert(STRINGIZE(CONDITION) && 0); \
+}
+
+// Just warn.
+#define WPWarning(CONDITION) \
+if (!(CONDITION)) \
+{ \
+    printf("%s:%i: Warning: Assertion in %s failed: %s",\
+        __FILE__, __LINE__, __FUNCTION__, STRINGIZE(CONDITION)); \
+}
 #endif
-#define WPError( assertion, errmsg ) if ( ! (assertion) ) { sLog.outError( "%\n%s:%i in %s ERROR:\n  %s\n", __FILE__, __LINE__, __FUNCTION__, (char *)errmsg ); assert( false ); }
-#define WPWarning( assertion, errmsg ) if ( ! (assertion) ) { sLog.outError( "\n%s:%i in %s WARNING:\n  %s\n", __FILE__, __LINE__, __FUNCTION__, (char *)errmsg ); }
 
-#define WPFatal( assertion, errmsg ) if ( ! (assertion) ) { sLog.outError( "\n%s:%i in %s FATAL ERROR:\n  %s\n", __FILE__, __LINE__, __FUNCTION__, (char *)errmsg ); assert( #assertion &&0 ); abort(); }
-
-#define ASSERT WPAssert
+#ifdef BLIZZLIKE_DEBUG
+#  define BLIZZLIKE_ASSERT WPError
+#else
+#  define BLIZZLIKE_ASSERT WPError                             // Error even if in release mode.
 #endif
 
+#endif

@@ -1,10 +1,23 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _blizzlikeSOAP_H
-#define _blizzlikeSOAP_H
+#ifndef _BCSOAP_H
+#define _BCSOAP_H
 
 #include "Common.h"
 #include "World.h"
@@ -18,11 +31,11 @@
 #include <ace/Task.h>
 
 
-class BCSoapRunnable: public ACE_Based::Runnable
+class BCsoapRunnable: public ACE_Based::Runnable
 {
     public:
-        BCSoapRunnable() { }
-        void run();
+        BCsoapRunnable() { }
+        void run() override;
         void setListenArguments(std::string host, uint16 port)
         {
             m_host = host;
@@ -36,29 +49,29 @@ class BCSoapRunnable: public ACE_Based::Runnable
 class SOAPWorkingThread : public ACE_Task<ACE_MT_SYNCH>
 {
     public:
-        SOAPWorkingThread ()
+        SOAPWorkingThread()
         { }
 
-        virtual int svc (void)
+        virtual int svc(void) override
         {
             while (1)
             {
-                ACE_Message_Block *mb = 0;
-                if (this->getq (mb) == -1)
+                ACE_Message_Block* mb = 0;
+                if (this->getq(mb) == -1)
                 {
-                    ACE_DEBUG ((LM_INFO,
-                                ACE_TEXT ("(%t) Shutting down\n")));
+                    ACE_DEBUG((LM_INFO,
+                               ACE_TEXT("(%t) Shutting down\n")));
                     break;
                 }
 
                 // Process the message.
-                process_message (mb);
+                process_message(mb);
             }
 
             return 0;
         }
     private:
-        void process_message (ACE_Message_Block *mb);
+        void process_message(ACE_Message_Block* mb);
 };
 
 
@@ -68,7 +81,6 @@ class SOAPCommand
         SOAPCommand():
             pendingCommands(0, USYNC_THREAD, "pendingCommands")
         {
-
         }
         ~SOAPCommand()
         {
@@ -102,4 +114,3 @@ class SOAPCommand
 };
 
 #endif
-

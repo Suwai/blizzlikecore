@@ -1,8 +1,3 @@
-/*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
- */
-
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include "adt.h"
@@ -49,7 +44,7 @@ bool ADT_file::prepareLoadedData()
         return false;
 
     // Check and prepare MHDR
-    a_grid = (adt_MHDR *)(GetData()+8+version->size);
+    a_grid = (adt_MHDR*)(GetData() + 8 + version->size);
     if (!a_grid->prepareLoadedData())
         return false;
 
@@ -61,7 +56,7 @@ bool adt_MHDR::prepareLoadedData()
     if (fcc != 'MHDR')
         return false;
 
-    if (size!=sizeof(adt_MHDR)-8)
+    if (size != sizeof(adt_MHDR) - 8)
         return false;
 
     // Check and prepare MCIN
@@ -81,9 +76,9 @@ bool adt_MCIN::prepareLoadedData()
         return false;
 
     // Check cells data
-    for (int i=0; i<ADT_CELLS_PER_GRID;i++)
-        for (int j=0; j<ADT_CELLS_PER_GRID;j++)
-            if (cells[i][j].offsMCNK && !getMCNK(i,j)->prepareLoadedData())
+    for (int i = 0; i < ADT_CELLS_PER_GRID; i++)
+        for (int j = 0; j < ADT_CELLS_PER_GRID; j++)
+            if (cells[i][j].offsMCNK && !getMCNK(i, j)->prepareLoadedData())
                 return false;
 
     return true;
@@ -121,7 +116,7 @@ bool adt_MCVT::prepareLoadedData()
     if (fcc != 'MCVT')
         return false;
 
-    if (size != sizeof(adt_MCVT)-8)
+    if (size != sizeof(adt_MCVT) - 8)
         return false;
 
     return true;

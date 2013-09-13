@@ -1,56 +1,97 @@
-# This file is part of the BlizzLikeCore Project.
-# See CREDITS and LICENSE files for Copyright information.
+# This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set(sources
-    MMapCommon.h
-    IntermediateValues.cpp
-    IntermediateValues.h
-    MapBuilder.cpp
-    MapBuilder.h
-    generator.cpp
-    TerrainBuilder.cpp
-    TerrainBuilder.h
-    VMapExtensions.cpp
-)
+add_definitions(-DMMAP_GENERATOR -DNO_CORE_FUNCS -DDEBUG)
 
-# definitions
-add_definitions(-DNO_CORE_FUNCS)
-add_definitions(-DDEBUG)
-add_definitions(-DNO_vsnprintf)
+# zlib
+add_definitions( -DNO_vsnprintf )
+
+if(NOT WIN32)
+  add_definitions("-ggdb")
+  add_definitions("-O3")
+endif()
 
 include_directories(
-  ${ACE_INCLUDE_DIR}
-  ${MYSQL_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/dep/libmpq
-  ${CMAKE_SOURCE_DIR}/dep/zlib
-  ${CMAKE_SOURCE_DIR}/dep/acelite
-  ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/src/shared
-  ${CMAKE_SOURCE_DIR}/src/collision
-  ${CMAKE_SOURCE_DIR}/src/framework
-  ${CMAKE_SOURCE_DIR}/src/game
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/shared
+    ${CMAKE_SOURCE_DIR}/src/game
+    ${CMAKE_SOURCE_DIR}/src/game/vmap
+    ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
+    ${CMAKE_SOURCE_DIR}/src/framework
+    ${CMAKE_SOURCE_DIR}/dep/ACE_wrappers
+    ${CMAKE_SOURCE_DIR}/objdir/dep/ACE_wrappers
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Include
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Include
+    ${CMAKE_SOURCE_DIR}/dep/src/zlib
 )
 
-add_executable(mmap_generator
-    ${sources}
+add_library(mvmap
+	${CMAKE_SOURCE_DIR}/src/game/vmap/BIH.cpp
+	${CMAKE_SOURCE_DIR}/src/game/vmap/VMapManager2.cpp
+	${CMAKE_SOURCE_DIR}/src/game/vmap/MapTree.cpp
+	${CMAKE_SOURCE_DIR}/src/game/vmap/TileAssembler.cpp
+	${CMAKE_SOURCE_DIR}/src/game/vmap/WorldModel.cpp
+	${CMAKE_SOURCE_DIR}/src/game/vmap/ModelInstance.cpp
 )
 
-target_link_libraries(mmap_generator
-  collision
-  g3dlib
-  Recast
-  Detour
-  blizzlikeframework
-  ${MYSQL_LIBRARY}
-  ${ACE_LIBRARY}
-  ${BZIP2_LIBRARIES}
-  ${ZLIB_LIBRARIES}
-)
-
-if( UNIX )
-  install(TARGETS mmap_generator DESTINATION bin)
-elseif( WIN32 )
-  install(TARGETS mmap_generator DESTINATION "${CMAKE_INSTALL_PREFIX}")
+if(NOT WIN32)
+  add_library(zlib
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/adler32.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/compress.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/crc32.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/deflate.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/example.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/gzio.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/infback.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/inffast.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/inflate.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/inftrees.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/trees.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/uncompr.c
+      ${CMAKE_SOURCE_DIR}/dep/src/zlib/zutil.c
+  )
 endif()
+
+target_link_libraries(mvmap g3dlite zlib)
+
+add_library(Detour
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourAlloc.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourCommon.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourNavMesh.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourNavMeshBuilder.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourNavMeshQuery.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourNode.cpp
+)
+
+add_library(Recast
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/Recast.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastAlloc.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastArea.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastContour.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastFilter.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastMesh.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastMeshDetail.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastRasterization.cpp
+    ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastRegion.cpp
+)
+
+set(SOURCES
+    ./src/IntermediateValues.cpp
+    ./src/generator.cpp
+    ./src/MapBuilder.cpp
+    ./src/TerrainBuilder.cpp
+    ./src/VMapExtensions.cpp
+)
+
+add_executable( MoveMapGen ${SOURCES} )
+
+target_link_libraries( MoveMapGen g3dlite mvmap Detour Recast zlib )
+
+install(TARGETS MoveMapGen DESTINATION ${BIN_DIR}/tools)

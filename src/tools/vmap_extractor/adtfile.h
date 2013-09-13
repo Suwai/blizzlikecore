@@ -1,15 +1,29 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef ADT_H
 #define ADT_H
 
-#include "warnings.h"
 #include "mpq_libmpq04.h"
 #include "wmo.h"
+#include "vmapexport.h"
 #include "model.h"
+#include "libmpq/mpq.h"
 
 #define TILESIZE (533.33333f)
 #define CHUNKSIZE ((TILESIZE) / 16.0f)
@@ -22,7 +36,7 @@ typedef struct
     float x;
     float y;
     float z;
-}svec;
+} svec;
 
 struct vec
 {
@@ -38,9 +52,9 @@ struct triangle
 
 typedef struct
 {
-    float v9[16*8+1][16*8+1];
-    float v8[16*8][16*8];
-}Cell;
+    float v9[16 * 8 + 1][16 * 8 + 1];
+    float v8[16 * 8][16 * 8];
+} Cell;
 
 typedef struct
 {
@@ -50,12 +64,12 @@ typedef struct
     //Liquid *lq;
     float waterlevel[9][9];
     uint8 flag;
-}chunk;
+} chunk;
 
 typedef struct
 {
     chunk ch[16][16];
-}mcell;
+} mcell;
 
 struct MapChunkHeader
 {
@@ -94,34 +108,38 @@ struct MapChunkHeader
     uint32 effectId;
 };
 
+
 class ADTFile
 {
-public:
-    ADTFile(char* filename);
-    ~ADTFile();
-    int nWMO;
-    int nMDX;
-    string* WmoInstansName;
-    string* ModelInstansName;
-    bool init(uint32 map_num, uint32 tileX, uint32 tileY);
-    //void LoadMapChunks();
+    public:
+        ADTFile(char* filename);
+        ~ADTFile();
+        int nWMO;
+        int nMDX;
+        string* WmoInstansName;
+        string* ModelInstansName;
+        bool init(uint32 map_num, uint32 tileX, uint32 tileY, StringSet& failedPaths);
+        //void LoadMapChunks();
 
-    //uint32 wmo_count;
-/*
-    const mcell& Getmcell() const
-    {
-        return Mcell;
-    }
-*/
-private:
-    //size_t mcnk_offsets[256], mcnk_sizes[256];
-    MPQFile ADT;
-    //mcell Mcell;
-    string Adtfilename;
+        //uint32 wmo_count;
+        /*
+            const mcell& Getmcell() const
+            {
+                return Mcell;
+            }
+        */
+    private:
+        //size_t mcnk_offsets[256], mcnk_sizes[256];
+        MPQFile ADT;
+        //mcell Mcell;
+        string Adtfilename;
 };
 
-void fixnamen(char *name, size_t len);
+const char* GetPlainName(const char* FileName);
+char* GetPlainName(char* FileName);
+char const* GetExtension(char const* FileName);
+void fixnamen(char* name, size_t len);
+void fixname2(char* name, size_t len);
 //void fixMapNamen(char *name, size_t len);
 
 #endif
-

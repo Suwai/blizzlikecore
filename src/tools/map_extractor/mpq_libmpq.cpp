@@ -1,9 +1,4 @@
-/*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
- */
-
-#include "mpq_libmpq04.h"
+#include "mpq_libmpq.h"
 #include <deque>
 #include <stdio.h>
 
@@ -13,8 +8,10 @@ MPQArchive::MPQArchive(const char* filename)
 {
     int result = libmpq_archive_open(&mpq_a, (unsigned char*)filename);
     printf("Opening %s\n", filename);
-    if (result) {
-        switch (result) {
+    if (result)
+    {
+        switch (result)
+        {
             case LIBMPQ_EFILE :                   /* error on file operation */
                 printf("Error opening archive '%s': File operation Error\n", filename);
                 break;
@@ -66,9 +63,9 @@ MPQFile::MPQFile(const char* filename):
     pointer(0),
     size(0)
 {
-    for (ArchiveSet::iterator i=gOpenArchives.begin(); i!=gOpenArchives.end();++i)
+    for (ArchiveSet::iterator i = gOpenArchives.begin(); i != gOpenArchives.end(); ++i)
     {
-        mpq_archive &mpq_a = (*i)->mpq_a;
+        mpq_archive& mpq_a = (*i)->mpq_a;
 
         mpq_hash hash = (*i)->GetHashEntry(filename);
         uint32 blockindex = hash.blockindex;
@@ -79,13 +76,14 @@ MPQFile::MPQFile(const char* filename):
         uint32 fileno = blockindex;
 
         //int fileno = libmpq_file_number(&mpq_a, filename);
-        //if (fileno == LIBMPQ_EFILE_NOT_FOUND)
+        //if(fileno == LIBMPQ_EFILE_NOT_FOUND)
         //    continue;
 
         // Found!
         size = libmpq_file_info(&mpq_a, LIBMPQ_FILE_UNCOMPRESSED_SIZE, fileno);
         // HACK: in patch.mpq some files don't want to open and give 1 for filesize
-        if (size<=1) {
+        if (size <= 1)
+        {
             eof = true;
             buffer = 0;
             return;
@@ -106,7 +104,8 @@ size_t MPQFile::read(void* dest, size_t bytes)
     if (eof) return 0;
 
     size_t rpos = pointer + bytes;
-    if (rpos > size) {
+    if (rpos > size)
+    {
         bytes = size - pointer;
         eof = true;
     }

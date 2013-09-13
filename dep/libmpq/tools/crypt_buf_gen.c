@@ -44,7 +44,7 @@ int32_t libmpq__buffer_init() {
 
 	/* initialize the decryption buffer. */
 	for (index1 = 0; index1 < 0x100; index1++) {
-		for (index2 = index1, i = 0; i < 5; i++, index2 += 0x100) {
+		for(index2 = index1, i = 0; i < 5; i++, index2 += 0x100) {
 
 			/* some common variables. */
 			uint32_t temp1, temp2;

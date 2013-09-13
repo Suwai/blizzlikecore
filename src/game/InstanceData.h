@@ -1,78 +1,53 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef BLIZZLIKE_INSTANCE_DATA_H
 #define BLIZZLIKE_INSTANCE_DATA_H
 
-#include "ZoneScript.h"
-//#include "GameObject.h"
-//#include "Map.h"
+#include "Common.h"
+#include "ObjectGuid.h"
 
 class Map;
 class Unit;
 class Player;
 class GameObject;
 class Creature;
+class WorldObject;
 
-typedef std::set<GameObject*> DoorSet;
-typedef std::set<Creature*> MinionSet;
-
-enum EncounterState
+enum InstanceConditionIDs                                   // Suggested values used with CONDITION_INSTANCE_SCRIPT for some generic uses
 {
-    NOT_STARTED   = 0,
-    IN_PROGRESS   = 1,
-    FAIL          = 2,
-    DONE          = 3,
-    SPECIAL       = 4,
-    TO_BE_DECIDED = 5,
+    // for hard-mode loot (0 normal; 1,2... hard,harder... mode)
+    INSTANCE_CONDITION_ID_NORMAL_MODE       = 0,
+    INSTANCE_CONDITION_ID_HARD_MODE         = 1,
+    INSTANCE_CONDITION_ID_HARD_MODE_2       = 2,
+    INSTANCE_CONDITION_ID_HARD_MODE_3       = 3,
+    INSTANCE_CONDITION_ID_HARD_MODE_4       = 4,
+
+    // to check for which team the instance is doing scripts
+    INSTANCE_CONDITION_ID_TEAM_HORDE        = 67,
+    INSTANCE_CONDITION_ID_TEAM_ALLIANCE     = 469,
+
+    // to check water event in SSC
+    INSTANCE_CONDITION_ID_LURKER            = 21217,
+    INSTANCE_CONDITION_ID_SCALDING_WATER    = 37284,
 };
 
-enum DoorType
-{
-    DOOR_TYPE_ROOM = 0,
-    DOOR_TYPE_PASSAGE,
-    MAX_DOOR_TYPES,
-};
-
-struct DoorData
-{
-    uint32 entry, bossId;
-    DoorType type;
-};
-
-struct MinionData
-{
-    uint32 entry, bossId;
-};
-
-struct BossInfo
-{
-    BossInfo() : state(TO_BE_DECIDED) {}
-    EncounterState state;
-    DoorSet door[MAX_DOOR_TYPES];
-    MinionSet minion;
-};
-
-struct DoorInfo
-{
-    explicit DoorInfo(BossInfo *_bossInfo, DoorType _type)
-        : bossInfo(_bossInfo), type(_type) {}
-    BossInfo *bossInfo;
-    DoorType type;
-};
-
-struct MinionInfo
-{
-    explicit MinionInfo(BossInfo *_bossInfo) : bossInfo(_bossInfo) {}
-    BossInfo *bossInfo;
-};
-
-typedef std::multimap<uint32 /*entry*/, DoorInfo> DoorInfoMap;
-typedef std::map<uint32 /*entry*/, MinionInfo> MinionInfoMap;
-
-class InstanceData : public ZoneScript
+class BLIZZLIKE_DLL_SPEC InstanceData
 {
     public:
 
@@ -81,55 +56,63 @@ class InstanceData : public ZoneScript
 
         Map* instance;
 
-        //On creation, NOT load.
+        // On creation, NOT load.
         virtual void Initialize() {}
 
-        //On load
-        virtual void Load(const char * data) { LoadBossState(data); }
+        // On load
+        virtual void Load(const char* /*data*/) {}
 
-        //When save is needed, this function generates the data
-        virtual std::string GetSaveData() { return GetBossSaveData(); }
+        // When save is needed, this function generates the data
+        virtual const char* Save() const { return ""; }
 
-        void SaveToDB();
+        void SaveToDB() const;
 
+        // Called every map update
         virtual void Update(uint32 /*diff*/) {}
 
-        //Used by the map's CanEnter function.
-        //This is to prevent players from entering during boss encounters.
-        virtual bool IsEncounterInProgress() const;
+        // This is to prevent players from entering during boss encounters.
+        virtual bool IsEncounterInProgress() const { return false; };
 
-        //Called when a player successfully enters the instance.
-        virtual void OnPlayerEnter(Player* ) {}
+        // Called when a player successfully enters the instance (after really added to map)
+        virtual void OnPlayerEnter(Player*) {}
 
-        //Handle open / close objects
-        //use HandleGameObject(NULL,boolen,GO); in OnObjectCreate in instance scripts
-        //use HandleGameObject(GUID,boolen,NULL); in any other script
-        void HandleGameObject(uint64 GUID, bool open, GameObject* go = NULL);
+        // Called when a player dies inside instance
+        virtual void OnPlayerDeath(Player*) {}
 
-        //change active state of doors or buttons
-        void DoUseDoorOrButton(uint64 uiGuid, uint32 uiWithRestoreTime = 0, bool bUseAlternativeState = false);
+        // Called when a player leaves the instance (before really removed from map (or possibly world))
+        virtual void OnPlayerLeave(Player*) {}
 
-        //Respawns a GO having negative spawntimesecs in gameobject-table
-        void DoRespawnGameObject(uint64 uiGuid, uint32 uiTimeToDespawn = MINUTE);
+        // Called when a gameobject is created
+        virtual void OnObjectCreate(GameObject*) {}
 
-        virtual bool SetBossState(uint32 id, EncounterState state);
-    protected:
-        void SetBossNumber(uint32 number) { bosses.resize(number); }
-        void LoadDoorData(const DoorData *data);
-        void LoadMinionData(const MinionData *data);
+        // called on creature creation
+        virtual void OnCreatureCreate(Creature * /*creature*/) {}
 
-        void AddDoor(GameObject* door, bool add);
-        void AddMinion(Creature* minion, bool add);
+        // called on creature enter combat
+        virtual void OnCreatureEnterCombat(Creature * /*creature*/) {}
 
-        void UpdateDoorState(GameObject* door);
-        void UpdateMinionState(Creature* minion, EncounterState state);
+        // called on creature evade
+        virtual void OnCreatureEvade(Creature * /*creature*/) {}
 
-        std::string LoadBossState(const char * data);
-        std::string GetBossSaveData();
-    private:
-        std::vector<BossInfo> bosses;
-        DoorInfoMap doors;
-        MinionInfoMap minions;
+        // called on creature death
+        virtual void OnCreatureDeath(Creature * /*creature*/) {}
+
+        // All-purpose data storage 64 bit
+        virtual uint64 GetData64(uint32 /*Data*/) const { return 0; }
+        virtual void SetData64(uint32 /*Data*/, uint64 /*Value*/) { }
+
+        // Guid data storage (wrapper for set/get from uint64 storage
+        ObjectGuid GetGuid(uint32 dataIdx) const { return ObjectGuid(GetData64(dataIdx)); }
+        void SetGuid(uint32 dataIdx, ObjectGuid value) { SetData64(dataIdx, value.GetRawValue()); }
+
+        // All-purpose data storage 32 bit
+        virtual uint32 GetData(uint32 /*Type*/) const { return 0; }
+        virtual void SetData(uint32 /*Type*/, uint32 /*Data*/) {}
+
+        // Condition criteria additional requirements check
+        // This is used for such things are heroic loot
+        // See ObjectMgr.h enum ConditionSource for possible values of conditionSourceType
+        virtual bool CheckConditionCriteriaMeet(Player const* source, uint32 instance_condition_id, WorldObject const* conditionSource, uint32 conditionSourceType) const;
 };
-#endif
 
+#endif

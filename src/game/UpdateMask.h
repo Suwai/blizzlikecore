@@ -1,6 +1,19 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef __UPDATEMASK_H
@@ -17,34 +30,32 @@ class UpdateMask
 
         ~UpdateMask()
         {
-            if (mUpdateMask)
-                delete[] mUpdateMask;
+            delete[] mUpdateMask;
         }
 
-        void SetBit (uint32 index)
+        void SetBit(uint32 index)
         {
-            ((uint8 *)mUpdateMask)[ index >> 3 ] |= 1 << (index & 0x7);
+            ((uint8*)mUpdateMask)[ index >> 3 ] |= 1 << (index & 0x7);
         }
 
-        void UnsetBit (uint32 index)
+        void UnsetBit(uint32 index)
         {
-            ((uint8 *)mUpdateMask)[ index >> 3 ] &= (0xff ^ (1 <<  (index & 0x7)));
+            ((uint8*)mUpdateMask)[ index >> 3 ] &= (0xff ^(1 << (index & 0x7)));
         }
 
-        bool GetBit (uint32 index)
+        bool GetBit(uint32 index) const
         {
-            return (((uint8 *)mUpdateMask)[ index >> 3 ] & (1 << (index & 0x7))) != 0;
+            return (((uint8*)mUpdateMask)[ index >> 3 ] & (1 << (index & 0x7))) != 0;
         }
 
-        uint32 GetBlockCount() { return mBlocks; }
-        uint32 GetLength() { return mBlocks << 2; }
-        uint32 GetCount() { return mCount; }
+        uint32 GetBlockCount() const { return mBlocks; }
+        uint32 GetLength() const { return mBlocks << 2; }
+        uint32 GetCount() const { return mCount; }
         uint8* GetMask() { return (uint8*)mUpdateMask; }
 
-        void SetCount (uint32 valuesCount)
+        void SetCount(uint32 valuesCount)
         {
-            if (mUpdateMask)
-                delete[] mUpdateMask;
+            delete[] mUpdateMask;
 
             mCount = valuesCount;
             mBlocks = (valuesCount + 31) / 32;
@@ -69,21 +80,21 @@ class UpdateMask
 
         void operator &= (const UpdateMask& mask)
         {
-            ASSERT(mask.mCount <= mCount);
-            for (uint32 i = 0; i < mBlocks; i++)
+            BLIZZLIKE_ASSERT(mask.mCount <= mCount);
+            for (uint32 i = 0; i < mBlocks; ++i)
                 mUpdateMask[i] &= mask.mUpdateMask[i];
         }
 
         void operator |= (const UpdateMask& mask)
         {
-            ASSERT(mask.mCount <= mCount);
-            for (uint32 i = 0; i < mBlocks; i++)
+            BLIZZLIKE_ASSERT(mask.mCount <= mCount);
+            for (uint32 i = 0; i < mBlocks; ++i)
                 mUpdateMask[i] |= mask.mUpdateMask[i];
         }
 
         UpdateMask operator & (const UpdateMask& mask) const
         {
-            ASSERT(mask.mCount <= mCount);
+            BLIZZLIKE_ASSERT(mask.mCount <= mCount);
 
             UpdateMask newmask;
             newmask = *this;
@@ -94,7 +105,7 @@ class UpdateMask
 
         UpdateMask operator | (const UpdateMask& mask) const
         {
-            ASSERT(mask.mCount <= mCount);
+            BLIZZLIKE_ASSERT(mask.mCount <= mCount);
 
             UpdateMask newmask;
             newmask = *this;
@@ -106,7 +117,6 @@ class UpdateMask
     private:
         uint32 mCount;
         uint32 mBlocks;
-        uint32 *mUpdateMask;
+        uint32* mUpdateMask;
 };
 #endif
-

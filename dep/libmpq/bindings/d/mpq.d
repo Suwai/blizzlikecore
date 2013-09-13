@@ -115,7 +115,7 @@ class MPQException : Exception {
 
 /** template to wrap function calls and throw exceptions in case of error
  *
- * thanks for the idea to while (nan) blog,
+ * thanks for the idea to while(nan) blog,
  * http://while-nan.blogspot.com/2007/06/wrapping-functions-for-fun-and-profit.html
  *
  * use: MPQ_CHECKERR(libmpq__archive_open)(&m, "foo.mpq", -1);

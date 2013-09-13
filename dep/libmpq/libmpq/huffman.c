@@ -969,7 +969,7 @@ int32_t libmpq__do_decompress_huffman(struct huffman_tree_s *ht, struct huffman_
 	ht->cmp0 = (n8bits == 0) ? TRUE : FALSE;
 
 	/* loop until break. */
-	for (;;) {
+	for(;;) {
 
 		/* get 7 bits from input stream. */
 		n7bits = libmpq__huffman_get_7bit(is);

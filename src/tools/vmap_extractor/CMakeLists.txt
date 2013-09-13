@@ -1,7 +1,14 @@
-# This file is part of the BlizzLikeCore Project.
-# See CREDITS and LICENSE files for Copyright information.
+# This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-file(GLOB_RECURSE sources *.cpp *.h)
+file(GLOB_RECURSE SOURCES *.cpp *.h)
 
 # uncomment next line to disable debug mode
 add_definitions("-DIOMAP_DEBUG")
@@ -15,18 +22,33 @@ if(NOT WIN32)
   add_definitions("-O3")
 endif(NOT WIN32)
 
-if( UNIX )
+if(CMAKE_COMPILER_IS_GNUCXX)
+  add_definitions(--no-warnings)
+elseif(MSVC)
+  add_definitions(/W0)
+endif()
+
+include_directories(
+  ${CMAKE_SOURCE_DIR}/dep/libmpq
+)
+
+if(WIN32)
   include_directories(
-    ${CMAKE_SOURCE_DIR}/dep/libmpq
-  )
-elseif( WIN32 )
-  include_directories(
-    ${CMAKE_SOURCE_DIR}/dep/libmpq
     ${CMAKE_SOURCE_DIR}/dep/libmpq/win
   )
 endif()
 
-add_executable(vmap_extractor ${sources})
+LINK_DIRECTORIES( ${LINK_DIRECTORIES} ${CMAKE_SOURCE_DIR}/dep/libmpq/libmpq/.libs/ )
+
+add_executable(vmap_extractor ${SOURCES})
+
+if(WIN32)
+  set(BZIP2_LIBRARIES "bzip2")
+  set(ZLIB_LIBRARIES "zlib")
+elseif(UNIX)
+  set(BZIP2_LIBRARIES "bz2")
+  set(ZLIB_LIBRARIES "z")
+endif()
 
 target_link_libraries(vmap_extractor
   mpq
@@ -34,10 +56,4 @@ target_link_libraries(vmap_extractor
   ${ZLIB_LIBRARIES}
 )
 
-add_dependencies(vmap_extractor mpq)
-
-if( UNIX )
-  install(TARGETS vmap_extractor DESTINATION bin)
-elseif( WIN32 )
-  install(TARGETS vmap_extractor DESTINATION "${CMAKE_INSTALL_PREFIX}")
-endif()
+install(TARGETS vmap_extractor DESTINATION ${BIN_DIR}/tools)

@@ -1,12 +1,29 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+/** \file
+  \ingroup authserver
+  */
+
+#include "Common.h"
 #include "PatchHandler.h"
 #include "AuthCodes.h"
 #include "Log.h"
-#include "Common.h"
 
 #include <ace/OS_NS_sys_socket.h>
 #include <ace/OS_NS_dirent.h>
@@ -58,9 +75,9 @@ int PatchHandler::open(void*)
 
     int nodelay = 0;
     if (-1 == peer().set_option(ACE_IPPROTO_TCP,
-                TCP_NODELAY,
-                &nodelay,
-                sizeof(nodelay)))
+                                TCP_NODELAY,
+                                &nodelay,
+                                sizeof(nodelay)))
     {
         return -1;
     }
@@ -68,9 +85,9 @@ int PatchHandler::open(void*)
 #if defined(TCP_CORK)
     int cork = 1;
     if (-1 == peer().set_option(ACE_IPPROTO_TCP,
-                TCP_CORK,
-                &cork,
-                sizeof(cork)))
+                                TCP_CORK,
+                                &cork,
+                                sizeof(cork)))
     {
         return -1;
     }
@@ -99,8 +116,8 @@ int PatchHandler::svc(void)
         data.data_size = (ACE_UINT16)r;
 
         if (peer().send((const char*)&data,
-                    ((size_t) r) + sizeof(data) - sizeof(data.data),
-                    flags) == -1)
+                        ((size_t) r) + sizeof(data) - sizeof(data.data),
+                        flags) == -1)
         {
             return -1;
         }
@@ -116,7 +133,7 @@ int PatchHandler::svc(void)
 
 PatchCache::~PatchCache()
 {
-    for (Patches::iterator i = patches_.begin (); i != patches_.end (); i++)
+    for (Patches::iterator i = patches_.begin(); i != patches_.end(); ++i)
         delete i->second;
 }
 
@@ -135,7 +152,7 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
     // Try to open the patch file
     std::string path = "./patches/";
     path += szFileName;
-    FILE * pPatch = fopen(path.c_str (), "rb");
+    FILE* pPatch = fopen(path.c_str(), "rb");
     sLog.outDebug("Loading patch info from %s", path.c_str());
 
     if (!pPatch)
@@ -145,11 +162,11 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
     MD5_CTX ctx;
     MD5_Init(&ctx);
 
-    const size_t check_chunk_size = 4*1024;
+    const size_t check_chunk_size = 4 * 1024;
 
     ACE_UINT8 buf[check_chunk_size];
 
-    while (!feof (pPatch))
+    while (!feof(pPatch))
     {
         size_t read = fread(buf, 1, check_chunk_size, pPatch);
         MD5_Update(&ctx, buf, read);
@@ -159,13 +176,13 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
 
     // Store the result in the internal patch hash map
     patches_[path] = new PATCH_INFO;
-    MD5_Final((ACE_UINT8 *) & patches_[path]->md5, &ctx);
+    MD5_Final((ACE_UINT8*) & patches_[path]->md5, &ctx);
 }
 
-bool PatchCache::GetHash(const char * pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH])
+bool PatchCache::GetHash(const char* pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH])
 {
-    for (Patches::iterator i = patches_.begin (); i != patches_.end (); i++)
-        if (!stricmp(pat, i->first.c_str ()))
+    for (Patches::iterator i = patches_.begin(); i != patches_.end(); ++i)
+        if (!stricmp(pat, i->first.c_str()))
         {
             memcpy(mymd5, i->second->md5, MD5_DIGEST_LENGTH);
             return true;

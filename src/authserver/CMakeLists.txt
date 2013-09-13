@@ -1,73 +1,104 @@
-# This file is part of the BlizzLikeCore Project.
-# See CREDITS and LICENSE files for Copyright information.
+#
+# This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
 
-file(GLOB sources_localdir *.cpp *.h)
+set(EXECUTABLE_NAME authserver)
 
-set(authserver_SRCS
-  ${authserver_SRCS}
-  ${sources_localdir}
-)
+set(EXECUTABLE_SRCS
+    AuthCodes.h
+    AuthSocket.cpp
+    AuthSocket.h
+    BufferedSocket.cpp
+    BufferedSocket.h
+    Main.cpp
+    PatchHandler.cpp
+    PatchHandler.h
+    RealmList.cpp
+    RealmList.h
+   )
 
-if( WIN32 )
-  set(authserver_SRCS
-    ${authserver_SRCS}
-    ${sources_Debugging}
-    authserver.rc
-  )
+if(WIN32)
+  # add resource file to windows build
+  set(EXECUTABLE_SRCS ${EXECUTABLE_SRCS} authserver.rc)
 endif()
 
 include_directories(
-  ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/src/shared
-  ${CMAKE_SOURCE_DIR}/src/shared/Database
   ${CMAKE_SOURCE_DIR}/src/framework
-  ${ACE_INCLUDE_DIR}
+  ${CMAKE_BINARY_DIR}
+  ${CMAKE_BINARY_DIR}/src/shared
   ${MYSQL_INCLUDE_DIR}
-  ${OPENSSL_INCLUDE_DIR}
+  ${ACE_INCLUDE_DIR}
 )
 
-set(authserver_LINK_FLAGS "")
-
-add_executable(authserver
-  ${authserver_SRCS}
+add_executable(${EXECUTABLE_NAME}
+  ${EXECUTABLE_SRCS}
 )
 
-add_dependencies(authserver revision.h)
-
-if( NOT WIN32 )
-  add_definitions(-D_BLIZZLIKE_AUTH_CONFIG="${CONF_DIR}/authserver.conf")
+add_dependencies(${EXECUTABLE_NAME} revision.h)
+if(NOT ACE_USE_EXTERNAL)
+  add_dependencies(${EXECUTABLE_NAME} ACE_Project)
+# add_dependencies(${EXECUTABLE_NAME} ace)
 endif()
 
-if( UNIX )
-  set(authserver_LINK_FLAGS "-pthread ${authserver_LINK_FLAGS}")
-endif()
-
-if( CMAKE_SYSTEM_NAME MATCHES "Darwin" )
-  set(authserver_LINK_FLAGS "-framework Carbon ${authserver_LINK_FLAGS}")
-endif()
-
-set_target_properties(authserver PROPERTIES LINK_FLAGS "${authserver_LINK_FLAGS}")
-
-target_link_libraries(authserver
+target_link_libraries(${EXECUTABLE_NAME}
   shared
-  blizzlikeframework
-  ${MYSQL_LIBRARY}
-  ${OPENSSL_LIBRARIES}
-  ${OPENSSL_EXTRA_LIBRARIES}
-  ${OSX_LIBS}
+  framework
+  ${ACE_LIBRARIES}
 )
 
-if( WIN32 )
-  add_custom_command(TARGET authserver
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/authserver.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
+if(WIN32)
+  target_link_libraries(${EXECUTABLE_NAME}
+    optimized ${MYSQL_LIBRARY}
+    optimized ${OPENSSL_LIBRARIES}
+    debug ${MYSQL_DEBUG_LIBRARY}
+    debug ${OPENSSL_DEBUG_LIBRARIES}
+  )
+  if(PLATFORM MATCHES X86)
+    target_link_libraries(${EXECUTABLE_NAME})
+  endif()
+endif()
+
+if(UNIX)
+  target_link_libraries(${EXECUTABLE_NAME}
+    ${MYSQL_LIBRARY}
+    ${OPENSSL_LIBRARIES}
+    ${OPENSSL_EXTRA_LIBRARIES}
   )
 endif()
 
-if( UNIX )
-  install(TARGETS authserver DESTINATION bin)
-  install(FILES authserver.conf.dist DESTINATION etc)
-elseif( WIN32 )
-  install(TARGETS authserver DESTINATION "${CMAKE_INSTALL_PREFIX}")
-  install(FILES authserver.conf.dist DESTINATION "${CMAKE_INSTALL_PREFIX}")
+set(EXECUTABLE_LINK_FLAGS "")
+
+if(UNIX)
+  set(EXECUTABLE_LINK_FLAGS "-pthread ${EXECUTABLE_LINK_FLAGS}")
+endif()
+
+if(APPLE)
+  set(EXECUTABLE_LINK_FLAGS "-framework Carbon ${EXECUTABLE_LINK_FLAGS}")
+endif()
+
+set_target_properties(${EXECUTABLE_NAME} PROPERTIES LINK_FLAGS
+  "${EXECUTABLE_LINK_FLAGS}"
+)
+
+install(TARGETS ${EXECUTABLE_NAME} DESTINATION ${BIN_DIR})
+
+install(FILES authserver.conf.dist.in DESTINATION ${CONF_DIR} RENAME authserver.conf)
+
+if(WIN32 AND MSVC)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/\${BUILD_TYPE}/${EXECUTABLE_NAME}.pdb DESTINATION ${BIN_DIR} CONFIGURATIONS Debug)
 endif()

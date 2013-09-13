@@ -1,6 +1,19 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef __EVENTPROCESSOR_H
@@ -8,14 +21,19 @@
 
 #include "Platform/Define.h"
 
-#include<map>
+#include <map>
 
 // Note. All times are in milliseconds here.
 
 class BasicEvent
 {
     public:
-        BasicEvent() { to_Abort = false; }
+
+        BasicEvent()
+            : to_Abort(false)
+        {
+        }
+
         virtual ~BasicEvent()                               // override destructor to perform some actions on event removal
         {
         };
@@ -42,6 +60,7 @@ typedef std::multimap<uint64, BasicEvent*> EventList;
 class EventProcessor
 {
     public:
+
         EventProcessor();
         ~EventProcessor();
 
@@ -49,10 +68,12 @@ class EventProcessor
         void KillAllEvents(bool force);
         void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
         uint64 CalculateTime(uint64 t_offset);
+
     protected:
+
         uint64 m_time;
         EventList m_events;
         bool m_aborting;
 };
-#endif
 
+#endif

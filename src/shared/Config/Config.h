@@ -1,6 +1,19 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef CONFIG_H
@@ -12,13 +25,14 @@
 
 class ACE_Configuration_Heap;
 
-class Config
+class BLIZZLIKE_DLL_SPEC Config
 {
     public:
+
         Config();
         ~Config();
 
-        bool SetSource(const char *file);
+        bool SetSource(const char* file);
         bool Reload();
 
         std::string GetStringDefault(const char* name, const char* def);
@@ -31,10 +45,9 @@ class Config
     private:
 
         std::string mFilename;
-        ACE_Configuration_Heap *mConf;
+        ACE_Configuration_Heap* mConf;
 };
 
 #define sConfig BlizzLike::Singleton<Config>::Instance()
 
 #endif
-

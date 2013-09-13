@@ -1,12 +1,7 @@
-/*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
- */
-
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include "loadlib.h"
-#include "../mpq_libmpq04.h"
+#include "../mpq_libmpq.h"
 
 #include <stdio.h>
 
@@ -24,7 +19,7 @@ FileLoader::~FileLoader()
     free();
 }
 
-bool FileLoader::loadFile(char *filename, bool log)
+bool FileLoader::loadFile(char* filename, bool log)
 {
     free();
     MPQFile mf(filename);
@@ -54,7 +49,7 @@ bool FileLoader::loadFile(char *filename, bool log)
 bool FileLoader::prepareLoadedData()
 {
     // Check version
-    version = (file_MVER *) data;
+    version = (file_MVER*) data;
     if (version->fcc != 'MVER')
         return false;
     if (version->ver != FILE_FORMAT_VERSION)
@@ -69,4 +64,3 @@ void FileLoader::free()
     data_size = 0;
     version = 0;
 }
-

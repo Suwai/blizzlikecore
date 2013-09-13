@@ -1,41 +1,31 @@
-# This file is part of the BlizzLikeCore Project.
-# See CREDITS and LICENSE files for Copyright information.
+# This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-file(GLOB_RECURSE sources *.cpp *.h)
-
-if( UNIX )
-  include_directories (
-    ${CMAKE_SOURCE_DIR}/src/shared
-    ${CMAKE_SOURCE_DIR}/dep/libmpq
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/loadlib
-    ${CMAKE_SOURCE_DIR}/dep/zlib
-  )
-elseif( WIN32 )
-  include_directories (
-    ${CMAKE_SOURCE_DIR}/src/shared
-    ${CMAKE_SOURCE_DIR}/dep/libmpq
-    ${CMAKE_SOURCE_DIR}/dep/libmpq/win
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/loadlib
-    ${CMAKE_SOURCE_DIR}/dep/zlib
-  )
+if(CMAKE_COMPILER_IS_GNUCXX)
+  add_definitions(--no-warnings)
+elseif(MSVC)
+  add_definitions(/W0)
 endif()
 
-add_executable(map_extractor
-  ${sources}
-)
+add_subdirectory (libmpq)
+add_subdirectory (loadlib)
 
-target_link_libraries(map_extractor
-  mpq
-  ${BZIP2_LIBRARIES}
-  ${ZLIB_LIBRARIES}
-)
+include_directories (${CMAKE_CURRENT_SOURCE_DIR}/libmpq)
+include_directories (${CMAKE_CURRENT_SOURCE_DIR}/loadlib)
 
-add_dependencies(map_extractor mpq)
+link_directories (${CMAKE_CURRENT_SOURCE_DIR}/libmpq)
+link_directories (${CMAKE_CURRENT_SOURCE_DIR}/loadlib)
 
-if( UNIX )
-  install(TARGETS map_extractor DESTINATION bin)
-elseif( WIN32 )
-  install(TARGETS map_extractor DESTINATION "${CMAKE_INSTALL_PREFIX}") 
-endif()
+add_executable (ad dbcfile.cpp mpq_libmpq.cpp System.cpp)
+
+target_link_libraries (ad libmpq)
+target_link_libraries (ad loadlib)
+
+install(TARGETS ad DESTINATION ${BIN_DIR}/tools)

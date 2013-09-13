@@ -1,6 +1,19 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #ifndef DBCSTORE_H
@@ -11,12 +24,12 @@
 template<class T>
 class DBCStorage
 {
-    typedef std::list<char*> StringPoolList;
+        typedef std::list<char*> StringPoolList;
     public:
-        explicit DBCStorage(const char *f) : fmt(f), nCount(0), fieldCount(0), indexTable(NULL), m_dataTable(NULL) { }
+        explicit DBCStorage(const char* f) : nCount(0), fieldCount(0), fmt(f), indexTable(NULL), m_dataTable(NULL) { }
         ~DBCStorage() { Clear(); }
 
-        T const* LookupEntry(uint32 id) const { return (id>=nCount)?NULL:indexTable[id]; }
+        T const* LookupEntry(uint32 id) const { return (id >= nCount) ? NULL : indexTable[id]; }
         uint32  GetNumRows() const { return nCount; }
         char const* GetFormat() const { return fmt; }
         uint32 GetFieldCount() const { return fieldCount; }
@@ -29,8 +42,11 @@ class DBCStorage
                 return false;
 
             fieldCount = dbc.GetCols();
+
+            // load raw non-string data
             m_dataTable = (T*)dbc.AutoProduceData(fmt,nCount,(char**&)indexTable);
 
+            // load strings from dbc data
             m_stringPoolList.push_back(dbc.AutoProduceStrings(fmt,(char*)m_dataTable));
 
             // error in dbc file at loading if NULL
@@ -48,6 +64,7 @@ class DBCStorage
             if (!dbc.Load(fn, fmt))
                 return false;
 
+            // load strings from another locale dbc data
             m_stringPoolList.push_back(dbc.AutoProduceStrings(fmt,(char*)m_dataTable));
 
             return true;
@@ -58,9 +75,9 @@ class DBCStorage
             if (!indexTable)
                 return;
 
-            delete[] ((char*)indexTable);
+            delete[]((char*)indexTable);
             indexTable = NULL;
-            delete[] ((char*)m_dataTable);
+            delete[]((char*)m_dataTable);
             m_dataTable = NULL;
 
             while (!m_stringPoolList.empty())
@@ -71,10 +88,13 @@ class DBCStorage
             nCount = 0;
         }
 
+        void EraseEntry(uint32 id) { assert(id < nCount && "To be erased entry must be in bounds!") ; indexTable[id] = NULL; }
+        void InsertEntry(T* entry, uint32 id) { assert(id < nCount && "To be inserted entry must be in bounds!"); indexTable[id] = entry; }
+
     private:
-        char const* fmt;
         uint32 nCount;
         uint32 fieldCount;
+        char const* fmt;
         T** indexTable;
         T* m_dataTable;
         StringPoolList m_stringPoolList;

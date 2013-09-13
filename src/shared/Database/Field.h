@@ -1,10 +1,25 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#if !defined(FIELD_H)
+#ifndef FIELD_H
 #define FIELD_H
+
+#include "Common.h"
 
 class Field
 {
@@ -19,13 +34,13 @@ class Field
             DB_TYPE_BOOL    = 0x04
         };
 
-        Field();
-        Field(Field &f);
-        Field(const char* value, enum DataTypes type);
+        Field() : mValue(NULL), mType(DB_TYPE_UNKNOWN) {}
+        Field(const char* value, enum DataTypes type) : mValue(value), mType(type) {}
 
-        ~Field();
+        ~Field() {}
 
         enum DataTypes GetType() const { return mType; }
+        bool IsNULL() const { return mValue == NULL; }
 
         const char* GetString() const { return mValue; }
         std::string GetCppString() const
@@ -41,34 +56,23 @@ class Field
         uint32 GetUInt32() const { return mValue ? static_cast<uint32>(atol(mValue)) : uint32(0); }
         uint64 GetUInt64() const
         {
-            if (mValue)
-            {
-                uint64 value;
-                sscanf(mValue, UI64FMTD, &value);
-                return value;
-            }
-            else
+            uint64 value = 0;
+            if (!mValue || sscanf(mValue,UI64FMTD,&value) == -1)
                 return 0;
-        }
-        uint64 GetInt64() const
-        {
-            if (mValue)
-            {
-                int64 value;
-                sscanf(mValue, SI64FMTD, &value);
-                return value;
-            }
-            else
-                return 0;
+
+            return value;
         }
 
         void SetType(enum DataTypes type) { mType = type; }
-
-        void SetValue(const char* value);
+        // no need for memory allocations to store resultset field strings
+        // all we need is to cache pointers returned by different DBMS APIs
+        void SetValue(const char* value) { mValue = value; };
 
     private:
-        char* mValue;
+        Field(Field const&);
+        Field& operator=(Field const&);
+
+        const char* mValue;
         enum DataTypes mType;
 };
 #endif
-

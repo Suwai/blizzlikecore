@@ -1,7 +1,24 @@
 /*
- * This file is part of the BlizzLikeCore Project.
- * See CREDITS and LICENSE files for Copyright information.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+/** \file
+  \ingroup authserver
+  */
 
 #ifndef _PATCHHANDLER_H_
 #define _PATCHHANDLER_H_
@@ -17,7 +34,9 @@
 #include <openssl/bn.h>
 #include <openssl/md5.h>
 
-// Caches MD5 hash of client patches present on the server
+/**
+ * @brief Caches MD5 hash of client patches present on the server
+ */
 class PatchCache
 {
     public:
@@ -44,12 +63,11 @@ class PatchCache
         }
 
         void LoadPatchMD5(const char*);
-        bool GetHash(const char * pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH]);
+        bool GetHash(const char* pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH]);
 
     private:
         void LoadPatchesInfo();
         Patches patches_;
-
 };
 
 class PatchHandler: public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH>
@@ -61,14 +79,13 @@ class PatchHandler: public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH>
         PatchHandler(ACE_HANDLE socket, ACE_HANDLE patch);
         virtual ~PatchHandler();
 
-        int open(void* = 0);
+        int open(void* = 0) override;
 
     protected:
-        virtual int svc(void);
+        virtual int svc(void) override;
 
     private:
         ACE_HANDLE patch_fd_;
-
 };
 
 #endif /* _BK_PATCHHANDLER_H__ */
