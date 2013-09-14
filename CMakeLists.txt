@@ -57,10 +57,6 @@ endif()
 # Output description of this script
 message(
   "\nThis script builds the BlizzLikeCore server.
-  Options that can be used in order to configure the process:
-    CMAKE_INSTALL_PREFIX: Path where the server should be installed to
-    PCH: Use precompiled headers
-    DEBUG: Debug mode
   To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
   For example: cmake .. -DDEBUG=1 -DCMAKE_INSTALL_PREFIX=/opt/blizzlikecore\n"
 ) # TODO: PLATFORM: Sets the architecture for compile (X86,X64)
@@ -258,18 +254,10 @@ message("")
 #   message("* Build with RA         : No  (default)")
 # endif(RA)
 
-if(PCH AND NOT PCHSupport_FOUND)
-  set(PCH 0 CACHE BOOL
-    "Use precompiled headers"
-    FORCE)
-  message(
-    "No PCH for your system possible but PCH was set to 1. Resetting it."
-  )
-endif()
-if(PCH)
-  message("Use PCH               : Yes")
+if(ACE_USE_EXTERNAL)
+  message("Use Ace External      : Yes")
 else()
-  message("Use PCH               : No")
+  message("Use Ace External      : No  (default)")
 endif()
 
 if(DEBUG)
@@ -284,7 +272,6 @@ if(UNIX)
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 endif()
-
 # Set warning levels for different builds
 if(UNIX)
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} --no-warnings")
@@ -299,6 +286,56 @@ elseif(WIN32)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
   endif()
+endif()
+
+if(PCH AND NOT PCHSupport_FOUND)
+  set(PCH 0 CACHE BOOL
+    "Use precompiled headers"
+    FORCE)
+  message(
+    "No PCH for your system possible but PCH was set to 1. Resetting it."
+  )
+endif()
+if(PCH)
+  message("Use PCH               : Yes (default)")
+else()
+  message("Use PCH               : No")
+endif()
+
+if(TBB_USE_EXTERNAL)
+  message("Use TBB External      : Yes")
+else()
+  message("Use TBB External      : No  (default)")
+endif()
+
+if(TOOLS)
+  message("Tools                 : Yes (default)")
+else()
+  message("Tools                 : No")
+endif()
+
+if(USE_FASTMM_MALLOC)
+  message("Use FASTMM MALLOC     : Yes (default)")
+else()
+  message("Use FASTMM MALLOC     : No")
+endif()
+
+if(USE_SCRIPTS)
+  message("Use Scripts           : Yes (default)")
+else()
+  message("Use Scripts           : No")
+endif()
+
+if(USE_STD_MALLOC)
+  message("Use STD MALLOC        : Yes")
+else()
+  message("Use STD MALLOC        : No  (default)")
+endif()
+
+if(USE_TBB_MALLOC)
+  message("Use TBB MALLOC        : Yes")
+else()
+  message("Use TBB MALLOC        : No  (default)")
 endif()
 
 # if(SQL)
@@ -433,3 +470,8 @@ add_subdirectory(src)
 # if(SQL)
 #   add_subdirectory(sql)
 # endif()
+
+# Specify the maximum PreCompiled Header memory allocation limit
+# Fixes a compiler-problem when using PCH - the /Ym flag is adjusted by the compiler in MSVC2012, hence we need to set an upper limit with /Zm to avoid discrepancies)
+string(REGEX REPLACE "/Zm[0-9]+ *" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm500" CACHE STRING "" FORCE)

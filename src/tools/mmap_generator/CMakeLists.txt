@@ -8,6 +8,9 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+cmake_minimum_required (VERSION 2.6)
+project( MoveMapGen )
+
 add_definitions(-DMMAP_GENERATOR -DNO_CORE_FUNCS -DDEBUG)
 
 # zlib
@@ -61,7 +64,7 @@ endif()
 
 target_link_libraries(mvmap g3dlite zlib)
 
-add_library(Detour
+add_library(mdetour
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourAlloc.cpp
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourCommon.cpp
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourNavMesh.cpp
@@ -70,7 +73,7 @@ add_library(Detour
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Source/DetourNode.cpp
 )
 
-add_library(Recast
+add_library(mrecast
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/Recast.cpp
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastAlloc.cpp
     ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast/Source/RecastArea.cpp
@@ -92,6 +95,6 @@ set(SOURCES
 
 add_executable( MoveMapGen ${SOURCES} )
 
-target_link_libraries( MoveMapGen g3dlite mvmap Detour Recast zlib )
+target_link_libraries( MoveMapGen g3dlite mvmap mdetour mrecast zlib )
 
 install(TARGETS MoveMapGen DESTINATION ${BIN_DIR}/tools)

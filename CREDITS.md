@@ -3,6 +3,7 @@ Copyright (C) 2012-2013  BlizzLikeGroup
 All credits to:
 
  * Copyright (C) 2005-2013 CMaNGOS <http://cmangos.net/>
+ * Copyright (C) 2005-2013 ScriptDev2 <http://www.scriptdev2.com/>
 
  * Special Thanks: Blizzard Entertainment <http://blizzard.com/>
 

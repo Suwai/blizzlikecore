@@ -16,8 +16,8 @@ SET /p compiler=What is your Compiler?		[VC11]:
 if %compiler%. == . SET compiler=VC11
 SET /p BUILD_PLATFORM=What is your Build Platform?	[Win32]: 
 if %BUILD_PLATFORM%. == . SET BUILD_PLATFORM=Win32
-SET /p MEMORY_MANAGER=What memory manager use?	[STD]: 
-if %MEMORY_MANAGER%. == . SET MEMORY_MANAGER=STD
+SET /p MEMORY_MANAGER=What memory manager use?	[FASTMM]: 
+if %MEMORY_MANAGER%. == . SET MEMORY_MANAGER=FASTMM
 SET /p INSTALL_PATH=What install path use?	["C:\\BlizzLikeCore"]: 
 if %INSTALL_PATH%. == . SET INSTALL_PATH="C:\\BlizzLikeCore"
 echo.
@@ -57,7 +57,7 @@ SET MEMMAN_STR2="0"
 if %MEMORY_MANAGER%==STD    (SET MEMMAN_STR2="1")
 if %MEMORY_MANAGER%==TBB    (SET MEMMAN_STR3="1")
 if %MEMORY_MANAGER%==FASTMM (SET MEMMAN_STR1="1")
-SET C_FLAGS="/DWIN32 /D_WINDOWS /W3 /Zm1000 /EHsc /GR"
+SET C_FLAGS="/DWIN32 /D_WINDOWS /W3 /EHsc /GR"
 goto :begin
 
 :begin
