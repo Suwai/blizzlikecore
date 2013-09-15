@@ -9,7 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 cmake_minimum_required (VERSION 2.6)
-project (BLIZZLIKE_VMAP_ASSEMB_IO)
+project (BlizzLikeVmapAssembler)
 
 set(CMAKE_VERBOSE_MAKEFILE true)
 

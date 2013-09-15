@@ -9,7 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 cmake_minimum_required (VERSION 2.6)
-project( MoveMapGen )
+project(BlizzLikeMoveMapGen)
 
 add_definitions(-DMMAP_GENERATOR -DNO_CORE_FUNCS -DDEBUG)
 

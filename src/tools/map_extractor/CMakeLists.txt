@@ -9,7 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 cmake_minimum_required (VERSION 2.6)
-project (BLIZZLIKE_MAP_EXTRACTOR)
+project (BlizzLikeMapExtractor)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   add_definitions(--no-warnings)

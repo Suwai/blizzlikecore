@@ -24,11 +24,7 @@
 
 if(WIN32)
   set(ACE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/ACE_wrappers)
-  if(PLATFORM MATCHES X64)
-    set(ACE_LIBRARIES_DIR ${CMAKE_SOURCE_DIR}/dep/ACE_wrappers/lib/x64)
-  else()
-    set(ACE_LIBRARIES_DIR ${CMAKE_SOURCE_DIR}/dep/ACE_wrappers/lib)
-  endif()
+  set(ACE_LIBRARIES_DIR ${CMAKE_SOURCE_DIR}/dep/ACE_wrappers/lib)
   set(ACE_LIBRARIES optimized ACE debug ACEd)
 else()
   set(ACE_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include)
