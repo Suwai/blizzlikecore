@@ -23,8 +23,10 @@ if(WIN32)
 endif()
 
 if(WIN32 AND MSVC)
-  # VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
-  if(VS100_FOUND)
+  # VS110 and VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
+  if(VS110_FOUND)
+    set(ACE_BUILD_TOOL ${VS110_DIR}/devenv.com)
+  elseif(VS100_FOUND)
     set(ACE_BUILD_TOOL ${VS100_DIR}/devenv.com)
   else()
     set(ACE_BUILD_TOOL ${CMAKE_BUILD_TOOL})

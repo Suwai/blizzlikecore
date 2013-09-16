@@ -19,8 +19,11 @@
 include(ExternalProject)
 
 if(WIN32 AND MSVC)
-  # VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
-  if(VS100_FOUND)
+  # VS110 and VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
+  if(VS110_FOUND)
+    set(TBB_BUILD_TOOL ${VS110_DIR}/devenv.com)
+    set(TBB_SOURCE <SOURCE_DIR>\\build\\vs110project)
+  elseif(VS100_FOUND)
     set(TBB_BUILD_TOOL ${VS100_DIR}/devenv.com)
     set(TBB_SOURCE <SOURCE_DIR>\\build\\vs100project)
   else()

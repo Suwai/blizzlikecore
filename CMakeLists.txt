@@ -16,7 +16,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
+
+if(WIN32 AND NOT CMAKE_INSTALL_PREFIX)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/bin" CACHE INTERNAL "")
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}" CACHE INTERNAL "")
+endif()
 
 project(BlizzLikeCore)
 set(BLIZZLIKE_VERSION TBC)
@@ -43,8 +48,9 @@ endif()
 find_package(Platform REQUIRED)
 find_package(Git)
 
-# VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
+# VS110 and VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
 if(WIN32 AND MSVC_VERSION MATCHES 1600)
+  find_package(VisualStudio2012)
   find_package(VisualStudio2010)
 endif()
 
@@ -113,7 +119,7 @@ if(WIN32)
     option(USE_FASTMM_MALLOC "Use included FastMM malloc (default for win*)" 1)
   endif()
 else()
-#Unix and other platforms
+# Unix and other platforms
   option(USE_STD_MALLOC "Use standard malloc instead of TBB" 1)
 endif()
 
@@ -128,9 +134,9 @@ if(PCHSupport_FOUND)
   endif()
 endif()
 
-# TODO: remove this in the future! it has only been added to make the switch easier for end users
+# Set installation prefix
 if(PREFIX)
-  message(FATAL_ERROR "The parameter PREFIX has been removed. Please re-run CMake and use CMAKE_INSTALL_PREFIX instead to define your installation location!")
+  set(CMAKE_INSTALL_PREFIX "${PREFIX}")
 endif()
 
 set(BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
@@ -222,19 +228,30 @@ if(UNIX)
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 endif()
-# Set warning levels for different builds
+
+# UNIX
 if(UNIX)
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} --no-warnings")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} --no-warnings")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wfatal-errors")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wfatal-errors")
 elseif(WIN32)
-  # Disable warnings in Visual Studio 8 and above and add /MP
-  if(MSVC AND NOT CMAKE_GENERATOR MATCHES "Visual Studio 7")
-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4267 /MP")
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
+  # MSVC
+  if(MSVC)
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP /Zm500")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4267 /MP /Zm500")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP /Zm500 /bigobj")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP /Zm500 /bigobj")
+    if(PLATFORM EQUAL 64)
+      add_definitions("-D_WIN64")
+    endif()
+    # Mark 32 bit executables large address aware so they can use > 2GB address space
+    if(PLATFORM MATCHES X86)
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
+    endif()
+    add_definitions(-D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
   endif()
 endif()
 
@@ -345,14 +362,6 @@ endif()
 # endif()
 
 message("")
-
-# Some small tweaks for Visual Studio 7 and above.
-if(MSVC)
-  # Mark 32 bit executables large address aware so they can use > 2GB address space
-  if(PLATFORM MATCHES X86)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
-  endif()
-endif()
 
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
