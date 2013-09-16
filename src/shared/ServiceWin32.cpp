@@ -1,5 +1,5 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+ * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

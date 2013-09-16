@@ -1,6 +1,6 @@
-/* Copyright (C) 2006 - 2013 ScriptDev2 <http://www.scriptdev2.com/>
- * This program is free software licensed under GPL version 2
- * Please see the included DOCS/LICENSE.TXT for more information */
+/* This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
+ * This program is free software licensed under GPL version 3
+ * Please see the included README file for more information */
 
 #ifndef DEF_SUNWELLPLATEAU_H
 #define DEF_SUNWELLPLATEAU_H

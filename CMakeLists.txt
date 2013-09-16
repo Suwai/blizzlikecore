@@ -1,9 +1,9 @@
 #
-# This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files.
+# This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -54,21 +54,7 @@ endif()
 #   )
 # endif()
 
-# Output description of this script
-message(
-  "\nThis script builds the BlizzLikeCore server.
-  To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
-  For example: cmake .. -DDEBUG=1 -DCMAKE_INSTALL_PREFIX=/opt/blizzlikecore\n"
-) # TODO: PLATFORM: Sets the architecture for compile (X86,X64)
-
-# Override configuration-types - we don't use anything else than debug and release
-if(CMAKE_CONFIGURATION_TYPES)
-  set(CMAKE_CONFIGURATION_TYPES Release Debug)
-  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
-    "Reset the configurations to what we need"
-    FORCE)
-endif()
-
+# TODO: PLATFORM: Sets the architecture for compile (X86,X64)
 # Find out what system we use to include the needed libs
 if(WIN32)
   if(PLATFORM MATCHES X86) # 32-bit
@@ -92,6 +78,21 @@ endif()
 #   endif()
 # endif()
 
+# Override configuration-types - we don't use anything else than debug and release
+if(CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_CONFIGURATION_TYPES Release Debug)
+  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
+    "Reset the configurations to what we need"
+    FORCE)
+endif()
+
+# Output description of this script
+message(
+  "\nThis script builds the BlizzLikeCore server.
+  To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
+  For example: cmake .. -DDEBUG=1 -DCMAKE_INSTALL_PREFIX=/opt/blizzlikecore\n"
+) 
+
 option(DEBUG "Debug mode" 0)
 # option(CLI "With CLI" 1) # Not used by BlizzLike so far
 # option(RA "With Remote Access" 0) # TODO: support remote access
@@ -99,8 +100,9 @@ option(TBB_USE_EXTERNAL "Use external TBB" 0)
 option(USE_STD_MALLOC "Use standard malloc instead of TBB" 0)
 option(USE_TBB_MALLOC "Use included TBB malloc" 0)
 option(ACE_USE_EXTERNAL "Use external ACE" 0)
-option(USE_SCRIPTS "Use scripts" 1)
+option(SCRIPTS "Build scripts" 1)
 option(TOOLS "Build tools" 1)
+# option(SQL "Copy SQL files" 0)
 
 if(WIN32)
   if(PLATFORM MATCHES X86) # 32-bit
@@ -125,10 +127,6 @@ if(PCHSupport_FOUND)
     option(PCH "Use precompiled headers" 0)
   endif()
 endif()
-
-# FIXME: options that should be checked
-# option(SQL "Copy SQL files" 0)
-# option(TOOLS "Build tools" 0)
 
 # TODO: remove this in the future! it has only been added to make the switch easier for end users
 if(PREFIX)
@@ -219,6 +217,36 @@ add_custom_target(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
 )
 
+# Handle debugmode compiles (this will require further work for proper WIN32-setups)
+if(UNIX)
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+endif()
+# Set warning levels for different builds
+if(UNIX)
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} --no-warnings")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} --no-warnings")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wfatal-errors")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wfatal-errors")
+elseif(WIN32)
+  # Disable warnings in Visual Studio 8 and above and add /MP
+  if(MSVC AND NOT CMAKE_GENERATOR MATCHES "Visual Studio 7")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4267 /MP")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
+  endif()
+endif()
+
+if(PCH AND NOT PCHSupport_FOUND)
+  set(PCH 0 CACHE BOOL
+    "Use precompiled headers"
+    FORCE)
+  message(
+    "No PCH for your system possible but PCH was set to 1. Resetting it."
+  )
+endif()
+
 # Find core revision
 if(GIT_EXECUTABLE)
   execute_process(
@@ -261,45 +289,23 @@ else()
 endif()
 
 if(DEBUG)
-  message("Build in debug-mode   : Yes")
+  message("Debug Mode            : Yes")
   set(CMAKE_BUILD_TYPE Debug)
 else()
   set(CMAKE_BUILD_TYPE Release)
-  message("Build in debug-mode   : No  (default)")
-endif()
-# Handle debugmode compiles (this will require further work for proper WIN32-setups)
-if(UNIX)
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
-endif()
-# Set warning levels for different builds
-if(UNIX)
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} --no-warnings")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} --no-warnings")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wfatal-errors")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wfatal-errors")
-elseif(WIN32)
-  # Disable warnings in Visual Studio 8 and above and add /MP
-  if(MSVC AND NOT CMAKE_GENERATOR MATCHES "Visual Studio 7")
-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4267 /MP")
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP")
-  endif()
+  message("Debug Mode            : No  (default)")
 endif()
 
-if(PCH AND NOT PCHSupport_FOUND)
-  set(PCH 0 CACHE BOOL
-    "Use precompiled headers"
-    FORCE)
-  message(
-    "No PCH for your system possible but PCH was set to 1. Resetting it."
-  )
-endif()
 if(PCH)
   message("Use PCH               : Yes (default)")
 else()
   message("Use PCH               : No")
+endif()
+
+if(SCRIPTS)
+  message("Scripts SD2           : Yes (default)")
+else()
+  message("Scripts SD2           : No")
 endif()
 
 if(TBB_USE_EXTERNAL)
@@ -309,21 +315,15 @@ else()
 endif()
 
 if(TOOLS)
-  message("Tools                 : Yes (default)")
+  message("Tools map/vmap/mmaps  : Yes (default)")
 else()
-  message("Tools                 : No")
+  message("Tools map/vmap/mmaps  : No")
 endif()
 
 if(USE_FASTMM_MALLOC)
   message("Use FASTMM MALLOC     : Yes (default)")
 else()
   message("Use FASTMM MALLOC     : No")
-endif()
-
-if(USE_SCRIPTS)
-  message("Use Scripts           : Yes (default)")
-else()
-  message("Use Scripts           : No")
 endif()
 
 if(USE_STD_MALLOC)
@@ -342,12 +342,6 @@ endif()
 #   message("Install SQL-files     : Yes")
 # else()
 #   message("Install SQL-files     : No  (default)")
-# endif()
-
-# if(TOOLS)
-#   message("Build map/vmap tools  : Yes")
-# else()
-#   message("Build map/vmap tools  : No  (default)")
 # endif()
 
 message("")
@@ -432,6 +426,7 @@ endif()
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ARCH_FLAGS}")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ARCH_FLAGS}")
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ARCH_FLAGS}")
+
 if(XCODE)
   if(PLATFORM MATCHES X86)
     set(CMAKE_OSX_ARCHITECTURES i386)
@@ -467,6 +462,7 @@ set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_RELEASE "${DEFINITIONS_R
 set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_DEBUG "${DEFINITIONS_DEBUG}")
 
 add_subdirectory(src)
+
 # if(SQL)
 #   add_subdirectory(sql)
 # endif()
