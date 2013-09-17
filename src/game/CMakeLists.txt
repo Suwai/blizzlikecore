@@ -66,7 +66,7 @@ set(SRC_GRP_BATTLEGROUND
 )
 
 set(SRC_GRP_CHAT_COMMANDS
-    debugcmds.cpp
+    Debugcmds.cpp
     Level0.cpp
     Level1.cpp
     Level2.cpp

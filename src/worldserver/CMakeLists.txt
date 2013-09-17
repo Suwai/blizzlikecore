@@ -21,8 +21,8 @@ set(EXECUTABLE_NAME worldserver)
 set(EXECUTABLE_SRCS
     CliRunnable.cpp
     CliRunnable.h
-    BCsoap.cpp
-    BCsoap.h
+    BCSoap.cpp
+    BCSoap.h
     Main.cpp
     Master.cpp
     Master.h

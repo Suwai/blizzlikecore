@@ -179,9 +179,8 @@ extern int main(int argc, char** argv)
     }
 #endif
 
-    sLog.outString("********************************************************************************");
+    sLog.outString("");
     sLog.outString("%s worldserver", _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID));
-    sLog.outString("********************************************************************************");
     sLog.outString("");
     sLog.outString("<Ctrl-C> to stop.");
     sLog.outString("");

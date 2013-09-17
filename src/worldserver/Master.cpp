@@ -40,7 +40,7 @@
 #include "RASocket.h"
 #include "Util.h"
 #include "revision_sql.h"
-#include "BCSOAP.h"
+#include "BCSoap.h"
 #include "MassMailMgr.h"
 #include "DBCStores.h"
 
