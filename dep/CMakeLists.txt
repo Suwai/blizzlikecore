@@ -33,6 +33,6 @@ endif()
 add_subdirectory(recastnavigation)
 add_subdirectory(src)
 
-if(TOOLS AND NOT WIN32)
+if(TOOLS)
   add_subdirectory(libmpq)
 endif()

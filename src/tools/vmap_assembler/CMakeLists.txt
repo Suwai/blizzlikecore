@@ -18,9 +18,14 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/shared
   ${CMAKE_SOURCE_DIR}/src/game/vmap/
   ${CMAKE_SOURCE_DIR}/src/framework/
-  ${CMAKE_SOURCE_DIR}/dep/ACE_wrappers/
   ${CMAKE_SOURCE_DIR}/dep/src/zlib
 )
+
+if(WIN32)
+  include_directories(
+    ${CMAKE_SOURCE_DIR}/dep/ACE_wrappers/
+  )
+endif()
 
 add_library(vmap
 	${CMAKE_SOURCE_DIR}/src/game/vmap/BIH.cpp

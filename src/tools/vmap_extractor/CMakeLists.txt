@@ -41,8 +41,6 @@ if(WIN32)
   )
 endif()
 
-LINK_DIRECTORIES( ${LINK_DIRECTORIES} ${CMAKE_SOURCE_DIR}/dep/libmpq/libmpq/.libs/ )
-
 add_executable(vmap_extractor ${SOURCES})
 
 if(WIN32)
