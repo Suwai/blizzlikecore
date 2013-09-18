@@ -69,11 +69,11 @@ add_library(recast
 )
 
 set(SOURCES
-    IntermediateValues.cpp
-    generator.cpp
-    MapBuilder.cpp
-    TerrainBuilder.cpp
-    VMapExtensions.cpp
+    ./src/IntermediateValues.cpp
+    ./src/generator.cpp
+    ./src/MapBuilder.cpp
+    ./src/TerrainBuilder.cpp
+    ./src/VMapExtensions.cpp
 )
 
 add_executable( MoveMapGen ${SOURCES} )
