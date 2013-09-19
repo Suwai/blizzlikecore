@@ -31,11 +31,17 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake
 )
 
+# Output description of this script
+message(
+  "\nThis script builds the BlizzLikeCore server.
+  To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
+  For example: cmake .. -DDEBUG=1 -DCMAKE_INSTALL_PREFIX=/opt/blizzlikecore\n"
+)
+
 # Force out-of-source build
-string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" BUILDING_IN_SOURCE)
-if(BUILDING_IN_SOURCE)
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR
-    "This project requires an out of source build. Remove the file 'CMakeCache.txt' found in this directory before continuing, create a separate build directory and run 'cmake <srcs> [options]' from there."
+    "This project requires an out of source build. Remove the file 'CMakeCache.txt' found in this directory before continuing, create a separate build directory and run 'cmake [options] <srcs>' from there."
   )
 endif()
 
@@ -45,22 +51,15 @@ if(WIN32 AND NOT MSVC)
   )
 endif()
 
-find_package(Platform REQUIRED)
-find_package(Git)
-
-# VS110 and VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
-if(WIN32 AND MSVC_VERSION MATCHES 1600)
-  find_package(VisualStudio2012)
-  find_package(VisualStudio2010)
+# Set installation prefix
+if(PREFIX)
+  set(CMAKE_INSTALL_PREFIX "${PREFIX}")
 endif()
 
-# if(NOT PLATFORM MATCHES X86 AND NOT PLATFORM MATCHES X64)
-#   message(FATAL_ERROR
-#     "An unknown Architecture was selected. Only the values X86 and X64 for PLATFORM are supported."
-#   )
-# endif()
+# TODO: use MSVC_CXX_ARCHITECTURE_ID instead to identify platform on windows (not required on other systems)
+# find platform: required to build 3rd party libraries w/o CMake files
+find_package(Platform REQUIRED)
 
-# TODO: PLATFORM: Sets the architecture for compile (X86,X64)
 # Find out what system we use to include the needed libs
 if(WIN32)
   if(PLATFORM MATCHES X86) # 32-bit
@@ -70,19 +69,18 @@ if(WIN32)
   endif()
 endif()
 
-# if(WIN32)
-#   if(PLATFORM MATCHES X86)
-#     set(ARCH_FLAGS "/MACHINE:X86")
-#   else()
-#     set(ARCH_FLAGS "/MACHINE:X64")
-#   endif()
-# elseif(UNIX)
-#   if(PLATFORM MATCHES X86)
-#     set(ARCH_FLAGS "-m32")
-#   else()
-#     set(ARCH_FLAGS "-m64")
-#   endif()
-# endif()
+# find Git: used to get the revision number
+find_package(Git)
+
+# check if the platform supports precomiled headers
+find_package(PCHSupport)
+
+# TODO: remove this (refactor ACE & TBB CMake code)
+# VS110 and VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
+if(WIN32 AND MSVC_VERSION MATCHES 1600)
+  find_package(VisualStudio2012)
+  find_package(VisualStudio2010)
+endif()
 
 # Override configuration-types - we don't use anything else than debug and release
 if(CMAKE_CONFIGURATION_TYPES)
@@ -91,13 +89,6 @@ if(CMAKE_CONFIGURATION_TYPES)
     "Reset the configurations to what we need"
     FORCE)
 endif()
-
-# Output description of this script
-message(
-  "\nThis script builds the BlizzLikeCore server.
-  To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
-  For example: cmake .. -DDEBUG=1 -DCMAKE_INSTALL_PREFIX=/opt/blizzlikecore\n"
-) 
 
 option(DEBUG "Debug mode" 0)
 # option(CLI "With CLI" 1) # Not used by BlizzLike so far
@@ -131,8 +122,6 @@ else()
   option(USE_STD_MALLOC "Use standard malloc instead of TBB" 1)
 endif()
 
-find_package(PCHSupport)
-
 # Add options for compile of BlizzLike
 if(PCHSupport_FOUND)
   if(WIN32)
@@ -140,11 +129,6 @@ if(PCHSupport_FOUND)
   else()
     option(PCH "Use precompiled headers" 0)
   endif()
-endif()
-
-# Set installation prefix
-if(PREFIX)
-  set(CMAKE_INSTALL_PREFIX "${PREFIX}")
 endif()
 
 set(BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
@@ -280,6 +264,7 @@ if(GIT_EXECUTABLE)
     OUTPUT_VARIABLE GIT_REVISION
     RESULT_VARIABLE GIT_RESULT
     ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
   )
   if(GIT_RESULT)
     set(GIT_REVISION "Git repository not found")
@@ -395,7 +380,6 @@ else()
   message("Use TBB MALLOC        : No  (default)")
 endif()
 
-
 # if(SQL)
 #   message("Install SQL-files     : Yes")
 # else()
@@ -417,22 +401,6 @@ set(GENREV_SRC
 add_executable(genrev
   ${GENREV_SRC}
 )
-
-# if(WIN32)
-#   set_target_properties(genrev PROPERTIES
-#     COMPILE_FLAGS "/MACHINE:X86"
-#   )
-# elseif(UNIX)
-#   set_target_properties(genrev PROPERTIES
-#     COMPILE_FLAGS "-m32"
-#     LINK_FLAGS "-m32"
-#   )
-# endif()
-# if(XCODE)
-#   set_target_properties(genrev PROPERTIES
-#     XCODE_ATTRIBUTE_ARCHS "i386"
-#   )
-# endif()
 
 get_target_property(GENERATE_EXE genrev LOCATION)
 add_custom_target("revision.h" ALL
@@ -472,10 +440,6 @@ if(WIN32)
     )
   endif()
 endif()
-
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ARCH_FLAGS}")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ARCH_FLAGS}")
-# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ARCH_FLAGS}")
 
 if(XCODE)
   if(PLATFORM MATCHES X86)
