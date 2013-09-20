@@ -19,8 +19,9 @@
 cmake_minimum_required(VERSION 2.6)
 
 if(WIN32 AND NOT CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/bin" CACHE INTERNAL "")
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}" CACHE INTERNAL "")
+  message(FATAL_ERROR
+    "Use ((windows_build.bat)) to build this project."
+  )
 endif()
 
 project(BlizzLikeCore)
@@ -35,7 +36,7 @@ set(CMAKE_MODULE_PATH
 message(
   "\nThis script builds the BlizzLikeCore server.
   To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
-  For example: cmake .. -DDEBUG=1 -DCMAKE_INSTALL_PREFIX=/opt/blizzlikecore\n"
+  For example: cmake ../blizzlikecore/ -DPREFIX=/home/<username>/server -DTOOLS=1\n"
 )
 
 # Force out-of-source build
@@ -106,7 +107,7 @@ else()
   option(ACE_USE_EXTERNAL "Use external ACE" 1)
 endif()
 option(SCRIPTS "Build scripts" 1)
-option(TOOLS "Build tools" 1)
+option(TOOLS "Build tools" 0)
 # option(SQL "Copy SQL files" 0)
 
 if(WIN32)
@@ -455,12 +456,21 @@ add_subdirectory(dep) # TODO: add vmap extractor build support
 
 # Add definitions for all build types
 # Don't place this above 'dep' subdirectory! Because of defines build will crash.
-set(DEFINITIONS
-  DO_MYSQL
-  HAVE_CONFIG_H
-  VERSION="${BLIZZLIKE_VERSION}"
-  SYSCONFDIR="${CONF_DIR}/"
-)
+if(WIN32)
+  set(DEFINITIONS
+    DO_MYSQL
+    HAVE_CONFIG_H
+    VERSION="${BLIZZLIKE_VERSION}"
+    SYSCONFDIR="../etc/"
+  )
+else()
+  set(DEFINITIONS
+    DO_MYSQL
+    HAVE_CONFIG_H
+    VERSION="${BLIZZLIKE_VERSION}"
+    SYSCONFDIR="${CONF_DIR}/"
+  )
+endif()
 set(DEFINITIONS_RELEASE NDEBUG)
 set(DEFINITIONS_DEBUG _DEBUG BLIZZLIKE_DEBUG)
 if(WIN32)
