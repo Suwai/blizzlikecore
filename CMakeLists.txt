@@ -456,20 +456,15 @@ add_subdirectory(dep) # TODO: add vmap extractor build support
 
 # Add definitions for all build types
 # Don't place this above 'dep' subdirectory! Because of defines build will crash.
+set(DEFINITIONS
+  DO_MYSQL
+  HAVE_CONFIG_H
+  VERSION="${BLIZZLIKE_VERSION}"
+)
 if(WIN32)
-  set(DEFINITIONS
-    DO_MYSQL
-    HAVE_CONFIG_H
-    VERSION="${BLIZZLIKE_VERSION}"
-    SYSCONFDIR="../etc/"
-  )
+  set(DEFINITIONS ${DEFINITIONS} SYSCONFDIR="../etc/")
 else()
-  set(DEFINITIONS
-    DO_MYSQL
-    HAVE_CONFIG_H
-    VERSION="${BLIZZLIKE_VERSION}"
-    SYSCONFDIR="${CONF_DIR}/"
-  )
+  set(DEFINITIONS ${DEFINITIONS} SYSCONFDIR="${CONF_DIR}/")
 endif()
 set(DEFINITIONS_RELEASE NDEBUG)
 set(DEFINITIONS_DEBUG _DEBUG BLIZZLIKE_DEBUG)
