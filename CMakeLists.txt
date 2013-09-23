@@ -19,9 +19,8 @@
 cmake_minimum_required(VERSION 2.6)
 
 if(WIN32 AND NOT CMAKE_INSTALL_PREFIX)
-  message(FATAL_ERROR
-    "Use ((windows_build.bat)) to build this project."
-  )
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/server" CACHE INTERNAL "")
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}" CACHE INTERNAL "")
 endif()
 
 project(BlizzLikeCore)
@@ -99,8 +98,7 @@ if(WIN32)
 else()
   option(TBB_USE_EXTERNAL "Use external TBB" 1)
 endif()
-option(USE_STD_MALLOC "Use standard malloc instead of TBB" 0)
-option(USE_TBB_MALLOC "Use included TBB malloc" 0)
+option(USE_STD_MALLOC "Use standard malloc instead of TBB" 1)
 if(WIN32)
   option(ACE_USE_EXTERNAL "Use external ACE" 0)
 else()
@@ -109,19 +107,6 @@ endif()
 option(SCRIPTS "Build scripts" 1)
 option(TOOLS "Build tools" 0)
 # option(SQL "Copy SQL files" 0)
-
-if(WIN32)
-  if(PLATFORM MATCHES X86) # 32-bit
-    option(USE_FASTMM_MALLOC "Use included FastMM malloc (default for win*)" 1)
-    option(USE_STD_MALLOC "Use standard malloc instead of TBB" 0)
-  else() # 64-bit
-    option(USE_STD_MALLOC "Use standard malloc instead of TBB" 0)
-    option(USE_FASTMM_MALLOC "Use included FastMM malloc (default for win*)" 1)
-  endif()
-else()
-# Unix and other platforms
-  option(USE_STD_MALLOC "Use standard malloc instead of TBB" 1)
-endif()
 
 # Add options for compile of BlizzLike
 if(PCHSupport_FOUND)
@@ -132,6 +117,7 @@ if(PCHSupport_FOUND)
   endif()
 endif()
 
+# Config dir
 set(BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 set(CONF_DIR ${CMAKE_INSTALL_PREFIX}/etc)
 # If win32 put it in the bin dir not lib
@@ -168,7 +154,7 @@ else()
   include(cmake/ImportACE.cmake)
 endif()
 
-if(USE_TBB_MALLOC)
+if(NOT USE_STD_MALLOC)
   unset(TBB_INCLUDE_DIR CACHE)
   unset(TBB_LIBRARIES CACHE)
   unset(TBB_LIBRARIES_DIR CACHE)
@@ -187,7 +173,7 @@ if(USE_TBB_MALLOC)
   endif()
 endif()
 
-# Win32 delifered packages
+# Win32 delivered packages
 if(WIN32)
   set(MYSQL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/include/mysql)
   set(MYSQL_LIBRARY ${CMAKE_SOURCE_DIR}/dep/lib/${DEP_ARCH}_release/libmySQL.lib)
@@ -235,9 +221,6 @@ elseif(WIN32)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4267 /MP /Zm500")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP /Zm500 /bigobj")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP /Zm500 /bigobj")
-    if(PLATFORM EQUAL 64)
-      add_definitions("-D_WIN64")
-    endif()
     # Mark 32 bit executables large address aware so they can use > 2GB address space
     if(PLATFORM MATCHES X86)
       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
@@ -355,30 +338,10 @@ else()
   message("Tools map/vmap/mmaps  : No  (default)")
 endif()
 
-if(WIN32)
-  if(USE_FASTMM_MALLOC)
-    message("Use FASTMM MALLOC     : Yes (default)")
-  else()
-    message("Use FASTMM MALLOC     : No")
-  endif()
-else()
-  if(USE_FASTMM_MALLOC)
-    message("Use FASTMM MALLOC     : Yes")
-  else()
-    message("Use FASTMM MALLOC     : No  (default)")
-  endif()
-endif()
-
 if(USE_STD_MALLOC)
-  message("Use STD MALLOC        : Yes")
+  message("Use STD MALLOC        : Yes (default)")
 else()
-  message("Use STD MALLOC        : No  (default)")
-endif()
-
-if(USE_TBB_MALLOC)
-  message("Use TBB MALLOC        : Yes")
-else()
-  message("Use TBB MALLOC        : No  (default)")
+  message("Use STD MALLOC        : No")
 endif()
 
 # if(SQL)

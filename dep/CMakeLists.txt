@@ -22,7 +22,7 @@ elseif(MSVC)
   add_definitions(/W0)
 endif()
 
-if(NOT (TBB_USE_EXTERNAL OR USE_STD_MALLOC OR USE_FASTMM_MALLOC))
+if(NOT (TBB_USE_EXTERNAL OR USE_STD_MALLOC))
   add_subdirectory(tbb)
 endif()
 

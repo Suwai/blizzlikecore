@@ -102,3 +102,7 @@ install(FILES authserver.conf.dist.in DESTINATION ${CONF_DIR} RENAME authserver.
 if(WIN32 AND MSVC)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/\${BUILD_TYPE}/${EXECUTABLE_NAME}.pdb DESTINATION ${BIN_DIR} CONFIGURATIONS Debug)
 endif()
+
+if(WIN32 AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/authserver.conf.dist.in ${CMAKE_BINARY_DIR}/server/etc/authserver.conf)
+endif()
