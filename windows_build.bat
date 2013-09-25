@@ -1,6 +1,5 @@
 @echo off
 color 0b
-rem used memory manager: possible managers - STD, TBB, FASTMM
 rem compilers supported: VC11, VC10
 cls
 echo.

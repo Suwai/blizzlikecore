@@ -117,5 +117,5 @@ if(WIN32 AND MSVC)
 endif()
 
 if(WIN32 AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/worldserver.conf.dist.in ${CMAKE_BINARY_DIR}/server/etc/worldserver.conf)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/worldserver.conf.dist.in ${CMAKE_INSTALL_PREFIX}/etc/worldserver.conf)
 endif()

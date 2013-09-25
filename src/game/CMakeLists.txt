@@ -515,5 +515,5 @@ endif()
 install(FILES AuctionHouseBot/ahbot.conf.dist.in DESTINATION ${CONF_DIR} RENAME ahbot.conf)
 
 if(WIN32 AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/AuctionHouseBot/ahbot.conf.dist.in ${CMAKE_BINARY_DIR}/server/etc/ahbot.conf)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/AuctionHouseBot/ahbot.conf.dist.in ${CMAKE_INSTALL_PREFIX}/etc/ahbot.conf)
 endif()

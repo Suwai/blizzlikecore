@@ -150,5 +150,5 @@ install(TARGETS blizzlikescript
 install(FILES scripts.conf.dist.in DESTINATION ${CONF_DIR} RENAME scripts.conf)
 
 if(WIN32 AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts.conf.dist.in ${CMAKE_BINARY_DIR}/server/etc/scripts.conf)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts.conf.dist.in ${CMAKE_INSTALL_PREFIX}/etc/scripts.conf)
 endif()
