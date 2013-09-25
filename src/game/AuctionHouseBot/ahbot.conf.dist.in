@@ -1,5 +1,5 @@
 ######################################################
-# BLIZZLIKECOR Auction House Bot Configuration file  #
+# BLIZZLIKECORE Auction House Bot Configuration file  #
 ######################################################
 
 [AhbotConf]
@@ -9,7 +9,7 @@ ConfVersion=2010102201
 # AUCTION HOUSE BOT SETTINGS
 #
 #    AuctionHouseBot.Seller.Enabled
-#        General enable or disable AuctionHouseBot Seller fonctionality
+#        General enable or disable AuctionHouseBot Seller functionality
 #    Default 0 (Disabled)
 #
 #    AuctionHouseBot.DEBUG.Seller
@@ -128,7 +128,7 @@ ConfVersion=2010102201
 #    Default 0
 #
 #    AuctionHouseBot.Class.Container.ItemLevel.*
-#        Prevent seller from listing contianers below/above this item level
+#        Prevent seller from listing containers below/above this item level
 #    Default 0
 #
 #    AuctionHouseBot.forceIncludeItems
@@ -217,7 +217,7 @@ AuctionHouseBot.forceExcludeItems = ""
 # Buyer config
 #
 #    AuctionHouseBot.Buyer.Enabled
-#        General enable or disable AuctionHouseBot Buyer fonctionality
+#        General enable or disable AuctionHouseBot Buyer functionality
 #    Default 0 (Disabled)
 #
 #    AuctionHouseBot.DEBUG.Buyer
