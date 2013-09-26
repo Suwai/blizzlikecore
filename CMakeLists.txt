@@ -108,7 +108,7 @@ option(SCRIPTS "Build scripts" 1)
 option(TOOLS "Build tools" 0)
 # option(SQL "Copy SQL files" 0)
 
-# Add options for compile of BlizzLike
+# Add options for compile of BlizzLikeCore
 if(PCHSupport_FOUND)
   if(WIN32)
     option(PCH "Use precompiled headers" 1)

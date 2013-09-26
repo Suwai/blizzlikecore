@@ -69,7 +69,7 @@ echo Importing World database:
 echo.
 echo Wait..
 echo.
-for %%i in (%dbpath%\world\*.sql) do if %%i neq %dbpath%\world\characters.sql if %%i neq %dbpath%\world\auth.sql echo %%i & %mysql%\mysql -q -s -h %svr% --user=%user% --password=%pass% --port=%port% %wdb% < %%i
+for %%i in (%dbpath%\world\*.sql) do if %%i neq %dbpath%\world\characters*.sql if %%i neq %dbpath%\world\auth*.sql if %%i neq %dbpath%\world\scripts*.sql echo %%i & %mysql%\mysql -q -s -h %svr% --user=%user% --password=%pass% --port=%port% %wdb% < %%i
 echo.
 pause
 goto panel
