@@ -1,10 +1,10 @@
 @echo off
-color 0b
-rem compilers supported: VC11, VC10
 cls
+color 0b
 echo.
 echo ======================================
 echo *           BlizzLikeCore            *
+echo *  Compilers supported: VC11, VC10   *
 echo ======================================
 echo.
 SET /p BUILD_TYPE=What build type use?		[Release]: 
@@ -85,6 +85,7 @@ goto :help
 cd build
 cmake -G %COMPILER% -DPCH=1 -DSCRIPTS=%SCRIPTS% -DTOOLS=%TOOLS% -DDEBUG=%CBUILD_TYPE% -DCMAKE_CXX_COMPILER=%COMPILER_PATH% -DCMAKE_CXX_FLAGS=%C_FLAGS% -DCMAKE_C_FLAGS=%C_FLAGS% -DCMAKE_INSTALL_PREFIX=%INSTALL_PATH% ..
 pause
+if %ERRORLEVEL% NEQ 0 goto :warning
 call %VC_VARS%vcvarsall.bat
 MSBuild INSTALL.vcxproj /m:%CORE_NUMBER% /t:Rebuild /p:Configuration=%BUILD_TYPE%;Platform=%BUILD_PLATFORM%
 goto :end
@@ -93,6 +94,7 @@ goto :end
 cd build
 cmake -G %COMPILER% -DPCH=1 -DSCRIPTS=%SCRIPTS% -DTOOLS=%TOOLS% -DDEBUG=%CBUILD_TYPE% -DPLATFORM=X64 -DCMAKE_CXX_COMPILER=%COMPILER_PATH% -DCMAKE_CXX_FLAGS=%C_FLAGS% -DCMAKE_C_FLAGS=%C_FLAGS% -DCMAKE_INSTALL_PREFIX=%INSTALL_PATH% ..
 pause
+if %ERRORLEVEL% NEQ 0 goto :warning
 call %VC_VARS%vcvarsall.bat
 MSBuild INSTALL.vcxproj /m:%CORE_NUMBER%  /t:Rebuild /p:Configuration=%BUILD_TYPE%;Platform=x64
 goto :end
@@ -100,3 +102,15 @@ goto :end
 :end
 cd ..
 pause
+exit
+
+:warning
+cls
+color 0e
+echo ============================================
+echo  Warning..
+echo  When installing CMake check the box:
+echo  Add CMake to the system PATH for all users
+echo ============================================
+pause
+exit
