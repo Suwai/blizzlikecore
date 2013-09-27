@@ -7,40 +7,45 @@ echo *           BlizzLikeCore            *
 echo *  Compilers supported: VC11, VC10   *
 echo ======================================
 echo.
-SET /p BUILD_TYPE=What build type use?		[Release]: 
-if %BUILD_TYPE%. == . SET BUILD_TYPE=Release
-SET /p CORE_NUMBER=What is your Core Number?	[4]: 
-if %CORE_NUMBER%. == . SET CORE_NUMBER=4
-SET /p compiler=What is your Compiler?		[VC11]: 
-if %compiler%. == . SET compiler=VC11
-SET /p BUILD_PLATFORM=What is your Build Platform?	[Win32]: 
-if %BUILD_PLATFORM%. == . SET BUILD_PLATFORM=Win32
-SET /p SCRIPTS=Build Scripts?			[1]: 
-if %SCRIPTS%. == . SET SCRIPTS=1
-SET /p TOOLS=Build Tools?			[0]: 
-if %TOOLS%. == . SET TOOLS=0
-SET /p INSTALL_PATH=What install path use?		["C:\\BlizzLikeCore"]: 
-if %INSTALL_PATH%. == . SET INSTALL_PATH="C:\\BlizzLikeCore"
+set /p BUILD_TYPE=What build type use?		[Release]: 
+if %BUILD_TYPE%. == . set BUILD_TYPE=Release
+set /p CORE_NUMBER=What is your Core Number?	[4]: 
+if %CORE_NUMBER%. == . set CORE_NUMBER=4
+set /p BUILD_PLATFORM=What is your Build Platform?	[Win32]: 
+if %BUILD_PLATFORM%. == . set BUILD_PLATFORM=Win32
+set /p SCRIPTS=Build Scripts?			[1]: 
+if %SCRIPTS%. == . set SCRIPTS=1
+set /p TOOLS=Build Tools?			[0]: 
+if %TOOLS%. == . set TOOLS=0
+set /p INSTALL_PATH=What install path use?		["C:\\BlizzLikeCore"]: 
+if %INSTALL_PATH%. == . set INSTALL_PATH="C:\\BlizzLikeCore"
 echo.
-if %compiler%==VC11 goto :vc11
-if %compiler%==VC10 goto :vc10
-goto :help
 
-:vc11
-SET COMPILER="Visual Studio 11"
-if %BUILD_PLATFORM%==Win64 (SET COMPILER="Visual Studio 11 Win64")
-SET COMPILER_PATH="C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/bin/cl.exe"
-SET LINKER_PATH="C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/bin/link.exe"
-SET VC_VARS="C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\VC\\"
+if exist "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\cl.exe" (
+if %BUILD_PLATFORM%==Win64 (set COMPILER="Visual Studio 11 Win64") else (set COMPILER="Visual Studio 11")
+set COMPILER_PATH="C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/bin/cl.exe"
+set VC_VARS="C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\VC\\"
 goto :common
-
-:vc10
-SET COMPILER="Visual Studio 10"
-if %BUILD_PLATFORM%==Win64 (SET COMPILER="Visual Studio 10 Win64")
-SET COMPILER_PATH="C:/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe"
-SET LINKER_PATH="C:/Program Files/Microsoft Visual Studio 10.0/VC/bin/link.exe"
-SET VC_VARS="C:\\Program Files\\Microsoft Visual Studio 10.0\\VC\\"
+)
+if exist "C:\Program Files\Microsoft Visual Studio 11.0\VC\bin\cl.exe" (
+if %BUILD_PLATFORM%==Win64 (set COMPILER="Visual Studio 11 Win64") else (set COMPILER="Visual Studio 11")
+set COMPILER_PATH="C:/Program Files/Microsoft Visual Studio 11.0/VC/bin/cl.exe"
+set VC_VARS="C:\\Program Files\\Microsoft Visual Studio 11.0\\VC\\"
 goto :common
+)
+if exist "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe" (
+if %BUILD_PLATFORM%==Win64 (set COMPILER="Visual Studio 10 Win64") else (set COMPILER="Visual Studio 10")
+set COMPILER_PATH="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/bin/cl.exe"
+set VC_VARS="C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\"
+goto :common
+)
+if exist "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe" (
+if %BUILD_PLATFORM%==Win64 (set COMPILER="Visual Studio 10 Win64") else (set COMPILER="Visual Studio 10")
+set COMPILER_PATH="C:/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe"
+set VC_VARS="C:\\Program Files\\Microsoft Visual Studio 10.0\\VC\\"
+goto :common
+)
+goto :warning2
 
 :help
 cls
@@ -52,13 +57,13 @@ pause
 exit
 
 :common
-SET C_FLAGS="/DWIN32 /D_WINDOWS /W3 /EHsc /GR"
+set C_FLAGS="/DWIN32 /D_WINDOWS /W3 /EHsc /GR"
 if %BUILD_TYPE%==Release (
-SET CBUILD_TYPE="0"
+set CBUILD_TYPE="0"
 goto :begin
 )
 if %BUILD_TYPE%==Debug (
-SET CBUILD_TYPE="1"
+set CBUILD_TYPE="1"
 goto :begin
 )
 goto :help
@@ -111,6 +116,17 @@ echo ============================================
 echo  Warning..
 echo  When installing CMake check the box:
 echo  Add CMake to the system PATH for all users
+echo ============================================
+pause
+exit
+
+:warning2
+cls
+color 0e
+echo ============================================
+echo  You need to install:
+echo  Microsoft Visual Studio 11 (2012)
+echo  or Microsoft Visual Studio 10 (2010)
 echo ============================================
 pause
 exit
