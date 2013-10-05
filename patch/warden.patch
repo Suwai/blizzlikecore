@@ -4,9 +4,9 @@ Date: Sat, 5 Oct 2013 04:46:43 +0800
 Subject: [PATCH] Add Warden anticheat system
 
 ---
- .../warden/01_authserver_warden_data_result.sql    |   12 +
- .../warden/02_authserver_warden_data_result.sql    |    5 +
- sql/development/warden/authserver_account.sql      |    1 +
+ .../auth/warden_01_warden_data_result.sql          |   12 +
+ .../auth/warden_02_warden_data_result.sql          |    5 +
+ sql/development/auth/warden_03_account.sql         |    1 +
  src/authserver/AuthSocket.cpp                      |   17 +-
  src/authserver/AuthSocket.h                        |    1 +
  src/game/CMakeLists.txt                            |   20 +
@@ -41,9 +41,9 @@ Subject: [PATCH] Add Warden anticheat system
  src/shared/Util.h                                  |    1 +
  src/worldserver/worldserver.conf.dist.in           |   50 +
  36 files changed, 3891 insertions(+), 18 deletions(-)
- create mode 100644 sql/development/warden/01_authserver_warden_data_result.sql
- create mode 100644 sql/development/warden/02_authserver_warden_data_result.sql
- create mode 100644 sql/development/warden/authserver_account.sql
+ create mode 100644 sql/development/auth/warden_01_warden_data_result.sql
+ create mode 100644 sql/development/auth/warden_02_warden_data_result.sql
+ create mode 100644 sql/development/auth/warden_03_account.sql
  create mode 100644 src/game/Warden/WardenBase.cpp
  create mode 100644 src/game/Warden/WardenBase.h
  create mode 100644 src/game/Warden/WardenDataStorage.cpp
@@ -60,15 +60,15 @@ Subject: [PATCH] Add Warden anticheat system
  create mode 100644 src/shared/Auth/SARC4.h
  create mode 100644 src/shared/Auth/WardenKeyGeneration.h
 
-diff --git a/sql/development/warden/01_authserver_warden_data_result.sql b/sql/development/warden/01_authserver_warden_data_result.sql
+diff --git a/sql/development/auth/warden_01_warden_data_result.sql b/sql/development/auth/warden_01_warden_data_result.sql
 new file mode 100644
 index 0000000..7338e50
 --- /dev/null
-+++ b/sql/development/warden/01_authserver_warden_data_result.sql
++++ b/sql/development/auth/warden_01_warden_data_result.sql
 @@ -0,0 +1,12 @@
 +DROP TABLE IF EXISTS `warden_data_result`;
-+
 +CREATE TABLE `warden_data_result` (
++  `id` int(4) NOT NULL AUTO_INCREMENT,
 +  `check` int(3) DEFAULT NULL,
 +  `data` tinytext,
 +  `str` tinytext,
@@ -79,23 +79,23 @@ index 0000000..7338e50
 +  PRIMARY KEY (`id`)
 +) ENGINE=InnoDB AUTO_INCREMENT=1004 DEFAULT CHARSET=utf8;
 \ No newline at end of file
-diff --git a/sql/development/warden/02_authserver_warden_data_result.sql b/sql/development/warden/02_authserver_warden_data_result.sql
+diff --git a/sql/development/auth/warden_02_warden_data_result.sql b/sql/development/auth/warden_02_warden_data_result.sql
 new file mode 100644
 index 0000000..58043f9
 --- /dev/null
-+++ b/sql/development/warden/02_authserver_warden_data_result.sql
++++ b/sql/development/auth/warden_02_warden_data_result.sql
 @@ -0,0 +1,5 @@
-+INSERT INTO `warden_data_result` (`check`, `data`, `str`, `address`, `length`, `result`, `comment`) VALUES
-+(243,'','',4840352,2,'558B','lua protection'),
-+(243,'','',8979979,5,'E04D62503F','Hyper speed'),
-+(243,'','',9208923,5,'C0854A3340','gravity'),
-+(243,'','',8100062,2,'7541','air jump');
++INSERT INTO `warden_data_result` (`id`, `check`, `data`, `str`, `address`, `length`, `result`, `comment`) VALUES
++(1,243,'','',4840352,2,'558B','lua protection'),
++(2,243,'','',8979979,5,'E04D62503F','Hyper speed'),
++(3,243,'','',9208923,5,'C0854A3340','gravity'),
++(4,243,'','',8100062,2,'7541','air jump');
 \ No newline at end of file
-diff --git a/sql/development/warden/authserver_account.sql b/sql/development/warden/authserver_account.sql
+diff --git a/sql/development/auth/warden_03_account.sql b/sql/development/auth/warden_03_account.sql
 new file mode 100644
 index 0000000..0065797
 --- /dev/null
-+++ b/sql/development/warden/authserver_account.sql
++++ b/sql/development/auth/warden_03_account.sql
 @@ -0,0 +1 @@
 +ALTER TABLE `account` ADD COLUMN `os` VARCHAR(4) DEFAULT '' NOT NULL AFTER `locale`;
 \ No newline at end of file
@@ -3715,8 +3715,8 @@ index dde5a49..35eaf9a 100644
      MMAP::MMapFactory::preventPathfindingOnMaps(ignoreMapIds.c_str());
      sLog.outString("WORLD: MMap pathfinding %sabled", getConfig(CONFIG_BOOL_MMAP_ENABLED) ? "en" : "dis");
 +    // Warden
-+    setConfig(CONFIG_BOOL_WARDEN_ENABLED, "Warden.Enabled", false);
-+    setConfig(CONFIG_FLOAT_WARDEN_KICK_BAN, "Warden.Kick.Ban", 0);
++    setConfig(CONFIG_BOOL_WARDEN_ENABLED, "Warden.Enabled", true);
++    setConfig(CONFIG_FLOAT_WARDEN_KICK_BAN, "Warden.Kick.Ban", 1);
 +    setConfig(CONFIG_UINT32_WARDEN_NUM_CHECKS, "Warden.NumChecks", 3);
 +    setConfig(CONFIG_UINT32_WARDEN_CLIENT_CHECK_HOLDOFF, "Warden.ClientCheckHoldOff", 30);
 +    setConfig(CONFIG_UINT32_WARDEN_CLIENT_RESPONSE_DELAY, "Warden.ClientResponseDelay", 15);
@@ -4421,13 +4421,13 @@ index a283053..7d486d6 100644
 +#
 +#    Warden.Enabled
 +#        Enable Enabled Warden System
-+#        Default: 0 (Disabled)
-+#                 1 (Enabled)
++#                 0 (Disabled)
++#        Default: 1 (Enabled)
 +#
 +#    Warden.Kick.Ban
 +#        Kick or ban player on failed check
-+#        Default: 0 (Disabled)
-+#                 1 (Kick)
++#                 0 (Disabled)
++#        Default: 1 (Kick)
 +#                 2 (Ban)
 +#
 +#    Warden.BanLength
@@ -4453,8 +4453,8 @@ index a283053..7d486d6 100644
 +#
 +###################################################################################################################
 +
-+Warden.Enabled              = 0
-+Warden.Kick.Ban             = 0
++Warden.Enabled              = 1
++Warden.Kick.Ban             = 1
 +Warden.BanLength            = 900000
 +Warden.NumChecks            = 3
 +Warden.ClientResponseDelay  = 90
