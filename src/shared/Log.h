@@ -127,6 +127,10 @@ class Log : public BlizzLike::Singleton<Log, BlizzLike::ClassLevelLockable<Log, 
             if (worldLogfile != NULL)
                 fclose(worldLogfile);
             worldLogfile = NULL;
+
+            if (wardenLogFile != NULL)
+                fclose(wardenLogFile);
+            wardenLogFile = NULL;
         }
     public:
         void Initialize();
@@ -163,6 +167,7 @@ class Log : public BlizzLike::Singleton<Log, BlizzLike::ClassLevelLockable<Log, 
         // any log level
         void outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name);
         void outRALog(const char* str, ...)       ATTR_PRINTF(2, 3);
+		void outWarden(const char* str, ...)      ATTR_PRINTF(2, 3);
         uint32 GetLogLevel() const { return m_logLevel; }
         void SetLogLevel(char* Level);
         void SetLogFileLevel(char* Level);
@@ -194,6 +199,7 @@ class Log : public BlizzLike::Singleton<Log, BlizzLike::ClassLevelLockable<Log, 
         FILE* eventAiErLogfile;
         FILE* scriptErrLogFile;
         FILE* worldLogfile;
+		FILE* wardenLogFile;
         ACE_Thread_Mutex m_worldLogMtx;
 
         // log/console control
