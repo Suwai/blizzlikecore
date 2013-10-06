@@ -263,7 +263,7 @@ index 0000000..b18e70f
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -295,38 +295,38 @@ index 0000000..b18e70f
 +
 +void WardenBase::Init(WorldSession *pClient, BigNumber *K)
 +{
-+	BLIZZLIKE_ASSERT(false);
++    BLIZZLIKE_ASSERT(false);
 +}
 +
 +ClientWardenModule *WardenBase::GetModuleForClient(WorldSession *session)
 +{
-+	BLIZZLIKE_ASSERT(false);
++    BLIZZLIKE_ASSERT(false);
 +    return NULL;
 +}
 +
 +void WardenBase::InitializeModule()
 +{
-+	BLIZZLIKE_ASSERT(false);
++    BLIZZLIKE_ASSERT(false);
 +}
 +
 +void WardenBase::RequestHash()
 +{
-+	BLIZZLIKE_ASSERT(false);
++    BLIZZLIKE_ASSERT(false);
 +}
 +
 +void WardenBase::HandleHashResult(ByteBuffer &buff)
 +{
-+	BLIZZLIKE_ASSERT(false);
++    BLIZZLIKE_ASSERT(false);
 +}
 +
 +void WardenBase::RequestData()
 +{
-+	BLIZZLIKE_ASSERT(false);
++    BLIZZLIKE_ASSERT(false);
 +}
 +
 +void WardenBase::HandleData(ByteBuffer &buff)
 +{
-+	BLIZZLIKE_ASSERT(false);
++    BLIZZLIKE_ASSERT(false);
 +}
 +
 +void WardenBase::SendModuleToClient()
@@ -503,7 +503,7 @@ index 0000000..b077c64
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -645,7 +645,7 @@ index 0000000..c6c26df
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -815,7 +815,7 @@ index 0000000..cd02570
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -888,7 +888,7 @@ index 0000000..5788039
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -1177,7 +1177,7 @@ index 0000000..6ddb311
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -1233,7 +1233,7 @@ index 0000000..46c3778
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -1858,7 +1858,7 @@ index 0000000..060d3bd
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -3073,7 +3073,7 @@ index 0000000..0507e0f
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -3606,7 +3606,7 @@ index 0000000..a231da4
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 +  */
 +
-+/// \addtogroup worldserver BlizzLike Daemon
++/// \addtogroup worldserver BlizzLikeCore
 +/// @{
 +/// \file
 +
@@ -3964,7 +3964,7 @@ index 0000000..2b90e1d
 +
 +HmacHash::HmacHash(uint32 len, uint8 *seed)
 +{
-+	BLIZZLIKE_ASSERT(len == SEED_KEY_SIZE);
++    BLIZZLIKE_ASSERT(len == SEED_KEY_SIZE);
 +
 +    memcpy(&m_key, seed, len);
 +    HMAC_CTX_init(&m_ctx);
@@ -4001,7 +4001,7 @@ index 0000000..2b90e1d
 +{
 +    uint32 length = 0;
 +    HMAC_Final(&m_ctx, m_digest, &length);
-+	BLIZZLIKE_ASSERT(length == SHA_DIGEST_LENGTH);
++    BLIZZLIKE_ASSERT(length == SHA_DIGEST_LENGTH);
 +}
 \ No newline at end of file
 diff --git a/src/shared/Auth/Hmac.h b/src/shared/Auth/Hmac.h
@@ -4397,8 +4397,8 @@ index a283053..7d486d6 100644
  #
 +#    WardenLogFile
 +#        Log file of Warden
-+#        Default: ""           - no log file created
-+#                 "warden.log" - recommended name to create a log file
++#                 ""           - no log file created
++#        Default: "Warden.log" - recommended name to create a log file
 +#
  #    LogColors
  #        Color for messages (format "normal_color details_color debug_color error_color")
@@ -4407,7 +4407,7 @@ index a283053..7d486d6 100644
  GmLogTimestamp = 0
  GmLogPerAccount = 0
  RaLogFile = ""
-+WardenLogFile = "warden.log"
++WardenLogFile = "Warden.log"
  LogColors = "13 7 11 9"
  
  ###################################################################################################################

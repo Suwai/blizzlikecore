@@ -1,6 +1,6 @@
-#####################################
-# BLIZZLIKECOR Configuration file   #
-#####################################
+####################################
+# BlizzLikeCore Configuration file #
+####################################
 
 [AuthServerConf]
 ConfVersion=2010062001

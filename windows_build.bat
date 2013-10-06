@@ -89,8 +89,8 @@ goto :help
 :win32
 cd build
 cmake -G %COMPILER% -DPCH=1 -DSCRIPTS=%SCRIPTS% -DTOOLS=%TOOLS% -DDEBUG=%CBUILD_TYPE% -DCMAKE_CXX_COMPILER=%COMPILER_PATH% -DCMAKE_CXX_FLAGS=%C_FLAGS% -DCMAKE_C_FLAGS=%C_FLAGS% -DCMAKE_INSTALL_PREFIX=%INSTALL_PATH% ..
-pause
 if %ERRORLEVEL% NEQ 0 goto :warning
+pause
 call %VC_VARS%vcvarsall.bat
 MSBuild INSTALL.vcxproj /m:%CORE_NUMBER% /t:Rebuild /p:Configuration=%BUILD_TYPE%;Platform=%BUILD_PLATFORM%
 goto :end
@@ -98,8 +98,8 @@ goto :end
 :win64
 cd build
 cmake -G %COMPILER% -DPCH=1 -DSCRIPTS=%SCRIPTS% -DTOOLS=%TOOLS% -DDEBUG=%CBUILD_TYPE% -DPLATFORM=X64 -DCMAKE_CXX_COMPILER=%COMPILER_PATH% -DCMAKE_CXX_FLAGS=%C_FLAGS% -DCMAKE_C_FLAGS=%C_FLAGS% -DCMAKE_INSTALL_PREFIX=%INSTALL_PATH% ..
-pause
 if %ERRORLEVEL% NEQ 0 goto :warning
+pause
 call %VC_VARS%vcvarsall.bat
 MSBuild INSTALL.vcxproj /m:%CORE_NUMBER%  /t:Rebuild /p:Configuration=%BUILD_TYPE%;Platform=x64
 goto :end
@@ -113,7 +113,7 @@ exit
 cls
 color 0e
 echo ============================================
-echo  Warning..
+echo  You need to install: CMake 2.8 or above
 echo  When installing CMake check the box:
 echo  Add CMake to the system PATH for all users
 echo ============================================
