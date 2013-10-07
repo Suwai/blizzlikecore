@@ -10,4 +10,5 @@ All credits to:
 BlizzLikeGroup individual credits:
 
 melursus hellstorm06 cqqjjf kalogr ScullyNY Schtom shuwen Gimlik Dudelzack Amara
-aghameysam netherwow morno Clanat amir_cinderella magicyear clarkname Calimera vstar0v0
+aghameysam netherwow morno Clanat amir_cinderella magicyear clarkname Calimera
+vstar0v0 ysfl
