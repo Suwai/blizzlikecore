@@ -343,8 +343,6 @@ set(SRC_GRP_WORLD_HANDLERS
     MapManager.h
     MapPersistentStateMgr.cpp
     MapPersistentStateMgr.h
-    MapUpdater.cpp
-    MapUpdater.h
     MassMailMgr.cpp
     MassMailMgr.h
     MiscHandler.cpp

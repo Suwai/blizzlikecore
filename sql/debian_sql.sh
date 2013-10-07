@@ -1,7 +1,7 @@
 #!/bin/bash
 ####################################################
 function pause(){
-   read -n1 -p "$*"
+  read -n1 -p "$*"
 }
 clear
 echo
@@ -15,88 +15,88 @@ if [ -z "$PASS" ]; then PASS=""; fi
 MYSQL_="mysql -u ${USER} -p${PASS}"
 ####################################################
 function dropmysql(){
-echo
-$MYSQL_ < drop_mysql.sql
-pause 'Press [any] key to continue...'
+  echo
+  $MYSQL_ < drop_mysql.sql
+  pause 'Press [any] key to continue...'
 }
 function createmysql(){
-echo
-$MYSQL_ < create_mysql.sql
-pause 'Press [any] key to continue...'
+  echo
+  $MYSQL_ < create_mysql.sql
+  pause 'Press [any] key to continue...'
 }
 ####################################################
 function appworld(){
-echo
-echo "Wait!"
-for SQL_ in development/world/*.sql
-do
-	echo " Applying $SQL_"
-	$MYSQL_ world < $SQL_
-	[[ $? != 0 ]] && exit 1
-done
-pause 'Press [any] key to continue...'
+  echo
+  echo "Wait!"
+  for SQL_ in development/world/*.sql
+  do
+    echo " Applying $SQL_"
+    $MYSQL_ world < $SQL_
+    [[ $? != 0 ]] && exit 1
+  done
+  pause 'Press [any] key to continue...'
 }
 ####################################################
 function appcharacters(){
-echo
-echo "Wait!"
-for SQL_ in development/characters/*.sql
-do
-	echo " Applying $SQL_"
-	$MYSQL_ characters < $SQL_
-	[[ $? != 0 ]] && exit 1
-done
-pause 'Press [any] key to continue...'
+  echo
+  echo "Wait!"
+  for SQL_ in development/characters/*.sql
+  do
+    echo " Applying $SQL_"
+    $MYSQL_ characters < $SQL_
+    [[ $? != 0 ]] && exit 1
+  done
+  pause 'Press [any] key to continue...'
 }
 ####################################################
 function appauth(){
-echo
-echo "Wait!"
-for SQL_ in development/auth/*.sql
-do
-	echo " Applying $SQL_"
-	$MYSQL_ auth < $SQL_
-	[[ $? != 0 ]] && exit 1
-done
-pause 'Press [any] key to continue...'
+  echo
+  echo "Wait!"
+  for SQL_ in development/auth/*.sql
+  do
+    echo " Applying $SQL_"
+    $MYSQL_ auth < $SQL_
+    [[ $? != 0 ]] && exit 1
+  done
+  pause 'Press [any] key to continue...'
 }
 ####################################################
 function appscripts(){
-echo
-echo "Wait!"
-for SQL_ in development/scripts/*.sql
-do
-	echo " Applying $SQL_"
-	$MYSQL_ scripts < $SQL_
-	[[ $? != 0 ]] && exit 1
-done
-pause 'Press [any] key to continue...'
+  echo
+  echo "Wait!"
+  for SQL_ in development/scripts/*.sql
+  do
+    echo " Applying $SQL_"
+    $MYSQL_ scripts < $SQL_
+    [[ $? != 0 ]] && exit 1
+  done
+  pause 'Press [any] key to continue...'
 }
 ####################################################
 function menu(){
-clear
-echo
-echo "================="
-echo "= BlizzLikeCore ="
-echo "================="
-echo
-echo "Create MySQL--[1]"
-echo "World DB------[2]"
-echo "Chars DB------[3]"
-echo "Auth DB-------[4]"
-echo "Scripts DB----[5]"
-echo "Drop MySQL----[6]"
-echo "Exit----------[0]"
-echo
-read -p "what is your option? " var
-if  [ $var == 1 ]; then createmysql; menu
-elif  [ $var == 2 ]; then appworld; menu
-elif  [ $var == 3 ]; then appcharacters; menu
-elif  [ $var == 4 ]; then appauth; menu
-elif  [ $var == 5 ]; then appscripts; menu
-elif  [ $var == 6 ]; then dropmysql; menu
-elif  [ $var == 0 ]; then break
-else menu
-fi
+  clear
+  echo
+  echo "================="
+  echo "= BlizzLikeCore ="
+  echo "================="
+  echo
+  echo "Create MySQL--[1]"
+  echo "World DB------[2]"
+  echo "Chars DB------[3]"
+  echo "Auth DB-------[4]"
+  echo "Scripts DB----[5]"
+  echo "Drop MySQL----[6]"
+  echo "Exit----------[0]"
+  echo
+  read -p "what is your option? " var
+  if  [ $var == 1 ]; then createmysql; menu
+  elif  [ $var == 2 ]; then appworld; menu
+  elif  [ $var == 3 ]; then appcharacters; menu
+  elif  [ $var == 4 ]; then appauth; menu
+  elif  [ $var == 5 ]; then appscripts; menu
+  elif  [ $var == 6 ]; then dropmysql; menu
+  elif  [ $var == 0 ]; then break
+  else menu
+  fi
 }
 menu
