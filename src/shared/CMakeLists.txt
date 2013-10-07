@@ -78,6 +78,9 @@ set(SRC_GRP_UTIL
     ByteBuffer.cpp
     ByteBuffer.h
     Errors.h
+    DelayExecutor.cpp
+    DelayExecutor.h
+    SystemConfig.h
     # dep/include/mersennetwister/MersenneTwister.h is part of this group in the VC 2012 file but it is not part of src/shared, so it is omitted here
     ProgressBar.cpp
     ProgressBar.h
