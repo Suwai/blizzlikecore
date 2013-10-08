@@ -8,9 +8,9 @@ echo
 echo "================"
 echo "= MySQL Config ="
 echo "================"
-read -p "MySQL User [root]" USER
+read -p "MySQL User [root] " USER
 if [ -z "$USER" ]; then USER="root"; fi
-read -p "MySQL Pass []" PASS
+read -p "MySQL Pass [] " PASS
 if [ -z "$PASS" ]; then PASS=""; fi
 MYSQL_="mysql -u ${USER} -p${PASS}"
 ####################################################
@@ -73,6 +73,14 @@ function appscripts(){
   pause 'Press [any] key to continue...'
 }
 ####################################################
+function setrealmlist(){
+  echo
+  read -p "What is your Server IP? [127.0.0.1] " IP
+  if [ -z "$IP" ]; then IP="127.0.0.1"; fi
+  $MYSQL_ -e "update auth.realmlist set address = '"${IP}"' where id = 1;"
+  pause 'Press [any] key to continue...'
+}
+####################################################
 function menu(){
   clear
   echo
@@ -85,7 +93,8 @@ function menu(){
   echo "Chars DB------[3]"
   echo "Auth DB-------[4]"
   echo "Scripts DB----[5]"
-  echo "Drop MySQL----[6]"
+  echo "Set Realmlist-[6]"
+  echo "Drop MySQL----[7]"
   echo "Exit----------[0]"
   echo
   read -p "what is your option? " var
@@ -94,7 +103,8 @@ function menu(){
   elif  [ $var == 3 ]; then appcharacters; menu
   elif  [ $var == 4 ]; then appauth; menu
   elif  [ $var == 5 ]; then appscripts; menu
-  elif  [ $var == 6 ]; then dropmysql; menu
+  elif  [ $var == 6 ]; then setrealmlist; menu
+  elif  [ $var == 7 ]; then dropmysql; menu
   elif  [ $var == 0 ]; then break
   else menu
   fi

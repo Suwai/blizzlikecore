@@ -71,6 +71,9 @@ goto :help
 :begin
 if not exist build (
     mkdir build
+) else (
+    rmdir /S /Q build
+    mkdir build
 )
 
 if not exist %INSTALL_PATH% (
