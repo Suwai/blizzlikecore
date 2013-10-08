@@ -1,6 +1,6 @@
-#####################################
-# BLIZZLIKECOR Configuration file   #
-#####################################
+####################################
+# BlizzLikeCore Configuration file #
+####################################
 
 [WorldServerConf]
 ConfVersion=2013012201

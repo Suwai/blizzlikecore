@@ -4596,7 +4596,6 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
                 }
 
                 // Devastate causing Sunder Armor Effect
-                // and no need to cast over max stack amount
                 if (!sunder || sunder->GetStackAmount() < sunder->GetSpellProto()->StackAmount)
                 {
                     // get highest rank of the Sunder Armor spell

@@ -1,6 +1,6 @@
-######################################################
-# BLIZZLIKECORE Auction House Bot Configuration file #
-######################################################
+####################################
+# BlizzLikeCore Configuration file #
+####################################
 
 [AhbotConf]
 ConfVersion=2010102201

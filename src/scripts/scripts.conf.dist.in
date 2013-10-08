@@ -1,4 +1,7 @@
-# Scripts Configuration file
+####################################
+# BlizzLikeCore Configuration file #
+####################################
+
 # This file must be placed within the directory which holds worldserver.conf and authserver.conf
 
 [ScriptsConf]

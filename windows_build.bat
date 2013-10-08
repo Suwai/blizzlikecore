@@ -71,6 +71,9 @@ goto :help
 :begin
 if not exist build (
     mkdir build
+) else (
+    rmdir /S /Q build
+    mkdir build
 )
 
 if not exist %INSTALL_PATH% (
@@ -113,7 +116,7 @@ exit
 cls
 color 0e
 echo ============================================
-echo  Warning..
+echo  You need to install: CMake 2.8 or above
 echo  When installing CMake check the box:
 echo  Add CMake to the system PATH for all users
 echo ============================================

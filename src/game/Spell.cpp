@@ -299,7 +299,7 @@ Spell::Spell(Unit* caster, SpellEntry const* info, bool triggered, ObjectGuid or
     m_castPositionX = m_castPositionY = m_castPositionZ = 0;
     m_TriggerSpells.clear();
     m_preCastSpells.clear();
-    m_IsTriggeredSpell = triggered;
+    m_IsTriggeredSpell = bool(triggered || info->HasAttribute(SPELL_ATTR_EX4_TRIGGERED));
     // m_AreaAura = false;
     m_CastItem = NULL;
 
@@ -2666,7 +2666,7 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
     m_caster->m_Events.AddEvent(Event, m_caster->m_Events.CalculateTime(1));
 
     // Prevent casting at cast another spell (ServerSide check)
-    if (m_caster->IsNonMeleeSpellCasted(false, true, true) && m_cast_count)
+    if (!m_IsTriggeredSpell && m_caster->IsNonMeleeSpellCasted(false, true, true) && m_cast_count)
     {
         SendCastResult(SPELL_FAILED_SPELL_IN_PROGRESS);
         finish(false);
@@ -2696,6 +2696,17 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
     m_casttime = GetSpellCastTime(m_spellInfo, this);
     m_duration = CalculateSpellDuration(m_spellInfo, m_caster);
 
+    // don't allow channeled spells / spells with cast time to be casted while moving
+    // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
+    if ((IsChanneledSpell(m_spellInfo) || m_casttime)
+        && m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->isMoving()
+        && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT)
+    {
+        SendCastResult(SPELL_FAILED_MOVING);
+        finish(false);
+        return;
+    }
+
     // set timer base at cast time
     ReSetTimer();
 
@@ -2703,7 +2714,12 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
     // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
     if (!m_IsTriggeredSpell && isSpellBreakStealth(m_spellInfo))
     {
-        m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+        // Sap - don't exit Stealth yet to prevent getting in combat and making Sap impossible to cast
+        // Removing Stealth depends on talent later
+        // Pick Pocket - don't exit Stealth at all
+        if (!(m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000080) || m_spellInfo->SpellFamilyFlags & 2147483648)))
+            m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
     }
 
@@ -2895,6 +2911,13 @@ void Spell::cast(bool skipCheck)
                 AddPrecastSpell(25771);                     // Forbearance
             break;
         }
+        case SPELLFAMILY_ROGUE:
+        {
+            // exit stealth on sap when improved sap is not skilled
+            if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000080) && m_caster->GetTypeId() == TYPEID_PLAYER &&
+                (!m_caster->GetAura(14076,SpellEffectIndex(0)) && !m_caster->GetAura(14094,SpellEffectIndex(0)) && !m_caster->GetAura(14095,SpellEffectIndex(0))))
+                m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+        }
         default:
             break;
     }
@@ -2915,9 +2938,11 @@ void Spell::cast(bool skipCheck)
     // CAST SPELL
     SendSpellCooldown();
 
-    TakePower();
-    TakeReagents();                                         // we must remove reagents before HandleEffects to allow place crafted item in same slot
-    TakeAmmo();
+    if (!m_IsTriggeredSpell)
+    {
+        TakePower();
+        TakeReagents();                                     // we must remove reagents before HandleEffects to allow place crafted item in same slot
+    }
 
     SendCastResult(castResult);
     SendSpellGo();                                          // we must send smsg_spell_go packet before m_castItem delete in TakeCastItem()...
@@ -4394,14 +4419,21 @@ SpellCastResult Spell::CheckCast(bool strict)
         else
             return SPELL_FAILED_NOT_MOUNTED;
     }
+    SpellCastResult castResult = SPELL_CAST_OK;
 
     // always (except passive spells) check items
     if (!IsPassiveSpell(m_spellInfo))
     {
-        SpellCastResult castResult = CheckItems();
+        castResult = CheckItems();
         if (castResult != SPELL_CAST_OK)
             return castResult;
     }
+
+    // Triggered spells also have range check
+    // TODO: determine if there is some flag to enable/disable the check
+    castResult = CheckRange(strict);
+    if (castResult != SPELL_CAST_OK)
+        return castResult;
 
     // check spell focus object
     if (m_spellInfo->RequiresSpellFocus)
@@ -4640,7 +4672,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // spell different for friends and enemies
                     // hart version required facing
                     if (m_targets.getUnitTarget() && !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) && !m_caster->HasInArc(M_PI_F, m_targets.getUnitTarget()))
-                        return SPELL_FAILED_UNIT_NOT_INFRONT;
+                        return !m_IsTriggeredSpell ? SPELL_FAILED_UNIT_NOT_INFRONT : SPELL_FAILED_DONT_REPORT;
                 }
                 break;
             }
@@ -5203,8 +5235,8 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
     if (!m_caster->isAlive())
         return SPELL_FAILED_CASTER_DEAD;
 
-//  if (m_caster->IsNonMeleeSpellCasted(false))             // prevent spellcast interruption by another spellcast
-//      return SPELL_FAILED_SPELL_IN_PROGRESS;              // problem: not allow pet stop cast!
+    if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX4_TRIGGERED) && m_caster->IsNonMeleeSpellCasted(false))              //prevent spellcast interruption by another spellcast
+        return SPELL_FAILED_SPELL_IN_PROGRESS;
 
     if (m_caster->isInCombat() && IsNonCombatSpell(m_spellInfo))
         return SPELL_FAILED_AFFECTING_COMBAT;
@@ -5487,21 +5519,21 @@ SpellCastResult Spell::CheckRange(bool strict)
         float dist = m_caster->GetCombatDistance(target, m_spellInfo->rangeIndex == SPELL_RANGE_IDX_COMBAT);
 
         if (dist > max_range)
-            return SPELL_FAILED_OUT_OF_RANGE;
+            return !m_IsTriggeredSpell ? SPELL_FAILED_OUT_OF_RANGE : SPELL_FAILED_DONT_REPORT;
         if (min_range && dist < min_range)
-            return SPELL_FAILED_TOO_CLOSE;
+            return !m_IsTriggeredSpell ? SPELL_FAILED_TOO_CLOSE : SPELL_FAILED_DONT_REPORT;
         if (m_caster->GetTypeId() == TYPEID_PLAYER &&
                 (m_spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && !m_caster->HasInArc(M_PI_F, target))
-            return SPELL_FAILED_UNIT_NOT_INFRONT;
+            return !m_IsTriggeredSpell ? SPELL_FAILED_UNIT_NOT_INFRONT : SPELL_FAILED_DONT_REPORT;
     }
 
     // TODO verify that such spells really use bounding radius
     if (m_targets.m_targetMask == TARGET_FLAG_DEST_LOCATION && m_targets.m_destX != 0 && m_targets.m_destY != 0 && m_targets.m_destZ != 0)
     {
         if (!m_caster->IsWithinDist3d(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, max_range))
-            return SPELL_FAILED_OUT_OF_RANGE;
+            return !m_IsTriggeredSpell ? SPELL_FAILED_OUT_OF_RANGE : SPELL_FAILED_DONT_REPORT;
         if (min_range && m_caster->IsWithinDist3d(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, min_range))
-            return SPELL_FAILED_TOO_CLOSE;
+            return !m_IsTriggeredSpell ? SPELL_FAILED_TOO_CLOSE : SPELL_FAILED_DONT_REPORT;
     }
 
     return SPELL_CAST_OK;
