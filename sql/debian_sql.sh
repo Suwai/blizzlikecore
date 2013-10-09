@@ -24,55 +24,17 @@ function createmysql(){
   $MYSQL_ < create_mysql.sql
   pause 'Press [any] key to continue...'
 }
-####################################################
-function appworld(){
+function appsql(){
   echo
   echo "Wait!"
-  for SQL_ in development/world/*.sql
+  for SQL_ in development/${LOC_}/*.sql
   do
     echo " Applying $SQL_"
-    $MYSQL_ world < $SQL_
+    $MYSQL_ ${LOC_} < $SQL_
     [[ $? != 0 ]] && exit 1
   done
   pause 'Press [any] key to continue...'
 }
-####################################################
-function appcharacters(){
-  echo
-  echo "Wait!"
-  for SQL_ in development/characters/*.sql
-  do
-    echo " Applying $SQL_"
-    $MYSQL_ characters < $SQL_
-    [[ $? != 0 ]] && exit 1
-  done
-  pause 'Press [any] key to continue...'
-}
-####################################################
-function appauth(){
-  echo
-  echo "Wait!"
-  for SQL_ in development/auth/*.sql
-  do
-    echo " Applying $SQL_"
-    $MYSQL_ auth < $SQL_
-    [[ $? != 0 ]] && exit 1
-  done
-  pause 'Press [any] key to continue...'
-}
-####################################################
-function appscripts(){
-  echo
-  echo "Wait!"
-  for SQL_ in development/scripts/*.sql
-  do
-    echo " Applying $SQL_"
-    $MYSQL_ scripts < $SQL_
-    [[ $? != 0 ]] && exit 1
-  done
-  pause 'Press [any] key to continue...'
-}
-####################################################
 function setrealmlist(){
   echo
   read -p "What is your Server IP? [127.0.0.1] " IP
@@ -99,10 +61,10 @@ function menu(){
   echo
   read -p "what is your option? " var
   if  [ $var == 1 ]; then createmysql; menu
-  elif  [ $var == 2 ]; then appworld; menu
-  elif  [ $var == 3 ]; then appcharacters; menu
-  elif  [ $var == 4 ]; then appauth; menu
-  elif  [ $var == 5 ]; then appscripts; menu
+  elif  [ $var == 2 ]; then LOC_="world"; appsql; menu
+  elif  [ $var == 3 ]; then LOC_="characters"; appsql; menu
+  elif  [ $var == 4 ]; then LOC_="auth"; appsql; menu
+  elif  [ $var == 5 ]; then LOC_="scripts"; appsql; menu
   elif  [ $var == 6 ]; then setrealmlist; menu
   elif  [ $var == 7 ]; then dropmysql; menu
   elif  [ $var == 0 ]; then break
