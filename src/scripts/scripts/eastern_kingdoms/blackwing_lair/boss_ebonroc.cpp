@@ -45,14 +45,14 @@ struct BLIZZLIKE_DLL_DECL boss_ebonrocAI : public ScriptedAI
     uint32 m_uiShadowFlameTimer;
     uint32 m_uiWingBuffetTimer;
     uint32 m_uiShadowOfEbonrocTimer;
-	uint32 m_uiThrashTimer;
+    uint32 m_uiThrashTimer;
 
     void Reset() override
     {
         m_uiShadowFlameTimer        = 15000;                // These times are probably wrong
         m_uiWingBuffetTimer         = 30000;
         m_uiShadowOfEbonrocTimer    = 45000;
-		m_uiThrashTimer             = 25000;
+        m_uiThrashTimer             = 25000;
     }
 
     void Aggro(Unit* /*pWho*/) override

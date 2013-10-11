@@ -47,7 +47,7 @@ struct BLIZZLIKE_DLL_DECL boss_flamegorAI : public ScriptedAI
     uint32 m_uiShadowFlameTimer;
     uint32 m_uiWingBuffetTimer;
     uint32 m_uiFrenzyTimer;
-	uint32 m_uiThrashTimer;
+    uint32 m_uiThrashTimer;
 
     void Reset() override
     {
