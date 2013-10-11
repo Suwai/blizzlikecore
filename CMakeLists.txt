@@ -75,23 +75,16 @@ find_package(Git)
 # check if the platform supports precomiled headers
 find_package(PCHSupport)
 
-# TODO: remove this (refactor ACE & TBB CMake code)
+# TODO: remove this (refactor ACE CMake code)
 # VS110 and VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
 if(WIN32 AND MSVC_VERSION MATCHES 1600)
   find_package(VisualStudio2012)
   find_package(VisualStudio2010)
 endif()
 
-# Override configuration-types - we don't use anything else than debug and release
-if(CMAKE_CONFIGURATION_TYPES)
-  set(CMAKE_CONFIGURATION_TYPES Release Debug)
-  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
-    "Reset the configurations to what we need"
-    FORCE)
-endif()
-
+# Options for compile of BlizzLikeCore
 option(DEBUG "Debug mode" 0)
-# option(CLI "With CLI" 1) # Not used by BlizzLike so far
+# option(CLI "With CLI" 1) # Not used by BlizzLikeCore so far
 # option(RA "With Remote Access" 0) # TODO: support remote access
 if(WIN32)
   option(ACE_USE_EXTERNAL "Use external ACE" 0)
@@ -101,8 +94,6 @@ endif()
 option(SCRIPTS "Build scripts" 1)
 option(TOOLS "Build tools" 0)
 # option(SQL "Copy SQL files" 0)
-
-# Add options for compile of BlizzLikeCore
 if(PCHSupport_FOUND)
   if(WIN32)
     option(PCH "Use precompiled headers" 1)
@@ -266,8 +257,12 @@ endif()
 
 if(DEBUG)
   message("Debug Mode            : Yes")
+  set(CMAKE_CONFIGURATION_TYPES Debug)
+  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "" FORCE)
   set(CMAKE_BUILD_TYPE Debug)
 else()
+  set(CMAKE_CONFIGURATION_TYPES Release)
+  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "" FORCE)
   set(CMAKE_BUILD_TYPE Release)
   message("Debug Mode            : No  (default)")
 endif()
