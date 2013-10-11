@@ -26,6 +26,7 @@ go_barov_journal
 go_ethereum_prison
 go_ethereum_stasis
 go_andorhal_tower
+go_silithyst_geyser
 EndContentData */
 
 #include "precompiled.h"
@@ -185,6 +186,23 @@ bool GOUse_go_andorhal_tower(Player* pPlayer, GameObject* pGo)
     return true;
 }
 
+/*######
+## go_silithyst_geyser
+######*/
+
+// UPDATE gameobject_template SET ScriptName='go_silithyst_geyser' WHERE entry=181598;
+
+enum
+{
+    SPELL_SILITHYST    = 29519
+};
+
+bool GOUse_go_silithyst_geyser(Player* pPlayer, GameObject* pGo)
+{
+    pPlayer->CastSpell(pPlayer,SPELL_SILITHYST,true);
+    return false;
+};
+
 void AddSC_go_scripts()
 {
     Script* pNewScript;
@@ -217,5 +235,10 @@ void AddSC_go_scripts()
     pNewScript = new Script;
     pNewScript->Name = "go_andorhal_tower";
     pNewScript->pGOUse =          &GOUse_go_andorhal_tower;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "go_silithyst_geyser";
+    pNewScript->pGOUse =          &GOUse_go_silithyst_geyser;
     pNewScript->RegisterSelf();
 }
