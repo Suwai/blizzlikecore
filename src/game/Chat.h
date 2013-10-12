@@ -449,11 +449,7 @@ class BLIZZLIKE_DLL_SPEC ChatHandler
         bool HandleReloadSpellTargetPositionCommand(char* args);
         bool HandleReloadSpellThreatsCommand(char* args);
         bool HandleReloadSpellPetAurasCommand(char* args);
-        //To debug the server easier
-        bool HandleReloadGameobjectTemplateCommand(char* args);
-        bool HandleReloadItemTemplateCommand(char* args);
-        bool HandleReloadCreatureTemplateCommand(char* args);
-        //End
+
         bool HandleResetAchievementsCommand(char* args);
         bool HandleResetAllCommand(char* args);
         bool HandleResetHonorCommand(char* args);

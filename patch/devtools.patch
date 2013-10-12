@@ -1,0 +1,84 @@
+﻿From 68eea54affcdf50d48a68ad3174672989d95ea13 Mon Sep 17 00:00:00 2001
+From: Vstar <vstar0v0@hotmail.com>
+Date: Sat, 12 Oct 2013 20:21:54 +0800
+Subject: [PATCH] Add: Reload Template Tables
+
+To debug the server easier
+---
+ src/game/Chat.cpp   |  5 +++++
+ src/game/Chat.h     |  6 +++++-
+ src/game/Level3.cpp | 25 +++++++++++++++++++++++++
+ 3 files changed, 35 insertions(+), 1 deletion(-)
+
+diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
+index 8b37a65..9312ec1 100644
+--- a/src/game/Chat.cpp
++++ b/src/game/Chat.cpp
+@@ -553,6 +553,11 @@ ChatCommand* ChatHandler::getCommandTable()
+         { "spell_script_target",         SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSpellScriptTargetCommand,       "", NULL },
+         { "spell_target_position",       SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSpellTargetPositionCommand,     "", NULL },
+         { "spell_threats",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSpellThreatsCommand,            "", NULL },
++        //To debug the server easier
++        { "gameobject_template",         SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadGameobjectTemplateCommand,      "", NULL },
++        { "item_template",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadItemTemplateCommand,            "", NULL },
++        { "creature_template",           SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadCreatureTemplateCommand,        "", NULL },
++        //End
+ 
+         { NULL,                          0,                 false, NULL,                                                     "", NULL }
+     };
+diff --git a/src/game/Chat.h b/src/game/Chat.h
+index 944e20e..0e35dd5 100644
+--- a/src/game/Chat.h
++++ b/src/game/Chat.h
+@@ -449,7 +449,11 @@ class BLIZZLIKE_DLL_SPEC ChatHandler
+         bool HandleReloadSpellTargetPositionCommand(char* args);
+         bool HandleReloadSpellThreatsCommand(char* args);
+         bool HandleReloadSpellPetAurasCommand(char* args);
+-
++        //To debug the server easier
++        bool HandleReloadGameobjectTemplateCommand(char* args);
++        bool HandleReloadItemTemplateCommand(char* args);
++        bool HandleReloadCreatureTemplateCommand(char* args);
++        //End
+         bool HandleResetAchievementsCommand(char* args);
+         bool HandleResetAllCommand(char* args);
+         bool HandleResetHonorCommand(char* args);
+diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
+index ace0ac6..aaef8a9 100644
+--- a/src/game/Level3.cpp
++++ b/src/game/Level3.cpp
+@@ -1079,6 +1079,31 @@ bool ChatHandler::HandleLoadScriptsCommand(char* args)
+ 
+     return true;
+ }
++// These functions should only be used in development mode - not on a production server
++bool ChatHandler::HandleReloadGameobjectTemplateCommand( char*)
++{
++    sLog.outString( "WARNING: Reloading gameobject_template" );
++    sObjectMgr.LoadGameobjectInfo();
++    SendGlobalSysMessage("WARNING: DB table `gameobject_template` reloaded.");
++    return true;
++}
++
++bool ChatHandler::HandleReloadItemTemplateCommand( char*)
++{
++    sLog.outString( "WARNING: Reloading item_template" );
++    sObjectMgr.LoadItemPrototypes();
++    SendGlobalSysMessage("WARNIONG: DB table `item_template` reloaded.");
++    return true;
++}
++
++bool ChatHandler::HandleReloadCreatureTemplateCommand( char*)
++{
++    sLog.outString( "WARNING: Reloading creature_template" );
++    sObjectMgr.LoadCreatureTemplates();
++    SendGlobalSysMessage("WARNING: DB table `creature_template` reloaded.");
++    return true;
++}
++//End
+ 
+ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
+ {
+-- 
+1.8.4
+

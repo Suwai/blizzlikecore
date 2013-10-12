@@ -1079,31 +1079,6 @@ bool ChatHandler::HandleLoadScriptsCommand(char* args)
 
     return true;
 }
-// These functions should only be used in development mode - not on a production server
-bool ChatHandler::HandleReloadGameobjectTemplateCommand( char*)
-{
-    sLog.outString( "WARNING: Reloading gameobject_template" );
-    sObjectMgr.LoadGameobjectInfo();
-    SendGlobalSysMessage("WARNING: DB table `gameobject_template` reloaded.");
-    return true;
-}
-
-bool ChatHandler::HandleReloadItemTemplateCommand( char*)
-{
-    sLog.outString( "WARNING: Reloading item_template" );
-    sObjectMgr.LoadItemPrototypes();
-    SendGlobalSysMessage("WARNIONG: DB table `item_template` reloaded.");
-    return true;
-}
-
-bool ChatHandler::HandleReloadCreatureTemplateCommand( char*)
-{
-    sLog.outString( "WARNING: Reloading creature_template" );
-    sObjectMgr.LoadCreatureTemplates();
-    SendGlobalSysMessage("WARNING: DB table `creature_template` reloaded.");
-    return true;
-}
-//End
 
 bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
 {
