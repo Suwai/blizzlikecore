@@ -206,10 +206,10 @@ index c9f353f..b11404d 100644
    FILES
      ${SRC_GRP_WORLD_HANDLERS}
 diff --git a/src/game/MiscHandler.cpp b/src/game/MiscHandler.cpp
-index 97721ad..5345dee 100644
+index 082e398..dd1bd50 100644
 --- a/src/game/MiscHandler.cpp
 +++ b/src/game/MiscHandler.cpp
-@@ -955,16 +955,6 @@ void WorldSession::HandleSetActionBarTogglesOpcode(WorldPacket& recv_data)
+@@ -961,16 +961,6 @@ void WorldSession::HandleSetActionBarTogglesOpcode(WorldPacket& recv_data)
      GetPlayer()->SetByteValue(PLAYER_FIELD_BYTES, 2, ActionBar);
  }
  
@@ -3832,7 +3832,7 @@ index d78440a..3df4ae3 100644
  {
      // need prevent do internal far teleports in handlers because some handlers do lot steps
 diff --git a/src/game/WorldSession.h b/src/game/WorldSession.h
-index dbd89f0..c98adc3 100644
+index abfd0db..58dff05 100644
 --- a/src/game/WorldSession.h
 +++ b/src/game/WorldSession.h
 @@ -28,6 +28,7 @@
@@ -3859,8 +3859,8 @@ index dbd89f0..c98adc3 100644
 +        WardenBase *m_Warden;
 +
          time_t _logoutTime;
+         time_t timeLastWhoCommand;
          bool m_inQueue;                                     // session wait in auth.queue
-         bool m_playerLoading;                               // code processed in LoginPlayer
 diff --git a/src/game/WorldSocket.cpp b/src/game/WorldSocket.cpp
 index 7d3773b..a4fee05 100644
 --- a/src/game/WorldSocket.cpp
