@@ -3,17 +3,21 @@ From: ysfl <ysfllxcn@live.com>
 Date: Mon, 14 Oct 2013 00:23:49 +0800
 Subject: Mount on loan
 
----
- src/scripts/scripts/Custom/npc_rentalmount.cpp | 136 +++++++++++++++++++++++++
- src/scripts/system/ScriptLoader.cpp            |   2 +
- 2 files changed, 138 insertions(+)
- create mode 100644 src/scripts/scripts/Custom/npc_rentalmount.cpp
-
-diff --git a/src/scripts/scripts/Custom/npc_rentalmount.cpp b/src/scripts/scripts/Custom/npc_rentalmount.cpp
+diff --git a/sql/development/world/world_rentalmount.sql b/sql/development/world/world_rentalmount.sql
+new file mode 100644
+index 0000000..b7d3b46
+--- /dev/null
++++ b/sql/development/world/world_rentalmount.sql
+@@ -0,0 +1,4 @@
++-- Command: .npc add 91015
++DELETE FROM `creature_template` WHERE `entry` = 91015;
++INSERT INTO `creature_template` (`entry`, `heroic_entry`, `modelid_1`, `modelid_2`, `modelid_3`, `modelid_4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `minhealth`, `maxhealth`, `minmana`, `maxmana`, `armor`, `faction_A`, `faction_H`, `npcflag`, `speed_run`, `scale`, `rank`, `mindmg`, `maxdmg`, `dmgschool`, `attackpower`, `baseattacktime`, `rangeattacktime`, `unit_flags`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `minrangedmg`, `maxrangedmg`, `rangedattackpower`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `PetSpellDataId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `InhabitType`, `RacialLeader`, `RegenHealth`, `equipment_id`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`) VALUES
++(91015, 0, 10216, 0, 10216, 0, 'Lucas', 'Mount on loan', NULL, 0, 70, 70, 5000, 5000, 0, 0, 2865, 35, 35, 1, 1, 1, 1, 60, 165, 0, 97, 1500, 1500, 0, 0, 0, 0, 0, 0, 0, 50, 100, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 1, 1, 1, 1, 0, 0, 0, 'npc_rentalmount');
+diff --git a/src/scripts/scripts/custom/npc_rentalmount.cpp b/src/scripts/scripts/custom/npc_rentalmount.cpp
 new file mode 100644
 index 0000000..da731c3
 --- /dev/null
-+++ b/src/scripts/scripts/Custom/npc_rentalmount.cpp
++++ b/src/scripts/scripts/custom/npc_rentalmount.cpp
 @@ -0,0 +1,136 @@
 +#include "precompiled.h"
 +#include "Config/Config.h"
@@ -71,7 +75,7 @@ index 0000000..da731c3
 +            _creature->MonsterSay(MSG_NOT_MONEY, NULL); 
 +        } else { 
 +            player->CastSpell(player,MOUNT_SPELL_ID_1,false);
-+            player->ModifyMoney(-fastprice); 
++            player->ModifyMoney(-1 * fastprice); 
 +        } 
 +        break; 
 +    case 1002: 
@@ -80,7 +84,7 @@ index 0000000..da731c3
 +            _creature->MonsterSay(MSG_NOT_MONEY, NULL); 
 +        } else { 
 +            player->CastSpell(player,MOUNT_SPELL_ID_2,false); 
-+            player->ModifyMoney(-fastprice); 
++            player->ModifyMoney(-1 * fastprice); 
 +        } 
 +        break; 
 +    case 1003: 
@@ -89,7 +93,7 @@ index 0000000..da731c3
 +            _creature->MonsterSay(MSG_NOT_MONEY, NULL); 
 +        } else { 
 +            player->CastSpell(player,MOUNT_SPELL_ID_3,false); 
-+            player->ModifyMoney(-fastprice); 
++            player->ModifyMoney(-1 * fastprice); 
 +        } 
 +        break; 
 +    case 1004: 
@@ -98,7 +102,7 @@ index 0000000..da731c3
 +            _creature->MonsterSay(MSG_NOT_MONEY, NULL); 
 +        } else { 
 +            player->CastSpell(player,MOUNT_SPELL_ID_4,false); 
-+            player->ModifyMoney(-fastprice); 
++            player->ModifyMoney(-1 * fastprice); 
 +        } 
 +        break; 
 +   case 1005: 
@@ -107,7 +111,7 @@ index 0000000..da731c3
 +            _creature->MonsterSay(MSG_NOT_MONEY, NULL); 
 +        } else { 
 +            player->CastSpell(player,MOUNT_SPELL_ID_5,false); 
-+            player->ModifyMoney(-fastprice); 
++            player->ModifyMoney(-1 * fastprice); 
 +        } 
 +        break; 
 +    case 1006: 
@@ -116,7 +120,7 @@ index 0000000..da731c3
 +            _creature->MonsterSay(MSG_NOT_MONEY, NULL); 
 +        } else { 
 +            player->CastSpell(player,MOUNT_SPELL_ID_6,false); 
-+            player->ModifyMoney(-fastprice); 
++            player->ModifyMoney(-1 * fastprice); 
 +        } 
 +        break; 
 +    case 1007: 
@@ -125,7 +129,7 @@ index 0000000..da731c3
 +            _creature->MonsterSay(MSG_NOT_MONEY, NULL); 
 +        } else { 
 +            player->CastSpell(player,MOUNT_SPELL_ID_7,false); 
-+            player->ModifyMoney(-fastprice); 
++            player->ModifyMoney(-1 * fastprice); 
 +        } 
 +        break; 
 +    case 1008: 
@@ -134,7 +138,7 @@ index 0000000..da731c3
 +            _creature->MonsterSay(MSG_NOT_MONEY, NULL); 
 +        } else { 
 +            player->CastSpell(player,MOUNT_SPELL_ID_8,false); 
-+            player->ModifyMoney(-fastprice); 
++            player->ModifyMoney(-1 * fastprice); 
 +        } 
 +        break; 
 +
@@ -168,9 +172,7 @@ index 8ef1280..62209c1 100644
      AddSC_battleground();
  
      // custom
-+	AddSC_npc_rentalmount();
++    AddSC_npc_rentalmount();
  
      // examples
      AddSC_example_creature();
--- 
-1.8.4
