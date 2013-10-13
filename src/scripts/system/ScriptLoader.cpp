@@ -9,6 +9,7 @@ extern void AddSC_battleground();
 
 // custom
 extern void AddSC_npc_rentalmount();
+extern void AddSC_transmog();
 
 // examples
 extern void AddSC_example_creature();
@@ -340,6 +341,7 @@ void AddScripts()
 
     // custom
 	AddSC_npc_rentalmount();
+	AddSC_transmog();
 
     // examples
     AddSC_example_creature();
