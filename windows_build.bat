@@ -25,27 +25,27 @@ if exist "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\cl.exe" (
 if %BUILD_PLATFORM%==Win64 (set COMPILER="Visual Studio 11 Win64") else (set COMPILER="Visual Studio 11")
 set COMPILER_PATH="C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/bin/cl.exe"
 set VC_VARS="C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\VC\\"
-goto :common
+goto common
 )
 if exist "C:\Program Files\Microsoft Visual Studio 11.0\VC\bin\cl.exe" (
 if %BUILD_PLATFORM%==Win64 (set COMPILER="Visual Studio 11 Win64") else (set COMPILER="Visual Studio 11")
 set COMPILER_PATH="C:/Program Files/Microsoft Visual Studio 11.0/VC/bin/cl.exe"
 set VC_VARS="C:\\Program Files\\Microsoft Visual Studio 11.0\\VC\\"
-goto :common
+goto common
 )
 if exist "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe" (
 if %BUILD_PLATFORM%==Win64 (set COMPILER="Visual Studio 10 Win64") else (set COMPILER="Visual Studio 10")
 set COMPILER_PATH="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/bin/cl.exe"
 set VC_VARS="C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\"
-goto :common
+goto common
 )
 if exist "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe" (
 if %BUILD_PLATFORM%==Win64 (set COMPILER="Visual Studio 10 Win64") else (set COMPILER="Visual Studio 10")
 set COMPILER_PATH="C:/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe"
 set VC_VARS="C:\\Program Files\\Microsoft Visual Studio 10.0\\VC\\"
-goto :common
+goto common
 )
-goto :warning2
+goto warning2
 
 :help
 cls
@@ -60,13 +60,13 @@ exit
 set C_FLAGS="/DWIN32 /D_WINDOWS /W3 /EHsc /GR"
 if %BUILD_TYPE%==Release (
 set CBUILD_TYPE="0"
-goto :begin
+goto begin
 )
 if %BUILD_TYPE%==Debug (
 set CBUILD_TYPE="1"
-goto :begin
+goto begin
 )
-goto :help
+goto help
 
 :begin
 if not exist build (
@@ -85,27 +85,27 @@ mkdir %INSTALL_PATH%
     )
 )
 
-if %BUILD_PLATFORM%==Win32 goto :win32
-if %BUILD_PLATFORM%==Win64 goto :win64
-goto :help
+if %BUILD_PLATFORM%==Win32 goto win32
+if %BUILD_PLATFORM%==Win64 goto win64
+goto help
 
 :win32
 cd build
 cmake -G %COMPILER% -DPCH=1 -DSCRIPTS=%SCRIPTS% -DTOOLS=%TOOLS% -DDEBUG=%CBUILD_TYPE% -DCMAKE_CXX_COMPILER=%COMPILER_PATH% -DCMAKE_CXX_FLAGS=%C_FLAGS% -DCMAKE_C_FLAGS=%C_FLAGS% -DCMAKE_INSTALL_PREFIX=%INSTALL_PATH% ..
 pause
-if %ERRORLEVEL% NEQ 0 goto :warning
+if %ERRORLEVEL% NEQ 0 goto warning
 call %VC_VARS%vcvarsall.bat
 MSBuild INSTALL.vcxproj /m:%CORE_NUMBER% /t:Rebuild /p:Configuration=%BUILD_TYPE%;Platform=%BUILD_PLATFORM%
-goto :end
+goto end
 
 :win64
 cd build
 cmake -G %COMPILER% -DPCH=1 -DSCRIPTS=%SCRIPTS% -DTOOLS=%TOOLS% -DDEBUG=%CBUILD_TYPE% -DPLATFORM=X64 -DCMAKE_CXX_COMPILER=%COMPILER_PATH% -DCMAKE_CXX_FLAGS=%C_FLAGS% -DCMAKE_C_FLAGS=%C_FLAGS% -DCMAKE_INSTALL_PREFIX=%INSTALL_PATH% ..
 pause
-if %ERRORLEVEL% NEQ 0 goto :warning
+if %ERRORLEVEL% NEQ 0 goto warning
 call %VC_VARS%vcvarsall.bat
 MSBuild INSTALL.vcxproj /m:%CORE_NUMBER%  /t:Rebuild /p:Configuration=%BUILD_TYPE%;Platform=x64
-goto :end
+goto end
 
 :end
 cd ..
