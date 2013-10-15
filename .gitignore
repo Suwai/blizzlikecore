@@ -1,13 +1,5 @@
-.directory
-.mailmap
 *.orig
 *.rej
-*~
 .hg/
 *.kdev*
 *.bak
-*.diff
-*.REMOTE.*
-*.BACKUP.*
-*.BASE.*
-*.LOCAL.*
