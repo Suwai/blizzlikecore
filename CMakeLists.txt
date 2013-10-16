@@ -56,8 +56,12 @@ if(PREFIX)
   set(CMAKE_INSTALL_PREFIX "${PREFIX}")
 endif()
 
+if(WIN32)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Libraries" CACHE INTERNAL "")
+endif()
+
 # TODO: use MSVC_CXX_ARCHITECTURE_ID instead to identify platform on windows (not required on other systems)
-# find platform: required to build 3rd party libraries w/o CMake files
+# Find platform: required to build 3rd party libraries w/o CMake files
 find_package(Platform REQUIRED)
 
 # Find out what system we use to include the needed libs
@@ -69,18 +73,11 @@ if(WIN32)
   endif()
 endif()
 
-# find Git: used to get the revision number
+# Find Git: used to get the revision number
 find_package(Git)
 
-# check if the platform supports precomiled headers
+# Check if the platform supports precomiled headers
 find_package(PCHSupport)
-
-# TODO: remove this (refactor ACE CMake code)
-# VS110 and VS100 uses MSBuild.exe instead of devenv.com, so force it to use devenv.com
-if(WIN32 AND MSVC_VERSION MATCHES 1600)
-  find_package(VisualStudio2012)
-  find_package(VisualStudio2010)
-endif()
 
 if(WIN32)
   set(ACE_USE_EXTERNAL 0)
@@ -90,14 +87,14 @@ endif()
 
 # Options for compile of BlizzLikeCore
 option(DEBUG "Debug mode" 0)
-# option(CLI "With CLI" 1) # Not used by BlizzLikeCore so far
-# option(RA "With Remote Access" 0) # TODO: support remote access
+# Option(CLI "With CLI" 1) # Not used by BlizzLikeCore so far
+# Option(RA "With Remote Access" 0) # TODO: support remote access
 option(SCRIPTS "Build scripts" 1)
 option(TOOLS "Build tools" 0)
-# option(SQL "Copy SQL files" 0)
+# Option(SQL "Copy SQL files" 0)
 option(PCH "Use precompiled headers" 1)
 
-# Config dir
+# Config DIR
 set(BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 set(CONF_DIR ${CMAKE_INSTALL_PREFIX}/etc)
 # If win32 put it in the bin dir not lib
