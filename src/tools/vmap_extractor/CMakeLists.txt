@@ -8,9 +8,6 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-cmake_minimum_required (VERSION 2.6)
-project (BlizzLikeVmapExtractor)
-
 file(GLOB_RECURSE SOURCES *.cpp *.h)
 
 # uncomment next line to disable debug mode

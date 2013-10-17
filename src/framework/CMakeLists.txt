@@ -111,5 +111,5 @@ add_library(${LIBRARY_NAME} STATIC
 )
 
 if(NOT ACE_USE_EXTERNAL)
-  add_dependencies(${LIBRARY_NAME} ace)
+  add_dependencies(${LIBRARY_NAME} ACE)
 endif()

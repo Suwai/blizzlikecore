@@ -76,7 +76,7 @@ add_dependencies(blizzlikescript revision.h)
 add_dependencies(blizzlikescript shared)
 
 if(NOT ACE_USE_EXTERNAL)
-  add_dependencies(blizzlikescript ace)
+  add_dependencies(blizzlikescript ACE)
 endif()
 
 if(UNIX)
