@@ -7,8 +7,9 @@ function applypatch(){
   echo
   for PATCH_ in patch/*.patch
   do
-    var="n"; read -p " Apply $PATCH_ (y or n)? " var
-    if  [ $var == "y" ]; then patch -p1 < $PATCH_; fi
+    read -p " Apply $PATCH_ (y or n)? " APPT
+    if [ -z "$APPT" ]; then APPT="n"; fi
+    if  [ $APPT == "y" ]; then patch -p1 < $PATCH_; fi
     [[ $? != 0 ]] && exit 1
   done
   pause 'Press [any] key to continue...'

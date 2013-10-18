@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-if(WIN32)
+if(NOT ACE_USE_EXTERNAL)
   set(ACE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dep/ACE_wrappers)
   set(ACE_LIBRARIES_DIR ${CMAKE_SOURCE_DIR}/Libraries)
   set(ACE_LIBRARIES ACE)

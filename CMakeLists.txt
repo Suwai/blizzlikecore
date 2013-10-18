@@ -56,10 +56,6 @@ if(PREFIX)
   set(CMAKE_INSTALL_PREFIX "${PREFIX}")
 endif()
 
-if(WIN32)
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Libraries" CACHE INTERNAL "")
-endif()
-
 # TODO: use MSVC_CXX_ARCHITECTURE_ID instead to identify platform on windows (not required on other systems)
 # Find platform: required to build 3rd party libraries w/o CMake files
 find_package(Platform REQUIRED)
@@ -79,20 +75,23 @@ find_package(Git)
 # Check if the platform supports precomiled headers
 find_package(PCHSupport)
 
+# Options for compile of BlizzLikeCore
+option(DEBUG "Debug mode" 0)
 if(WIN32)
   set(ACE_USE_EXTERNAL 0)
 else()
   set(ACE_USE_EXTERNAL 1)
 endif()
-
-# Options for compile of BlizzLikeCore
-option(DEBUG "Debug mode" 0)
 # Option(CLI "With CLI" 1) # Not used by BlizzLikeCore so far
 # Option(RA "With Remote Access" 0) # TODO: support remote access
 option(SCRIPTS "Build scripts" 1)
 option(TOOLS "Build tools" 0)
 # Option(SQL "Copy SQL files" 0)
 option(PCH "Use precompiled headers" 1)
+
+if(NOT ACE_USE_EXTERNAL)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Libraries" CACHE INTERNAL "")
+endif()
 
 # Config DIR
 set(BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
@@ -232,6 +231,20 @@ message("")
 # else(RA)
 #   message("* Build with RA         : No  (default)")
 # endif(RA)
+
+if(WIN32)
+  if(ACE_USE_EXTERNAL)
+    message("Use Ace External      : Yes")
+  else()
+    message("Use Ace External      : No  (default)")
+  endif()
+else()
+  if(ACE_USE_EXTERNAL)
+    message("Use Ace External      : Yes (default)")
+  else()
+    message("Use Ace External      : No")
+  endif()
+endif()
 
 if(DEBUG)
   message("Debug Mode            : Yes")
