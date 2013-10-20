@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "BCSoap.h"
+#include "BlizzLikeSoap.h"
 
 #define POOL_SIZE   5
 
-void BCsoapRunnable::run()
+void BlizzLikeSoapRunnable::run()
 {
     // create pool
     SOAPWorkingThread pool;
@@ -40,11 +40,11 @@ void BCsoapRunnable::run()
     soap.send_timeout = 5;
     if (m < 0)
     {
-        sLog.outError("BCSOAP: couldn't bind to %s:%d", m_host.c_str(), m_port);
+        sLog.outError("BlizzLikeSoap: couldn't bind to %s:%d", m_host.c_str(), m_port);
         exit(-1);
     }
 
-    sLog.outString("BCSOAP: bound to http://%s:%d", m_host.c_str(), m_port);
+    sLog.outString("BlizzLikeSoap: bound to http://%s:%d", m_host.c_str(), m_port);
 
     while (!World::IsStopped())
     {
@@ -56,7 +56,7 @@ void BCsoapRunnable::run()
             continue;
         }
 
-        DEBUG_LOG("BCSOAP: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip >> 24) & 0xFF, (int)(soap.ip >> 16) & 0xFF, (int)(soap.ip >> 8) & 0xFF, (int)soap.ip & 0xFF);
+        DEBUG_LOG("BlizzLikeSoap: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip >> 24) & 0xFF, (int)(soap.ip >> 16) & 0xFF, (int)(soap.ip >> 8) & 0xFF, (int)soap.ip & 0xFF);
         struct soap* thread_soap = soap_copy(&soap);// make a safe copy
 
         ACE_Message_Block* mb = new ACE_Message_Block(sizeof(struct soap*));
@@ -93,33 +93,33 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     // security check
     if (!soap->userid || !soap->passwd)
     {
-        DEBUG_LOG("BCSOAP: Client didn't provide login information");
+        DEBUG_LOG("BlizzLikeSoap: Client didn't provide login information");
         return 401;
     }
 
     uint32 accountId = sAccountMgr.GetId(soap->userid);
     if (!accountId)
     {
-        DEBUG_LOG("BCSOAP: Client used invalid username '%s'", soap->userid);
+        DEBUG_LOG("BlizzLikeSoap: Client used invalid username '%s'", soap->userid);
         return 401;
     }
 
     if (!sAccountMgr.CheckPassword(accountId, soap->passwd))
     {
-        DEBUG_LOG("BCSOAP: invalid password for account '%s'", soap->userid);
+        DEBUG_LOG("BlizzLikeSoap: invalid password for account '%s'", soap->userid);
         return 401;
     }
 
     if (sAccountMgr.GetSecurity(accountId) < SEC_ADMINISTRATOR)
     {
-        DEBUG_LOG("BCSOAP: %s's gmlevel is too low", soap->userid);
+        DEBUG_LOG("BlizzLikeSoap: %s's gmlevel is too low", soap->userid);
         return 403;
     }
 
     if (!command || !*command)
         return soap_sender_fault(soap, "Command mustn't be empty", "The supplied command was an empty string");
 
-    DEBUG_LOG("BCSOAP: got command '%s'", command);
+    DEBUG_LOG("BlizzLikeSoap: got command '%s'", command);
     SOAPCommand connection;
 
     // commands are executed in the world thread. We have to wait for them to be completed
@@ -134,7 +134,7 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     int acc = connection.pendingCommands.acquire();
     if (acc)
     {
-        sLog.outError("BCSOAP: Error while acquiring lock, acc = %i, errno = %u", acc, errno);
+        sLog.outError("BlizzLikeSoap: Error while acquiring lock, acc = %i, errno = %u", acc, errno);
     }
 
     // alright, command finished

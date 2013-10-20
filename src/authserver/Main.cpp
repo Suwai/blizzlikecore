@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup authserver Realm Daemon
+/// \addtogroup authserver
 /// @{
 /// \file
 
@@ -45,8 +45,8 @@
 #ifdef WIN32
 #include "ServiceWin32.h"
 char serviceName[] = "authserver";
-char serviceLongName[] = "BlizzLike authserver service";
-char serviceDescription[] = "Massive Network Game Object Server";
+char serviceLongName[] = "BlizzLikeCore authserver";
+char serviceDescription[] = "BlizzLikeCore Auth Service";
 /*
  * -1 - not in service mode
  *  0 - stopped
@@ -186,7 +186,7 @@ extern int main(int argc, char** argv)
     sLog.Initialize();
 
     sLog.outString("");
-    sLog.outString("%s authserver", _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID));
+    sLog.outString("%s auth-daemon", _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID));
     sLog.outString("");
     sLog.outString("<Ctrl-C> to stop.");
     sLog.outString("");

@@ -40,7 +40,7 @@
 #include "RASocket.h"
 #include "Util.h"
 #include "revision_sql.h"
-#include "BCSoap.h"
+#include "BlizzLikeSoap.h"
 #include "MassMailMgr.h"
 #include "DBCStores.h"
 
@@ -142,7 +142,7 @@ class RARunnable : public ACE_Based::Runnable
 
             if (m_Acceptor->open(listen_addr, m_Reactor, ACE_NONBLOCK) == -1)
             {
-                sLog.outError("BlizzLike RA can not bind to port %d on %s", raport, stringip.c_str());
+                sLog.outError("BlizzLikeCore RA can not bind to port %d on %s", raport, stringip.c_str());
             }
 
             sLog.outString("Starting Remote access listner on port %d on %s", raport, stringip.c_str());
@@ -290,7 +290,7 @@ int Master::Run()
 
     if (sConfig.GetBoolDefault("SOAP.Enabled", false))
     {
-        BCsoapRunnable* runnable = new BCsoapRunnable();
+        BlizzLikeSoapRunnable* runnable = new BlizzLikeSoapRunnable();
 
         runnable->setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
         soap_thread = new ACE_Based::Thread(runnable);

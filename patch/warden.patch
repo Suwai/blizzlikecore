@@ -263,7 +263,7 @@ index 0000000..b18e70f
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +
@@ -503,7 +503,7 @@ index 0000000..b077c64
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +
@@ -645,7 +645,7 @@ index 0000000..c6c26df
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +
@@ -815,7 +815,7 @@ index 0000000..cd02570
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +
@@ -888,7 +888,7 @@ index 0000000..5788039
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +
@@ -1177,7 +1177,7 @@ index 0000000..6ddb311
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +
@@ -1233,7 +1233,7 @@ index 0000000..46c3778
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +
@@ -1858,7 +1858,7 @@ index 0000000..060d3bd
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +
@@ -3073,7 +3073,7 @@ index 0000000..0507e0f
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +
@@ -3606,7 +3606,7 @@ index 0000000..a231da4
 + * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 +  */
 +
-+/// \addtogroup worldserver BlizzLikeCore
++/// \addtogroup worldserver
 +/// @{
 +/// \file
 +

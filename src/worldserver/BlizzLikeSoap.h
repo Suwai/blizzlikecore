@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _BCSOAP_H
-#define _BCSOAP_H
+#ifndef _BLIZZLIKESOAP_H
+#define _BLIZZLIKESOAP_H
 
 #include "Common.h"
 #include "World.h"
@@ -31,10 +31,10 @@
 #include <ace/Task.h>
 
 
-class BCsoapRunnable: public ACE_Based::Runnable
+class BlizzLikeSoapRunnable: public ACE_Based::Runnable
 {
     public:
-        BCsoapRunnable() { }
+        BlizzLikeSoapRunnable() { }
         void run() override;
         void setListenArguments(std::string host, uint16 port)
         {

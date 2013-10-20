@@ -165,25 +165,19 @@ if(UNIX)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 endif()
 
-# UNIX
+# Set warning levels for different builds
 if(UNIX)
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} --no-warnings")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} --no-warnings")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wfatal-errors")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wfatal-errors")
 elseif(WIN32)
-  # MSVC
-  if(MSVC)
+  # Disable warnings in Visual Studio and add /MP /Zm500 /bigobj
+  if(MSVC AND NOT CMAKE_GENERATOR MATCHES "Visual Studio 7")
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP /Zm500")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /wd4996 /wd4355 /wd4244 /wd4267 /MP /Zm500")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP /Zm500 /bigobj")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4996 /wd4355 /wd4244 /wd4985 /wd4267 /MP /Zm500 /bigobj")
-    # Mark 32 bit executables large address aware so they can use > 2GB address space
-    if(PLATFORM MATCHES X86)
-      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
-    endif()
-    add_definitions(-D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES)
-    add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
   endif()
 endif()
 
@@ -283,6 +277,14 @@ endif()
 # endif()
 
 message("")
+
+# Some small tweaks for Visual Studio 7 and above.
+if(MSVC)
+  # Mark 32 bit executables large address aware so they can use > 2GB address space
+  if(PLATFORM MATCHES X86)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
+  endif()
+endif()
 
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)

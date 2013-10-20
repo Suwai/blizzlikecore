@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/// \addtogroup worldserver BlizzLike Daemon
+/// \addtogroup worldserver
 /// @{
 /// \file
 
@@ -38,8 +38,8 @@
 #ifdef WIN32
 #include "ServiceWin32.h"
 char serviceName[] = "worldserver";
-char serviceLongName[] = "BlizzLike world service";
-char serviceDescription[] = "Massive Network Game Object Server";
+char serviceLongName[] = "BlizzLikeCore worldserver";
+char serviceDescription[] = "BlizzLikeCore World Service";
 /*
  * -1 - not in service mode
  *  0 - stopped
@@ -77,7 +77,7 @@ void usage(const char* prog)
                    , prog);
 }
 
-/// Launch the BlizzLike server
+/// Launch the blizzlikecore server
 extern int main(int argc, char** argv)
 {
     ///- Command line parsing
@@ -180,7 +180,7 @@ extern int main(int argc, char** argv)
 #endif
 
     sLog.outString("");
-    sLog.outString("%s worldserver", _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID));
+    sLog.outString("%s [world-daemon]", _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID));
     sLog.outString("");
     sLog.outString("<Ctrl-C> to stop.");
     sLog.outString("");
