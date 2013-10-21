@@ -1921,6 +1921,21 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             caster->CastCustomSpell(target, 28836, &damage, NULL, NULL, true, NULL, this);
                         return;
                     }
+                    case 30463:                             // Nether Beam - Dominance
+                    {
+                        target->CastSpell(target, 30468, true);
+                        return;
+                    }
+                    case 30464:                             // Nether Beam - Serenity
+                    {
+                        target->CastSpell(target, 30467, true);
+                        return;
+                    }
+                    case 30465:                             // Nether Beam - Perseverence
+                    {
+                        target->CastSpell(target, 30466, true);
+                        return;
+                    }
                     case 31606:                             // Stormcrow Amulet
                     {
                         CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(17970);

@@ -16,7 +16,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-set(SOURCES
+set(LIBRARY_NAME ACE)
+
+set(LIBRARY_SRCS
   ./ace/ACE.cpp
   ./ace/ACE_crc32.cpp
   ./ace/ACE_crc_ccitt.cpp
@@ -614,11 +616,11 @@ add_definitions(
   -D_WINDOWS
 )
 
-add_library(ACE SHARED
-  ${SOURCES}
+add_library(${LIBRARY_NAME} SHARED
+  ${LIBRARY_SRCS}
 )
 
-install(TARGETS ACE
+install(TARGETS ${LIBRARY_NAME}
   LIBRARY DESTINATION ${LIBS_DIR}
   RUNTIME DESTINATION ${LIBS_DIR}
 )

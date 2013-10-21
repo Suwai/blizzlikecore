@@ -26,6 +26,10 @@ EndScriptData */
 
 enum
 {
+    // emotes
+    EMOTE_PHASE_BEAM            = -1532089,
+    EMOTE_PHASE_BANISH          = -1532090,
+
     // netherspite spells
     SPELL_NETHERBURN            = 30522,
     SPELL_VOID_ZONE             = 37063,
@@ -74,11 +78,7 @@ enum
     SPELL_DOMINANCE_PASSIVE     = 30398,
     // note: for Perseverence, there isn't any passive spell - currently we use script timer
     SPELL_NETHER_BEAM           = 30469,                // spell triggered by the passive auras
-    // SPELL_CLEAR_NETHER_BEAM  = 37072,                // not clear how to use this
-
-    // emotes
-    EMOTE_PHASE_BEAM            = -1532089,
-    EMOTE_PHASE_BANISH          = -1532090,
+    SPELL_CLEAR_NETHER_BEAM     = 37072,
 
     // npcs
     NPC_PORTAL_GREEN            = 17367,

@@ -190,8 +190,6 @@ bool GOUse_go_andorhal_tower(Player* pPlayer, GameObject* pGo)
 ## go_silithyst_geyser
 ######*/
 
-// UPDATE gameobject_template SET ScriptName='go_silithyst_geyser' WHERE entry=181598;
-
 enum
 {
     SPELL_SILITHYST    = 29519

@@ -5259,6 +5259,73 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 30542, true);
                     break;
                 }
+                case 30425:                                 // Portal Attunement
+                {
+                    if (!unitTarget)
+                        return;
+
+                    uint32 triggeredSpell = 0;
+                    switch (unitTarget->GetEntry())
+                    {
+                        case 17367: triggeredSpell = 30397; break;
+                        case 17368: triggeredSpell = 30398; break;
+                        // note: creature 17369 doesn't have a triggered spell, so this will be handled in script
+                    }
+
+                    if (triggeredSpell)
+                        unitTarget->CastSpell(unitTarget, triggeredSpell, true);
+                    return;
+                }
+                case 30469:                                 // Nether Beam
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // The player and boss spells are different
+                    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        switch (m_caster->GetEntry())
+                        {
+                            case 17367:
+                                if (unitTarget->HasAura(38638))
+                                    return;
+
+                                m_caster->CastSpell(unitTarget, 30401, true);
+                                m_caster->CastSpell(unitTarget, 30422, true);
+                                break;
+                            case 17368:
+                                if (unitTarget->HasAura(38639))
+                                    return;
+
+                                m_caster->CastSpell(unitTarget, 30402, true);
+                                m_caster->CastSpell(unitTarget, 30423, true);
+                                break;
+                            case 17369:
+                                if (unitTarget->HasAura(38637))
+                                    return;
+
+                                m_caster->CastSpell(unitTarget, 30400, true);
+                                m_caster->CastSpell(unitTarget, 30421, true);
+                                break;
+                        }
+                    }
+                    // Ignore pets, target only boss
+                    else if (!((Creature*)unitTarget)->IsPet())
+                    {
+                        uint32 triggeredSpell = 0;
+
+                        switch (m_caster->GetEntry())
+                        {
+                            case 17367: triggeredSpell = 30464; break;
+                            case 17368: triggeredSpell = 30463; break;
+                            case 17369: triggeredSpell = 30465; break;
+                        }
+
+                        if (triggeredSpell)
+                            m_caster->CastSpell(unitTarget, triggeredSpell, true);
+                    }
+                    return;
+                }
                 case 30769:                                 // Pick Red Riding Hood
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
