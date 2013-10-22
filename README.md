@@ -1,12 +1,13 @@
 BlizzLikeCore
 -------
 **BlizzLikeCore** is a MMORPG framework that's built using C++, and using a 
-back-end of MySQL for the DB content. **BlizzLikeCore** is an individual project
-and is based on the code of CMaNGOS project with extensive changes over time 
-to optimize, improve and cleanup the codebase at the same time as improving 
-the ingame mechanics and functionality.
+back-end of MySQL for the DB content. **BlizzLikeCore** is an individual project 
+based on the code of [CMaNGOS](http://cmangos.net/ "CMaNGOS") and 
+[ScriptDev2](http://www.scriptdev2.com/ "SD2") with extensive changes over time 
+to optimize, improve and cleanup the codebase at the same time as improving the 
+ingame mechanics and functionality.
 if you have code for us to merge into the repo (please file a pull request), 
-or help us by posting issues, patches and enhancement suggestions on the
+or help us by posting issues, patches and enhancement suggestions on the 
 forum: [BlizzLikeGroup](http://blizzlike.servegame.com "Forum")
 
 Download
