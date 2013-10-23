@@ -425,7 +425,7 @@ void World::LoadConfigSettings(bool reload)
         if (confVersion < _WORDSERVERCONF)
         {
             sLog.outError("*****************************************************************************");
-            sLog.outError(" WARNING: Your worldserver.conf version indicates your conf file is out of date!");
+            sLog.outError(" WARNING: worldserver.conf version indicates your conf file is out of date!");
             sLog.outError("          Please check for updates, as your current default values may cause");
             sLog.outError("          unexpected behavior.");
             sLog.outError("*****************************************************************************");
@@ -867,6 +867,8 @@ void World::LoadConfigSettings(bool reload)
     std::string ignoreMapIds = sConfig.GetStringDefault("mmap.ignoreMapIds", "");
     MMAP::MMapFactory::preventPathfindingOnMaps(ignoreMapIds.c_str());
     sLog.outString("WORLD: MMap pathfinding %sabled", getConfig(CONFIG_BOOL_MMAP_ENABLED) ? "en" : "dis");
+
+    setConfig(CONFIG_BOOL_PLAYERTOLEADER_ENABLED, "PlayerToLeader.enable", false);
 }
 
 /// Initialize the World

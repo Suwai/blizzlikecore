@@ -1501,15 +1501,15 @@ void Group::SetDifficulty(Difficulty difficulty)
     if (!isBGGroup())
         CharacterDatabase.PExecute("UPDATE groups SET difficulty = %u WHERE groupId='%u'", m_difficulty, m_Id);
 
+    Player* leader = ObjectAccessor::FindPlayer(GetLeaderGuid());
+
     for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
         Player* player = itr->getSource();
         if (!player->GetSession())
             continue;
 
-        Player* leader = ObjectAccessor::FindPlayer(GetLeaderGuid());
-
-        if (sMapStore.LookupEntry(player->GetMap()->IsDungeon()))
+        if (sMapStore.LookupEntry(player->GetMap()->IsDungeon()) && sWorld.getConfig(CONFIG_BOOL_PLAYERTOLEADER_ENABLED))
             player->TeleportTo(leader->GetMapId(), leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(), leader->GetOrientation());
 
         if (player->getLevel() < LEVELREQUIREMENT_HEROIC)
