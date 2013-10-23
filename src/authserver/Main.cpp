@@ -196,11 +196,11 @@ extern int main(int argc, char** argv)
     uint32 confVersion = sConfig.GetIntDefault("ConfVersion", 0);
     if (confVersion < _AUTHSERVERCONF)
     {
-        sLog.outError("*****************************************************************************");
-        sLog.outError(" WARNING: Your authserver.conf version indicates your conf file is out of date!");
+        sLog.outError("******************************************************************************");
+        sLog.outError(" WARNING: The authserver.conf version indicates your conf file is out of date!");
         sLog.outError("          Please check for updates, as your current default values may cause");
         sLog.outError("          strange behavior.");
-        sLog.outError("*****************************************************************************");
+        sLog.outError("******************************************************************************");
         Log::WaitBeforeContinueIfNeed();
     }
 

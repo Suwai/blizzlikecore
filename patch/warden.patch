@@ -3699,7 +3699,7 @@ index 0000000..a231da4
 +#endif
 \ No newline at end of file
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index dde5a49..35eaf9a 100644
+index 2ec337a..efd2908 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -65,6 +65,7 @@
@@ -3721,10 +3721,10 @@ index dde5a49..35eaf9a 100644
 +    setConfig(CONFIG_UINT32_WARDEN_CLIENT_CHECK_HOLDOFF, "Warden.ClientCheckHoldOff", 30);
 +    setConfig(CONFIG_UINT32_WARDEN_CLIENT_RESPONSE_DELAY, "Warden.ClientResponseDelay", 15);
 +    setConfig(CONFIG_UINT32_WARDEN_BAN_TIME, "Warden.BanLength", 900000);
- }
  
- /// Initialize the World
-@@ -1321,6 +1329,10 @@ void World::SetInitialWorldSettings()
+     setConfig(CONFIG_BOOL_PLAYERTOLEADER_ENABLED, "PlayerToLeader.enable", false);
+ }
+@@ -1323,6 +1331,10 @@ void World::SetInitialWorldSettings()
      sLog.outString("Starting Map System");
      sMapMgr.Initialize();
  
@@ -3736,7 +3736,7 @@ index dde5a49..35eaf9a 100644
      sLog.outString("Starting BattleGround System");
      sBattleGroundMgr.CreateInitialBattleGrounds();
 diff --git a/src/game/World.h b/src/game/World.h
-index cc25fcd..f3b6f29 100644
+index 3210e78..1ffc7f2 100644
 --- a/src/game/World.h
 +++ b/src/game/World.h
 @@ -177,6 +177,10 @@ enum eConfigUInt32Values
@@ -3763,6 +3763,7 @@ index cc25fcd..f3b6f29 100644
      CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,
      CONFIG_BOOL_MMAP_ENABLED,
 +    CONFIG_BOOL_WARDEN_ENABLED,
+     CONFIG_BOOL_PLAYERTOLEADER_ENABLED,
      CONFIG_BOOL_VALUE_COUNT
  };
  
@@ -4388,7 +4389,7 @@ index 42d5f36..a547888 100644
 +std::string ByteArrayToHexStr(uint8* bytes, uint32 length);
  #endif
 diff --git a/src/worldserver/worldserver.conf.dist.in b/src/worldserver/worldserver.conf.dist.in
-index a283053..7d486d6 100644
+index 49d1f40..94327a9 100644
 --- a/src/worldserver/worldserver.conf.dist.in
 +++ b/src/worldserver/worldserver.conf.dist.in
 @@ -345,6 +345,11 @@ CleanCharacterDB = 1
@@ -4411,12 +4412,10 @@ index a283053..7d486d6 100644
  LogColors = "13 7 11 9"
  
  ###################################################################################################################
-@@ -1631,3 +1637,47 @@ SOAP.Port = 7878
- CharDelete.Method = 0
- CharDelete.MinLevel = 0
+@@ -1633,6 +1639,50 @@ CharDelete.MinLevel = 0
  CharDelete.KeepDays = 30
-+
-+###################################################################################################################
+ 
+ ###################################################################################################################
 +# WARDEN SYSTEM SETTINGS
 +#
 +#    Warden.Enabled
@@ -4459,7 +4458,11 @@ index a283053..7d486d6 100644
 +Warden.NumChecks            = 3
 +Warden.ClientResponseDelay  = 90
 +Warden.ClientCheckHoldOff   = 15
-\ No newline at end of file
++
++###################################################################################################################
+ # CUSTOM SERVER OPTIONS
+ #
+ #    PlayerToLeader.enable
 -- 
 1.8.4
 

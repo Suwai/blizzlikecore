@@ -424,11 +424,11 @@ void World::LoadConfigSettings(bool reload)
     {
         if (confVersion < _WORDSERVERCONF)
         {
-            sLog.outError("*****************************************************************************");
-            sLog.outError(" WARNING: worldserver.conf version indicates your conf file is out of date!");
+            sLog.outError("*******************************************************************************");
+            sLog.outError(" WARNING: The worldserver.conf version indicates your conf file is out of date!");
             sLog.outError("          Please check for updates, as your current default values may cause");
             sLog.outError("          unexpected behavior.");
-            sLog.outError("*****************************************************************************");
+            sLog.outError("*******************************************************************************");
             Log::WaitBeforeContinueIfNeed();
         }
     }
