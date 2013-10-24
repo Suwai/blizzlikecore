@@ -23,4 +23,4 @@ UPDATE `creature_template` SET `AIName`='EventAI' WHERE  `entry`=19292;
 UPDATE `creature_template` SET `minlevel` = '60', `maxlevel` = '60', `maxhealth` = '3451', `maxmana` = '2475' WHERE `entry` = '25223';
 
 -- Fix some errors (by Vstar <vstar0v0@hotmail.com>)
-UPDATE `creature_template_addon` SET `b2_0_sheath` = '1', `auras` = '1787 1 1787 0 18950 0 18950 1' WHERE `entry` = '16164';
+-- UPDATE `creature_template_addon` SET `b2_0_sheath` = '1', `auras` = '1787 1 1787 0 18950 0 18950 1' WHERE `entry` = '16164';
