@@ -1636,7 +1636,7 @@ CharDelete.KeepDays = 30
 # CUSTOM SERVER OPTIONS
 #
 #    PlayerToLeader.enable
-#        Enable Player teleport to leader when change difficulty instance
+#        Enable teleport player to leader when change instance difficulty
 #        Default: 0 (disable)
 #                 1 (enable)
 #
