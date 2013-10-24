@@ -37,10 +37,10 @@ index 0ab8072..e1e7271 100644
      // No SQL injection possible (paste the IP address as passed by the socket)
      std::string address = get_remote_address();
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 8b37a65..bf470a3 100644
+index 7205219..415f24b 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
-@@ -781,6 +781,10 @@ ChatCommand* ChatHandler::getCommandTable()
+@@ -782,6 +782,10 @@ ChatCommand* ChatHandler::getCommandTable()
          { "quit",           SEC_CONSOLE,        true,  &ChatHandler::HandleQuitCommand,                "", NULL },
          { "mmap",           SEC_GAMEMASTER,     false, NULL,                                           "", mmapCommandTable },
  
@@ -52,10 +52,10 @@ index 8b37a65..bf470a3 100644
      };
  
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 944e20e..efc775e 100644
+index e94b9b3..3220471 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
-@@ -577,6 +577,10 @@ class BLIZZLIKE_DLL_SPEC ChatHandler
+@@ -578,6 +578,10 @@ class BLIZZLIKE_DLL_SPEC ChatHandler
          bool HandleMmap(char* args);
          bool HandleMmapTestArea(char* args);
  
@@ -81,10 +81,10 @@ index c43562b..fb5aa0c 100644
  
          inline float xp_in_group_rate(uint32 count, bool isRaid)
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index ace0ac6..a2e3193 100644
+index d0a9365..4117d98 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
-@@ -4692,6 +4692,40 @@ bool ChatHandler::HandleResetAllCommand(char* args)
+@@ -4701,6 +4701,40 @@ bool ChatHandler::HandleResetAllCommand(char* args)
      return true;
  }
  

@@ -3699,7 +3699,7 @@ index 0000000..a231da4
 +#endif
 \ No newline at end of file
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 2ec337a..efd2908 100644
+index 09caf89..61c72e5 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -65,6 +65,7 @@
@@ -3724,7 +3724,7 @@ index 2ec337a..efd2908 100644
  
      setConfig(CONFIG_BOOL_PLAYERTOLEADER_ENABLED, "PlayerToLeader.enable", false);
  }
-@@ -1323,6 +1331,10 @@ void World::SetInitialWorldSettings()
+@@ -1326,6 +1334,10 @@ void World::SetInitialWorldSettings()
      sLog.outString("Starting Map System");
      sMapMgr.Initialize();
  
