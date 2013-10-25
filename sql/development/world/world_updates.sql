@@ -25,5 +25,8 @@ UPDATE `creature_template` SET `minlevel` = '60', `maxlevel` = '60', `maxhealth`
 -- Fix some errors (by Vstar <vstar0v0@hotmail.com>)
 -- UPDATE `creature_template_addon` SET `b2_0_sheath` = '1', `auras` = '1787 1 1787 0 18950 0 18950 1' WHERE `entry` = '16164';
 
--- Update:Our Boy Wants To Be A Skyguard Ranger (by ysfl <ysfllxcn@live.com>)
+-- UpdateQuestGameobjecetScript:Our Boy Wants To Be A Skyguard Ranger (by ysfl <ysfllxcn@live.com>)
 UPDATE `gameobject_template` SET `ScriptName`='go_fel_crystalforge' WHERE  `entry`=185919;
+
+-- UpdateRewardQuest:Blood of the Warlord (by ysfl <ysfllxcn@live.com>)
+UPDATE `quest_template` SET `RewItemId1`=29434, `RewItemCount1`=10, `RewOrReqMoney`=132000, `RewMoneyMaxLevel`=114000 WHERE  `entry`=11178;
