@@ -74,8 +74,7 @@ enum WorldTimers
     WUPDATE_EVENTS      = 4,
     WUPDATE_DELETECHARS = 5,
     WUPDATE_AHBOT       = 6,
-    WUPDATE_AUTOBROADCAST = 7,
-    WUPDATE_COUNT         = 8
+    WUPDATE_COUNT       = 7
 };
 
 /// Configuration elements
@@ -438,7 +437,6 @@ class World
 
         WorldSession* FindSession(uint32 id) const;
         void AddSession(WorldSession* s);
-        void SendBroadcast();
         bool RemoveSession(uint32 id);
         /// Get the number of current active sessions
         void UpdateMaxSessionCounters();

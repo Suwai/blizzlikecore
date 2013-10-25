@@ -1019,8 +1019,7 @@ enum BlizzLikeStrings
 
     // Use for not-in-official-sources patches
     //                                    10000-10999
-    // Auto Broadcaster
-    LANG_AUTO_BROADCAST                 = 11000,
+
     // Use for custom patches             11000-11999
 
     // NOT RESERVED IDS                   12000-1999999999
