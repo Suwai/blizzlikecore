@@ -30,3 +30,8 @@ UPDATE `gameobject_template` SET `ScriptName`='go_fel_crystalforge' WHERE  `entr
 
 -- UpdateRewardQuest: Blood of the Warlord (by ysfl <ysfllxcn@live.com>)
 UPDATE `quest_template` SET `RewItemId1` = '29434', `RewItemCount1` = '10', `RewOrReqMoney` = '132000', `RewMoneyMaxLevel` = '114000' WHERE  `entry` = '11178';
+
+-- Spells Mind Control crash the server (needs fix..)
+REPLACE INTO `spell_disabled` (`entry`, `ischeat_spell`, `active`) VALUES('605','0','1');
+REPLACE INTO `spell_disabled` (`entry`, `ischeat_spell`, `active`) VALUES('10911','0','1');
+REPLACE INTO `spell_disabled` (`entry`, `ischeat_spell`, `active`) VALUES('10912','0','1');
