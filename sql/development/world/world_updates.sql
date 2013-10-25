@@ -17,10 +17,16 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_netherspite_portal' WHERE `en
 -- Update:Mission Gateways Murketh and Shaadraz (by ysfl <ysfllxcn@live.com>)
 REPLACE INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`) VALUES (1929201, 19292, 8, 0, 100, 0, 33655, -1, 0, 0, 33, 19292, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Legion Transporter: Beta - Quest Credit on Dropping The Nether Modulator Spellhit (Quest: 10146)');
 REPLACE INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`) VALUES (1929101, 19291, 8, 0, 100, 0, 33655, -1, 0, 0, 33, 19291, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Legion Transporter: Alpha - Quest Credit on Dropping The Nether Modulator Spellhit (Quest: 10129)');
-UPDATE `creature_template` SET `AIName`='EventAI' WHERE  `entry`=19291;
-UPDATE `creature_template` SET `AIName`='EventAI' WHERE  `entry`=19292;
+UPDATE `creature_template` SET `AIName`='EventAI' WHERE  `entry` = '19291';
+UPDATE `creature_template` SET `AIName`='EventAI' WHERE  `entry` = '19292';
 -- Repair_Quest_GUID_9723_NPC
 UPDATE `creature_template` SET `minlevel` = '60', `maxlevel` = '60', `maxhealth` = '3451', `maxmana` = '2475' WHERE `entry` = '25223';
 
 -- Fix some errors (by Vstar <vstar0v0@hotmail.com>)
-UPDATE `creature_template_addon` SET `b2_0_sheath` = '1', `auras` = '1787 1 1787 0 18950 0 18950 1' WHERE `entry` = '16164';
+UPDATE `creature_template_addon` SET `auras` = '1787 18950' WHERE `entry` = '16164';
+
+-- Update: Our Boy Wants To Be A Skyguard Ranger (by ysfl <ysfllxcn@live.com>)
+UPDATE `gameobject_template` SET `ScriptName`='go_fel_crystalforge' WHERE  `entry` = '185919';
+
+-- UpdateRewardQuest: Blood of the Warlord (by ysfl <ysfllxcn@live.com>)
+UPDATE `quest_template` SET `RewItemId1` = '29434', `RewItemCount1` = '10', `RewOrReqMoney` = '132000', `RewMoneyMaxLevel` = '114000' WHERE  `entry` = '11178';
