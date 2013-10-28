@@ -126,10 +126,10 @@ index d0a9365..4117d98 100644
  {
      sWorld.ShutdownCancel();
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index e5e7c60..f730d03 100644
+index 05f8cde..499d040 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
-@@ -5885,6 +5885,8 @@ void Player::CheckAreaExploreAndOutdoor()
+@@ -5890,6 +5890,8 @@ void Player::CheckAreaExploreAndOutdoor()
                      XP = uint32(sObjectMgr.GetBaseXP(p->area_level) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_EXPLORE));
                  }
  
@@ -138,7 +138,7 @@ index e5e7c60..f730d03 100644
                  GiveXP(XP, NULL);
                  SendExplorationExperience(area, XP);
              }
-@@ -13241,6 +13243,8 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, Object* questGiver,
+@@ -13246,6 +13248,8 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, Object* questGiver,
  
      // Used for client inform but rewarded only in case not max level
      uint32 xp = uint32(pQuest->XPValue(this) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));

@@ -3722,7 +3722,7 @@ index 09caf89..61c72e5 100644
 +    setConfig(CONFIG_UINT32_WARDEN_CLIENT_RESPONSE_DELAY, "Warden.ClientResponseDelay", 15);
 +    setConfig(CONFIG_UINT32_WARDEN_BAN_TIME, "Warden.BanLength", 900000);
  
-     setConfig(CONFIG_BOOL_PLAYERTOLEADER_ENABLED, "PlayerToLeader.enable", false);
+     setConfig(CONFIG_BOOL_PLAYERTOLEADER_ENABLED, "PlayerToLeader.enable", true);
  }
 @@ -1326,6 +1334,10 @@ void World::SetInitialWorldSettings()
      sLog.outString("Starting Map System");

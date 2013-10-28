@@ -1637,9 +1637,9 @@ CharDelete.KeepDays = 30
 #
 #    PlayerToLeader.enable
 #        Enable teleport player to leader when change instance difficulty
-#        Default: 0 (disable)
-#                 1 (enable)
+#        Default: 1 (enable)
+#                 0 (disable)
 #
 ###################################################################################################################
 
-PlayerToLeader.enable = 0
+PlayerToLeader.enable = 1
