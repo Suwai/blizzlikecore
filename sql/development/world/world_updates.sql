@@ -30,3 +30,7 @@ UPDATE `gameobject_template` SET `ScriptName`='go_fel_crystalforge' WHERE  `entr
 
 -- UpdateRewardQuest: Blood of the Warlord (by ysfl <ysfllxcn@live.com>)
 UPDATE `quest_template` SET `RewItemId1` = '29434', `RewItemCount1` = '10', `RewOrReqMoney` = '132000', `RewMoneyMaxLevel` = '114000' WHERE  `entry` = '11178';
+UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14 WHERE  `entry`=22920;
+UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14 WHERE  `entry`=22826;
+UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14 WHERE  `entry`=22930;
+UPDATE `item_template` SET `class`=12,`delay`=0 WHERE  `entry`=10515;
