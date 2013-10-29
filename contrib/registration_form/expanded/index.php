@@ -129,7 +129,7 @@ Password:
 <br />
 <p style="text-align:center;">Email:
 <br /><input name="email" type="text" maxlength="50" /><img src="inc/help.gif" HEIGHT="20" WIDTH="20" alt="help" onMouseover="ttip(\'Email must be 15 - 50 chars long\', 300)"; onMouseout="hidettip()"><br />
-<INPUT TYPE=RADIO NAME="expansion" VALUE="0"         >Original - 
+<INPUT TYPE=RADIO NAME="expansion" VALUE="0"         >CLASSIC - 
 <INPUT TYPE=RADIO NAME="expansion" VALUE="1" CHECKED >TBC - 
 <INPUT TYPE=RADIO NAME="expansion" VALUE="2"         >WOTLK<br />
 <img src="inc/OOP5.php" style="border: 1px dashed silver;"><br />

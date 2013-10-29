@@ -23,7 +23,6 @@
 #include "Opcodes.h"
 #include "UpdateData.h"
 #include "Player.h"
-#include "World.h"
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {
@@ -49,24 +48,6 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 
     pl->SendDuelCountdown(3000);
     plTarget->SendDuelCountdown(3000);
-
-     if (sWorld.getConfig(CONFIG_BOOL_DUELMOD))
-     {
-	//Remove cooldowns
-	pl->RemoveArenaSpellCooldowns();
-	plTarget->RemoveArenaSpellCooldowns();
-	//Restart all power
-	pl->SetHealth(pl->GetMaxHealth());
-	plTarget->SetHealth(plTarget->GetMaxHealth());
-	pl->RegenerateAll();
-	plTarget->RegenerateAll();
-	//Remove diminishing returns
-	pl->ClearDiminishings();
-	plTarget->ClearDiminishings();
-	//Begin info
-	pl->GetSession()->SendNotification("Good luck !");
-	plTarget->GetSession()->SendNotification("Good luck !");
-     }
 }
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
