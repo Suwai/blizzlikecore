@@ -1,18 +1,12 @@
 <?php
 
-// Configuration.
-// Realm database.
-$r_db = "auth";
-// IP (and port).
-$ip = "127.0.0.1:3306";
-// Username.
-$user = "blizzlike";
-// Password.
-$pass = "blizzlike";
-// Site title.
-$title = "Registration Form";
+// Configuration
+$auth_db = "auth";            // Auth database
+$ip = "127.0.0.1:3306";       // IP:Port
+$user = "blizzlike";          // Username
+$pass = "blizzlike";          // Password.
+$title = "Registration Form"; // Site title.
 $title2 = "BlizzLikeGroup";
-// End config.
 
 $page = '<?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -103,7 +97,7 @@ if (!empty($_POST)) {
                 $username = mysql_real_escape_string($username);
                 $password = mysql_real_escape_string($password);
                 $email = mysql_real_escape_string($email);
-                $qry = @mysql_query("select username from " . mysql_real_escape_string($r_db) . ".account where username = '" . $username . "'", $con);
+                $qry = @mysql_query("select username from " . mysql_real_escape_string($auth_db) . ".account where username = '" . $username . "'", $con);
 				if (!$qry) {
 					error_s("Error querying database: " . mysql_error());
 				};
@@ -118,7 +112,7 @@ if (!empty($_POST)) {
                         exit();
                 };
 				unset($qry);
-                $qry = @mysql_query("select email from " . mysql_real_escape_string($r_db) . ".account where email = '" . $email . "'", $con);
+                $qry = @mysql_query("select email from " . mysql_real_escape_string($auth_db) . ".account where email = '" . $email . "'", $con);
 				if (!$qry) {
 					error_s("Error querying database: " . mysql_error());
 				};
@@ -133,7 +127,7 @@ if (!empty($_POST)) {
                 };
 				unset($qry);
                 $sha_pass_hash = sha1(strtoupper($username) . ":" . strtoupper($password));
-                $register_sql = "insert into " . mysql_real_escape_string($r_db) . ".account (username, sha_pass_hash, email, expansion) values (upper('" . $username . "'),'" . $sha_pass_hash . "','" . $email . "','" . $tbc . "')";
+                $register_sql = "insert into " . mysql_real_escape_string($auth_db) . ".account (username, sha_pass_hash, email, expansion) values (upper('" . $username . "'),'" . $sha_pass_hash . "','" . $email . "','" . $tbc . "')";
                 $qry = @mysql_query($register_sql, $con);
 				if (!$qry) {
 					error_s("Error creating account: " . mysql_error());

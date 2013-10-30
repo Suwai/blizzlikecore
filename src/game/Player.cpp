@@ -3531,6 +3531,10 @@ bool Player::resetTalents(bool no_cost)
         if ((getClassMask() & talentTabInfo->ClassMask) == 0)
             continue;
 
+        for (PlayerSpellMap::iterator itr = GetSpellMap().begin(); itr != GetSpellMap().end(); ++itr)
+            if ((itr->first == 37116 || itr->first == 37117) && itr->second.state != PLAYERSPELL_REMOVED && !itr->second.disabled)
+                removeSpell(itr->first, false, false);  // talent problem fix
+
         for (int j = 0; j < MAX_TALENT_RANK; ++j)
             if (talentInfo->RankID[j])
                 removeSpell(talentInfo->RankID[j], !IsPassiveSpell(talentInfo->RankID[j]), false);
