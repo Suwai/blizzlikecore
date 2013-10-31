@@ -44,7 +44,7 @@ index 0000000..8f7484f
 --- /dev/null
 +++ b/sql/development/auth/auth_raf.sql
 @@ -0,0 +1,10 @@
-+--Add account friends
++-- Add account friends
 +DROP TABLE IF EXISTS `account_friends`;
 + 
 + CREATE TABLE `account_friends` (
@@ -61,7 +61,7 @@ index 0000000..348fbd1
 --- /dev/null
 +++ b/sql/development/characters/characters_raf.sql
 @@ -0,0 +1,2 @@
-+--Extension
++-- Extension
 +ALTER TABLE `characters` ADD COLUMN `grantableLevels` tinyint(3) unsigned NOT NULL default '0' AFTER `actionBars`;
 \ No newline at end of file
 diff --git a/sql/development/world/world_raf.sql b/sql/development/world/world_raf.sql
@@ -70,12 +70,12 @@ index 0000000..43257e1
 --- /dev/null
 +++ b/sql/development/world/world_raf.sql
 @@ -0,0 +1,59 @@
-+--Add command
++-- Add command
 +REPLACE INTO `command` (`name`,`security`,`help`) VALUES
 + ('account friend add',3,'Syntax: .account friend add [#accountId|$accountName] [#friendaccountId|$friendaccountName]\r\n\r\nSet friend account.'),
 + ('account friend delete',3,'Syntax: .account friend delete [#accountId|$accountName] [#friendaccountId|$friendaccountName]\r\n\r\nDelete friend account.'),
 + ('account friend list',3,'Syntax: .account friend list [#accountId|$accountName]\r\n\r\nList friends for account.');
-+--Add spell
++-- Add spell
 +REPLACE INTO `playercreateinfo_spell` VALUES
 + (1,1,45927,'Summon Friend'),
 + (1,2,45927,'Summon Friend'),
@@ -540,7 +540,7 @@ index c7b587c..820d817 100644
      SMSG_SPLINE_MOVE_UNSET_FLYING                   = 0x422,
      SMSG_SUMMON_CANCEL                              = 0x423
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index 98b3657..cce10f2 100644
+index 98b3657..6198d80 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -62,6 +62,7 @@
@@ -622,7 +622,7 @@ index 98b3657..cce10f2 100644
      uint32 curXP = GetUInt32Value(PLAYER_XP);
      uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
 -    uint32 newXP = curXP + xp + rested_bonus_xp;
-+    int32 newXP = curXP + xp + bonus_xp;
++    uint32 newXP = curXP + xp + bonus_xp;
  
      while (newXP >= nextLvlXP && level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
      {
@@ -702,6 +702,15 @@ index 98b3657..cce10f2 100644
  
      _LoadAuras(holder->GetResult(PLAYER_LOGIN_QUERY_LOADAURAS), time_diff);
  
+@@ -16171,7 +16225,7 @@ void Player::SaveToDB()
+                               "trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, "
+                               "death_expire_time, taxi_path, arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, "
+                               "todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk, health, power1, power2, power3, "
+-                              "power4, power5, exploredZones, equipmentCache, ammoId, knownTitles, actionBars) "
++                              "power4, power5, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels) "
+                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                               "?, ?, ?, ?, ?, ?, "
+                               "?, ?, ?, "
 @@ -16179,7 +16233,7 @@ void Player::SaveToDB()
                                "?, ?, ?, ?, ?, ?, ?, ?, ?, "
                                "?, ?, ?, ?, ?, ?, ?, "
@@ -802,7 +811,7 @@ index 98b3657..cce10f2 100644
 +{
 +    if (increase)
 +    {
-+        if (m_GrantableLevelsCount <= uint32(sWorld.getConfig(CONFIG_UINT32_RAF_MAXGRANTLEVEL) * sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL)))
++        if (uint32(m_GrantableLevelsCount) <= uint32(sWorld.getConfig(CONFIG_UINT32_RAF_MAXGRANTLEVEL) * sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL)))
 +            m_GrantableLevelsCount += increase;
 +    }
 +    else
@@ -1221,21 +1230,21 @@ index c0c1224..80e815c 100644
 \ No newline at end of file
 +PlayerToLeader.enable = 1
 +
-+ ###################################################################################################################
-+ #    Refer-A-Friend system by Mas0n
-+ #    RAF.MaxGrantLevel       = 60  (max level for granting level bonuses)
-+ #    RAF.MaxReferals         = 5   (max referals for one account)
-+ #    RAF.MaxReferers         = 5   (max referred accounts for one account)
-+ #    Rate.RAF.XP             = 3   (XP bonus for referred friends in party)
-+ #    Rate.RAF.LevelPerLevel  = 0.5 (bonus levels per referal level)
-+ #
-+ ###################################################################################################################
-+ 
-+ RAF.MaxGrantLevel       = 60
-+ RAF.MaxReferals         = 5
-+ RAF.MaxReferers         = 5
-+ Rate.RAF.XP             = 3
-+ Rate.RAF.LevelPerLevel  = 0.5
++###################################################################################################################
++#    Refer-A-Friend system by Mas0n
++#    RAF.MaxGrantLevel       = 60  (max level for granting level bonuses)
++#    RAF.MaxReferals         = 5   (max referals for one account)
++#    RAF.MaxReferers         = 5   (max referred accounts for one account)
++#    Rate.RAF.XP             = 3   (XP bonus for referred friends in party)
++#    Rate.RAF.LevelPerLevel  = 0.5 (bonus levels per referal level)
++#
++###################################################################################################################
++
++RAF.MaxGrantLevel       = 60
++RAF.MaxReferals         = 5
++RAF.MaxReferers         = 5
++Rate.RAF.XP             = 3
++Rate.RAF.LevelPerLevel  = 0.5
 \ No newline at end of file
 -- 
 1.8.4
