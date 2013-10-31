@@ -1,0 +1,1243 @@
+From bd0f5e9175f6a8cc73135994bf18979ff5281462 Mon Sep 17 00:00:00 2001
+From: Vstar <vstar0v0@hotmail.com>
+Date: Thu, 31 Oct 2013 01:11:19 +0800
+Subject: [PATCH] Core/DB: Add Refer a Friend System
+
+Comrade calling system --thanks Salja
+---
+ sql/development/auth/auth_raf.sql             |  10 ++
+ sql/development/characters/characters_raf.sql |   2 +
+ sql/development/world/world_raf.sql           |  59 +++++++
+ src/game/AccountMgr.cpp                       |  44 ++++++
+ src/game/AccountMgr.h                         |   4 +-
+ src/game/CharacterHandler.cpp                 |   2 +-
+ src/game/Chat.cpp                             |   9 ++
+ src/game/Chat.h                               |   4 +
+ src/game/Group.h                              |   1 +
+ src/game/GroupHandler.cpp                     |   4 +-
+ src/game/Language.h                           |   6 +-
+ src/game/Level3.cpp                           |  87 +++++++++++
+ src/game/MiscHandler.cpp                      |  60 +++++++-
+ src/game/Object.cpp                           |   8 +
+ src/game/Opcodes.cpp                          |   6 +-
+ src/game/Opcodes.h                            |   2 +-
+ src/game/Player.cpp                           | 255 +++++++++++++++++++++++++++++--
+ src/game/Player.h                             |  49 +++++-
+ src/game/SharedDefines.h                      |   3 +-
+ src/game/SocialMgr.cpp                        |  10 +-
+ src/game/SocialMgr.h                          |  12 +-
+ src/game/Spell.cpp                            |  17 ++-
+ src/game/Spell.h                              |   1 +
+ src/game/SpellEffects.cpp                     |  19 ++-
+ src/game/World.cpp                            |   6 +
+ src/game/World.h                              |   5 +
+ src/game/WorldSession.h                       |   5 +
+ src/worldserver/worldserver.conf.dist.in      |  18 ++-
+ 28 files changed, 667 insertions(+), 41 deletions(-)
+ create mode 100644 sql/development/auth/auth_raf.sql
+ create mode 100644 sql/development/characters/characters_raf.sql
+ create mode 100644 sql/development/world/world_raf.sql
+
+diff --git a/sql/development/auth/auth_raf.sql b/sql/development/auth/auth_raf.sql
+new file mode 100644
+index 0000000..8f7484f
+--- /dev/null
++++ b/sql/development/auth/auth_raf.sql
+@@ -0,0 +1,10 @@
++--Add account friends
++DROP TABLE IF EXISTS `account_friends`;
++ 
++ CREATE TABLE `account_friends` (
++   `id` int(11) unsigned NOT NULL DEFAULT '0',
++   `friend_id` int(11) unsigned NOT NULL DEFAULT '0',
++   `bind_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Bring Date',
++   `expire_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Expire Date',
++   PRIMARY KEY (`id`,`friend_id`)
++ ) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores accounts for Refer-a-Friend System.';
+\ No newline at end of file
+diff --git a/sql/development/characters/characters_raf.sql b/sql/development/characters/characters_raf.sql
+new file mode 100644
+index 0000000..348fbd1
+--- /dev/null
++++ b/sql/development/characters/characters_raf.sql
+@@ -0,0 +1,2 @@
++--Extension
++ALTER TABLE `characters` ADD COLUMN `grantableLevels` tinyint(3) unsigned NOT NULL default '0' AFTER `actionBars`;
+\ No newline at end of file
+diff --git a/sql/development/world/world_raf.sql b/sql/development/world/world_raf.sql
+new file mode 100644
+index 0000000..43257e1
+--- /dev/null
++++ b/sql/development/world/world_raf.sql
+@@ -0,0 +1,59 @@
++--Add command
++REPLACE INTO `command` (`name`,`security`,`help`) VALUES
++ ('account friend add',3,'Syntax: .account friend add [#accountId|$accountName] [#friendaccountId|$friendaccountName]\r\n\r\nSet friend account.'),
++ ('account friend delete',3,'Syntax: .account friend delete [#accountId|$accountName] [#friendaccountId|$friendaccountName]\r\n\r\nDelete friend account.'),
++ ('account friend list',3,'Syntax: .account friend list [#accountId|$accountName]\r\n\r\nList friends for account.');
++--Add spell
++REPLACE INTO `playercreateinfo_spell` VALUES
++ (1,1,45927,'Summon Friend'),
++ (1,2,45927,'Summon Friend'),
++ (1,4,45927,'Summon Friend'),
++ (1,5,45927,'Summon Friend'),
++ (1,8,45927,'Summon Friend'),
++ (1,9,45927,'Summon Friend'),
++ (2,1,45927,'Summon Friend'),
++ (2,3,45927,'Summon Friend'),
++ (2,4,45927,'Summon Friend'),
++ (2,7,45927,'Summon Friend'),
++ (2,9,45927,'Summon Friend'),
++ (3,1,45927,'Summon Friend'),
++ (3,2,45927,'Summon Friend'),
++ (3,3,45927,'Summon Friend'),
++ (3,4,45927,'Summon Friend'),
++ (3,5,45927,'Summon Friend'),
++ (4,1,45927,'Summon Friend'),
++ (4,3,45927,'Summon Friend'),
++ (4,4,45927,'Summon Friend'),
++ (4,5,45927,'Summon Friend'),
++ (4,11,45927,'Summon Friend'),
++ (5,1,45927,'Summon Friend'),
++ (5,4,45927,'Summon Friend'),
++ (5,5,45927,'Summon Friend'),
++ (5,8,45927,'Summon Friend'),
++ (5,9,45927,'Summon Friend'),
++ (6,1,45927,'Summon Friend'),
++ (6,3,45927,'Summon Friend'),
++ (6,7,45927,'Summon Friend'),
++ (6,11,45927,'Summon Friend'),
++ (7,1,45927,'Summon Friend'),
++ (7,4,45927,'Summon Friend'),
++ (7,8,45927,'Summon Friend'),
++ (7,9,45927,'Summon Friend'),
++ (8,1,45927,'Summon Friend'),
++ (8,3,45927,'Summon Friend'),
++ (8,4,45927,'Summon Friend'),
++ (8,5,45927,'Summon Friend'),
++ (8,7,45927,'Summon Friend'),
++ (8,8,45927,'Summon Friend'),
++ (10,2,45927,'Summon Friend'),
++ (10,3,45927,'Summon Friend'),
++ (10,4,45927,'Summon Friend'),
++ (10,5,45927,'Summon Friend'),
++ (10,8,45927,'Summon Friend'),
++ (10,9,45927,'Summon Friend'),
++ (11,1,45927,'Summon Friend'),
++ (11,2,45927,'Summon Friend'),
++ (11,3,45927,'Summon Friend'),
++ (11,5,45927,'Summon Friend'),
++ (11,7,45927,'Summon Friend'),
++ (11,8,45927,'Summon Friend');
+\ No newline at end of file
+diff --git a/src/game/AccountMgr.cpp b/src/game/AccountMgr.cpp
+index 9e7c22d..5e01b6b 100644
+--- a/src/game/AccountMgr.cpp
++++ b/src/game/AccountMgr.cpp
+@@ -21,6 +21,7 @@
+ #include "ObjectAccessor.h"
+ #include "ObjectGuid.h"
+ #include "Player.h"
++#include "World.h"
+ #include "Policies/Singleton.h"
+ #include "Util.h"
+ #include "Auth/Sha1.h"
+@@ -264,3 +265,46 @@ bool AccountMgr::normalizeString(std::string& utf8str)
+ 
+     return encoded;
+ }
++
++std::vector<uint32> AccountMgr::GetRAFAccounts(uint32 accid, bool referred)
++{
++
++	QueryResult* result;
++
++	if (referred)
++		result = LoginDatabase.PQuery("SELECT `friend_id` FROM `account_friends` WHERE `id` = %u AND `expire_date` > NOW() LIMIT %u", accid, sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERERS));
++	else
++		result = LoginDatabase.PQuery("SELECT `id` FROM `account_friends` WHERE `friend_id` = %u AND `expire_date` > NOW() LIMIT %u", accid, sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERALS));
++
++	std::vector<uint32> acclist;
++
++	if (result)
++	{
++		do
++		{
++			Field* fields = result->Fetch();
++			uint32 refaccid = fields[0].GetUInt32();
++			acclist.push_back(refaccid);
++		}
++		while (result->NextRow());
++		delete result;
++	}
++
++	return acclist;
++}
++
++AccountOpResult AccountMgr::AddRAFLink(uint32 accid, uint32 friendid)
++{
++	if (!LoginDatabase.PExecute("INSERT INTO `account_friends`  (`id`, `friend_id`, `expire_date`) VALUES (%u,%u,NOW() + INTERVAL 3 MONTH)", accid, friendid))
++		return AOR_DB_INTERNAL_ERROR;
++
++	return AOR_OK;
++}
++
++AccountOpResult AccountMgr::DeleteRAFLink(uint32 accid, uint32 friendid)
++{
++	if (!LoginDatabase.PExecute("DELETE FROM `account_friends` WHERE `id` = %u AND `friend_id` = %u", accid, friendid))
++		return AOR_DB_INTERNAL_ERROR;
++
++	return AOR_OK;
++}
+\ No newline at end of file
+diff --git a/src/game/AccountMgr.h b/src/game/AccountMgr.h
+index 37cd20e..fb9fc58 100644
+--- a/src/game/AccountMgr.h
++++ b/src/game/AccountMgr.h
+@@ -53,7 +53,9 @@ class AccountMgr
+         bool GetName(uint32 acc_id, std::string& name);
+         uint32 GetCharactersCount(uint32 acc_id);
+         std::string CalculateShaPassHash(std::string& name, std::string& password);
+-
++        std::vector<uint32> GetRAFAccounts(uint32 accid, bool referred = true);
++        AccountOpResult AddRAFLink(uint32 accid, uint32 friendid);
++        AccountOpResult DeleteRAFLink(uint32 accid, uint32 friendid);
+         static bool normalizeString(std::string& utf8str);
+ };
+ 
+diff --git a/src/game/CharacterHandler.cpp b/src/game/CharacterHandler.cpp
+index 4319071..8729702 100644
+--- a/src/game/CharacterHandler.cpp
++++ b/src/game/CharacterHandler.cpp
+@@ -73,7 +73,7 @@ bool LoginQueryHolder::Initialize()
+                      "position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost,"
+                      "resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
+                      "arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk,"
+-                     "health, power1, power2, power3, power4, power5, exploredZones, equipmentCache, ammoId, knownTitles, actionBars FROM characters WHERE guid = '%u'", m_guid.GetCounter());
++                     "health, power1, power2, power3, power4, power5, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels FROM characters WHERE guid = '%u'", m_guid.GetCounter());
+     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGROUP,           "SELECT groupId FROM group_member WHERE memberGuid ='%u'", m_guid.GetCounter());
+     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES,  "SELECT id, permanent, map, difficulty, resettime FROM character_instance LEFT JOIN instance ON instance = id WHERE guid = '%u'", m_guid.GetCounter());
+     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADAURAS,           "SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM character_aura WHERE guid = '%u'", m_guid.GetCounter());
+diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
+index 817bbb6..f1aada4 100644
+--- a/src/game/Chat.cpp
++++ b/src/game/Chat.cpp
+@@ -70,6 +70,14 @@ ChatCommand* ChatHandler::getCommandTable()
+         { NULL,             0,                  false, NULL,                                           "", NULL }
+     };
+ 
++    static ChatCommand accountFriendCommandTable[] =
++     {
++         { "add"  ,          SEC_ADMINISTRATOR,        true,  &ChatHandler::HandleAccountFriendAddCommand,    "", NULL },
++         { "delete",         SEC_ADMINISTRATOR,        true,  &ChatHandler::HandleAccountFriendDeleteCommand, "", NULL },
++         { "list",           SEC_ADMINISTRATOR,        true,  &ChatHandler::HandleAccountFriendListCommand,   "", NULL },
++         { NULL,             0,                  false, NULL,                                           "", NULL }
++     };
++ 
+     static ChatCommand accountCommandTable[] =
+     {
+         { "characters",     SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAccountCharactersCommand,   "", NULL },
+@@ -78,6 +86,7 @@ ChatCommand* ChatHandler::getCommandTable()
+         { "onlinelist",     SEC_CONSOLE,        true,  &ChatHandler::HandleAccountOnlineListCommand,   "", NULL },
+         { "lock",           SEC_PLAYER,         true,  &ChatHandler::HandleAccountLockCommand,         "", NULL },
+         { "set",            SEC_ADMINISTRATOR,  true,  NULL,                                           "", accountSetCommandTable },
++        { "friend",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", accountFriendCommandTable },
+         { "password",       SEC_PLAYER,         true,  &ChatHandler::HandleAccountPasswordCommand,     "", NULL },
+         { "",               SEC_PLAYER,         true,  &ChatHandler::HandleAccountCommand,             "", NULL },
+         { NULL,             0,                  false, NULL,                                           "", NULL }
+diff --git a/src/game/Chat.h b/src/game/Chat.h
+index e94b9b3..376f9b9 100644
+--- a/src/game/Chat.h
++++ b/src/game/Chat.h
+@@ -152,6 +152,10 @@ class BLIZZLIKE_DLL_SPEC ChatHandler
+         bool HandleAHBotReloadCommand(char* args);
+         bool HandleAHBotStatusCommand(char* args);
+ 
++        bool HandleAccountFriendAddCommand(char* args);
++        bool HandleAccountFriendDeleteCommand(char* args);
++        bool HandleAccountFriendListCommand(char* args);
++
+         bool HandleAuctionAllianceCommand(char* args);
+         bool HandleAuctionGoblinCommand(char* args);
+         bool HandleAuctionHordeCommand(char* args);
+diff --git a/src/game/Group.h b/src/game/Group.h
+index ea07892..28b86a6 100644
+--- a/src/game/Group.h
++++ b/src/game/Group.h
+@@ -76,6 +76,7 @@ enum GroupMemberOnlineStatus
+     MEMBER_STATUS_UNK3      = 0x0020,                       // used in calls from Lua_GetPlayerMapPosition/Lua_GetBattlefieldFlagPosition
+     MEMBER_STATUS_AFK       = 0x0040,                       // Lua_UnitIsAFK
+     MEMBER_STATUS_DND       = 0x0080,                       // Lua_UnitIsDND
++    MEMBER_STATUS_RAF       = 0x0100,                       // RAF status in party/raid
+ };
+ 
+ enum GroupType
+diff --git a/src/game/GroupHandler.cpp b/src/game/GroupHandler.cpp
+index 3cabb76..aa5e818 100644
+--- a/src/game/GroupHandler.cpp
++++ b/src/game/GroupHandler.cpp
+@@ -793,9 +793,11 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
+     if (pet)
+         mask1 = 0x7FFFFFFF;                                 // for hunters and other classes with pets
+ 
++    uint16 online_status = GetPlayer()->IsReferAFriendLinked(player) ?  (MEMBER_STATUS_ONLINE | MEMBER_STATUS_RAF) : MEMBER_STATUS_ONLINE;
++ 
+     Powers powerType = player->getPowerType();
+     data << uint32(mask1);                                  // group update mask
+-    data << uint16(MEMBER_STATUS_ONLINE);                   // member's online status
++    data << uint16(online_status);                   // member's online status
+     data << uint16(player->GetHealth());                    // GROUP_UPDATE_FLAG_CUR_HP
+     data << uint16(player->GetMaxHealth());                 // GROUP_UPDATE_FLAG_MAX_HP
+     data << uint8(powerType);                               // GROUP_UPDATE_FLAG_POWER_TYPE
+diff --git a/src/game/Language.h b/src/game/Language.h
+index b751ff2..6977d75 100644
+--- a/src/game/Language.h
++++ b/src/game/Language.h
+@@ -1015,7 +1015,11 @@ enum BlizzLikeStrings
+     LANG_OPVP_SI_CAPTURE_H              = 1635,
+     LANG_OPVP_SI_CAPTURE_A              = 1636,
+ 
+-    // FREE IDS                           1700-9999
++    // Refer-A-Friend
++    LANG_COMMAND_FRIEND                 = 1700,
++    LANG_COMMAND_FRIEND_ERROR           = 1701,
++ 
++    // FREE IDS                           1800-9999
+ 
+     // Use for not-in-official-sources patches
+     //                                    10000-10999
+diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
+index d0a9365..5b2dacb 100644
+--- a/src/game/Level3.cpp
++++ b/src/game/Level3.cpp
+@@ -6648,3 +6648,90 @@ bool ChatHandler::HandleMmapTestArea(char* args)
+ 
+     return true;
+ }
++
++// Set friends for account
++bool ChatHandler::HandleAccountFriendAddCommand(char* args)
++{
++    ///- Get the command line arguments
++    std::string account_name;
++    uint32 targetAccountId = ExtractAccountId(&args, &account_name);
++
++    if (!targetAccountId)
++        return false;
++
++    std::string account_friend_name;
++    uint32 friendAccountId = ExtractAccountId(&args, &account_friend_name);
++
++    if (!friendAccountId)
++        return false;
++
++    AccountOpResult result = sAccountMgr.AddRAFLink(targetAccountId, friendAccountId);
++
++    switch(result)
++    {
++        case AOR_OK:
++            SendSysMessage(LANG_COMMAND_FRIEND);
++            break;
++        default:
++            SendSysMessage(LANG_COMMAND_FRIEND_ERROR);
++            SetSentErrorMessage(true);
++            return false;
++    }
++
++    return true;
++}
++
++// Delete friends for account
++bool ChatHandler::HandleAccountFriendDeleteCommand(char* args)
++{
++    ///- Get the command line arguments
++    std::string account_name;
++    uint32 targetAccountId = ExtractAccountId(&args, &account_name);
++
++    if (!targetAccountId)
++        return false;
++
++    std::string account_friend_name;
++    uint32 friendAccountId = ExtractAccountId(&args, &account_friend_name);
++
++    if (!friendAccountId)
++        return false;
++
++    AccountOpResult result = sAccountMgr.DeleteRAFLink(targetAccountId, friendAccountId);
++
++    switch(result)
++    {
++        case AOR_OK:
++            SendSysMessage(LANG_COMMAND_FRIEND);
++            break;
++        default:
++            SendSysMessage(LANG_COMMAND_FRIEND_ERROR);
++            SetSentErrorMessage(true);
++            return false;
++    }
++
++    return true;
++}
++
++// List friends for account
++bool ChatHandler::HandleAccountFriendListCommand(char* args)
++{
++  ///- Get the command line arguments
++  std::string account_name;
++  uint32 AccountId = ExtractAccountId(&args, &account_name);
++
++  if (!AccountId)
++    return false;
++
++  std::vector<uint32> result = sAccountMgr.GetRAFAccounts(AccountId, true);
++
++  if (!result.empty())
++  {
++    std::stringstream convert;
++    std::copy(result.begin(), result.end(), std::ostream_iterator<int>(convert, "\n"));
++
++    PSendSysMessage(convert.str().c_str());
++  }
++
++  return true;
++}
+\ No newline at end of file
+diff --git a/src/game/MiscHandler.cpp b/src/game/MiscHandler.cpp
+index 082e398..236dc15 100644
+--- a/src/game/MiscHandler.cpp
++++ b/src/game/MiscHandler.cpp
+@@ -405,13 +405,13 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
+     ObjectGuid guid;
+     recv_data >> guid;
+ 
+-    _player->SetSelectionGuid(guid);
+-
+     // update reputation list if need
+     Unit* unit = ObjectAccessor::GetUnit(*_player, guid);   // can select group members at diff maps
+     if (!unit)
+         return;
+ 
++    _player->SetSelectionGuid(guid);
++
+     if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->getFaction()))
+         _player->GetReputationMgr().SetVisible(factionTemplateEntry);
+ }
+@@ -1417,3 +1417,59 @@ void WorldSession::HandleSetTaxiBenchmarkOpcode(WorldPacket& recv_data)
+ 
+     DEBUG_LOG("Client used \"/timetest %d\" command", mode);
+ }
++
++ // Refer-A-Friend
++ void WorldSession::HandleGrantLevel(WorldPacket& recv_data)
++ {
++     DEBUG_LOG("WORLD: CMSG_GRANT_LEVEL");
++ 
++     ObjectGuid guid;
++     recv_data >> guid.ReadAsPacked();
++ 
++     if (!guid.IsPlayer())
++         return;
++ 
++     Player * target = sObjectMgr.GetPlayer(guid);
++ 
++     // cheating and other check
++     ReferAFriendError err = _player->GetReferFriendError(target, false);
++ 
++     if (err)
++     {
++         _player->SendReferFriendError(err, target);
++         return;
++     }
++ 
++     target->AccessGrantableLevel(_player->GetObjectGuid());
++ 
++     WorldPacket data(SMSG_PROPOSE_LEVEL_GRANT, 8);
++     data << _player->GetPackGUID();
++     target->GetSession()->SendPacket(&data);
++ }
++ 
++ void WorldSession::HandleAcceptGrantLevel(WorldPacket& recv_data)
++ {
++     DEBUG_LOG("WORLD: CMSG_ACCEPT_LEVEL_GRANT");
++ 
++     ObjectGuid guid;
++     recv_data >> guid.ReadAsPacked();
++ 
++     if (!guid.IsPlayer())
++         return;
++ 
++     if (!_player->IsAccessGrantableLevel(guid))
++         return;
++ 
++     _player->AccessGrantableLevel(ObjectGuid());
++     Player * grant_giver = sObjectMgr.GetPlayer(guid);
++ 
++     if (!grant_giver)
++         return;
++ 
++     if (grant_giver->GetGrantableLevels())
++         grant_giver->ChangeGrantableLevels(0);
++     else
++         return;
++ 
++     _player->GiveLevel(_player->getLevel() + 1);
++ }
+\ No newline at end of file
+diff --git a/src/game/Object.cpp b/src/game/Object.cpp
+index 96400ee..0462e60 100644
+--- a/src/game/Object.cpp
++++ b/src/game/Object.cpp
+@@ -519,6 +519,14 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
+                     else
+                         *data << uint32(0);                 // disable quest object
+                 }
++                // hide RAF flag if need
++                 else if (index == UNIT_DYNAMIC_FLAGS && GetTypeId() == TYPEID_PLAYER)
++                 {
++                     if (!((Player*)this)->IsReferAFriendLinked(target))
++                         *data << (m_uint32Values[index] & ~UNIT_DYNFLAG_REFER_A_FRIEND);
++                     else
++                         *data << m_uint32Values[index];
++                 }
+                 else
+                     *data << m_uint32Values[index];         // other cases
+             }
+diff --git a/src/game/Opcodes.cpp b/src/game/Opcodes.cpp
+index 668acdd..73123b8 100644
+--- a/src/game/Opcodes.cpp
++++ b/src/game/Opcodes.cpp
+@@ -1062,7 +1062,7 @@
+     /*0x409*/ { "MSG_QUERY_GUILD_BANK_TEXT",                    STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleQueryGuildBankTabText     },
+     /*0x40A*/ { "CMSG_SET_GUILD_BANK_TEXT",                     STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleSetGuildBankTabText       },
+     /*0x40B*/ { "CMSG_SET_GRANTABLE_LEVELS",                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
+-    /*0x40C*/ { "CMSG_GRANT_LEVEL",                             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
++    /*0x40C*/ { "CMSG_GRANT_LEVEL",                             STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleGrantLevel                },
+     /*0x40D*/ { "CMSG_REFER_A_FRIEND",                          STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
+     /*0x40E*/ { "MSG_GM_CHANGE_ARENA_RATING",                   STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
+     /*0x40F*/ { "CMSG_DECLINE_CHANNEL_INVITE",                  STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
+@@ -1081,8 +1081,8 @@
+     /*0x41C*/ { "SMSG_SERVER_BUCK_DATA",                        STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
+     /*0x41D*/ { "SMSG_SEND_UNLEARN_SPELLS",                     STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
+     /*0x41E*/ { "SMSG_PROPOSE_LEVEL_GRANT",                     STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
+-    /*0x41F*/ { "CMSG_ACCEPT_LEVEL_GRANT",                      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
+-    /*0x420*/ { "SMSG_REFER_A_FRIEND_FAILURE",                  STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
++    /*0x41F*/ { "CMSG_ACCEPT_LEVEL_GRANT",                      STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleAcceptGrantLevel          },
++    /*0x420*/ { "SMSG_REFER_A_FRIEND_ERROR",                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
+     /*0x421*/ { "SMSG_SPLINE_MOVE_SET_FLYING",                  STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
+     /*0x422*/ { "SMSG_SPLINE_MOVE_UNSET_FLYING",                STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
+     /*0x423*/ { "SMSG_SUMMON_CANCEL",                           STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
+diff --git a/src/game/Opcodes.h b/src/game/Opcodes.h
+index c7b587c..820d817 100644
+--- a/src/game/Opcodes.h
++++ b/src/game/Opcodes.h
+@@ -1090,7 +1090,7 @@ enum Opcodes
+     SMSG_SEND_UNLEARN_SPELLS                        = 0x41D,
+     SMSG_PROPOSE_LEVEL_GRANT                        = 0x41E,
+     CMSG_ACCEPT_LEVEL_GRANT                         = 0x41F,
+-    SMSG_REFER_A_FRIEND_FAILURE                     = 0x420,
++    SMSG_REFER_A_FRIEND_ERROR                       = 0x420,
+     SMSG_SPLINE_MOVE_SET_FLYING                     = 0x421,
+     SMSG_SPLINE_MOVE_UNSET_FLYING                   = 0x422,
+     SMSG_SUMMON_CANCEL                              = 0x423
+diff --git a/src/game/Player.cpp b/src/game/Player.cpp
+index 0e6e1ed..dee9eb0 100644
+--- a/src/game/Player.cpp
++++ b/src/game/Player.cpp
+@@ -62,6 +62,7 @@
+ #include "Mail.h"
+ #include "DBCStores.h"
+ #include "SQLStorages.h"
++#include "AccountMgr.h"
+ 
+ #include <cmath>
+ 
+@@ -546,6 +547,9 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
+ 
+     m_lastFallTime = 0;
+     m_lastFallZ = 0;
++
++    // Refer-A-Friend
++    m_GrantableLevelsCount = 0;
+ }
+ 
+ Player::~Player()
+@@ -661,7 +665,13 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
+     SetByteValue(PLAYER_BYTES, 3, hairColor);
+ 
+     SetByteValue(PLAYER_BYTES_2, 0, facialHair);
+-    SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_NORMAL);
++
++    LoadAccountLinkedState();
++ 
++    if (GetAccountLinkedState() != STATE_NOT_LINKED)
++        SetByteValue(PLAYER_BYTES_2, 3, 0x06);              // rest state = refer-a-friend
++    else
++        SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_NORMAL); // rest state = normal
+ 
+     SetUInt16Value(PLAYER_BYTES_3, 0, gender);              // only GENDER_MALE/GENDER_FEMALE (1 bit) allowed, drunk state = 0
+     SetByteValue(PLAYER_BYTES_3, 3, 0);                     // BattlefieldArenaFaction (0 or 1)
+@@ -2292,18 +2302,18 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid)
+     }
+ }
+ 
+-void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP)
++void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool ReferAFriend)
+ {
+     WorldPacket data(SMSG_LOG_XPGAIN, 21);
+     data << (victim ? victim->GetObjectGuid() : ObjectGuid());// guid
+-    data << uint32(GivenXP + RestXP);                       // given experience
++    data << uint32(GivenXP + BonusXP);                      // total experience
+     data << uint8(victim ? 0 : 1);                          // 00-kill_xp type, 01-non_kill_xp type
+     if (victim)
+     {
+         data << uint32(GivenXP);                            // experience without rested bonus
+         data << float(1);                                   // 1 - none 0 - 100% group bonus output
+     }
+-    data << uint8(0);                                       // new 2.4.0
++    data << uint8(ReferAFriend ? 1 : 0);                    // Refer-A-Friend State
+     GetSession()->SendPacket(&data);
+ }
+ 
+@@ -2326,22 +2336,47 @@ void Player::GiveXP(uint32 xp, Unit* victim)
+     for (Unit::AuraList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
+         xp = uint32(xp * (1.0f + (*i)->GetModifier()->m_amount / 100.0f));
+ 
+-    // XP resting bonus for kill
+-    uint32 rested_bonus_xp = victim ? GetXPRestBonus(xp) : 0;
++    uint32 bonus_xp = 0;
++    bool ReferAFriend = false;
++    if (CheckRAFConditions())
++    {
++        // RAF bonus exp don't decrease rest exp
++        bool ReferAFriend = true;
++        bonus_xp = xp * (sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_XP) - 1);
++    }
++    else
++        // XP resting bonus for kill
++        bonus_xp = victim ? GetXPRestBonus(xp) : 0;
+ 
+-    SendLogXPGain(xp, victim, rested_bonus_xp);
++    SendLogXPGain(xp, victim, bonus_xp, ReferAFriend);
+ 
+     uint32 curXP = GetUInt32Value(PLAYER_XP);
+     uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+-    uint32 newXP = curXP + xp + rested_bonus_xp;
++    int32 newXP = curXP + xp + bonus_xp;
+ 
+     while (newXP >= nextLvlXP && level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+     {
+         newXP -= nextLvlXP;
+ 
+         if (level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
++        {
+             GiveLevel(level + 1);
+-
++            level = getLevel();
++            // Refer-A-Friend
++            if (GetAccountLinkedState() == STATE_REFERRAL || GetAccountLinkedState() == STATE_DUAL)
++            {
++                if (level < sWorld.getConfig(CONFIG_UINT32_RAF_MAXGRANTLEVEL))
++                {
++                    if (sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL) < 1.0f)
++                    {
++                        if ( level%uint8(1.0f/sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL)) == 0 )
++                            ChangeGrantableLevels(1);
++                    }
++                    else
++                        ChangeGrantableLevels(uint8(sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL)));
++                }
++            }
++        }
+         level = getLevel();
+         nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+     }
+@@ -4179,6 +4214,10 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
+     SetWaterWalk(false);
+     SetRoot(false);
+ 
++    // refer-a-friend flag - maybe wrong and hacky
++    if (GetAccountLinkedState() != STATE_NOT_LINKED)
++        SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
++ 
+     m_deathTimer = 0;
+ 
+     // set health/powers (0- will be set in caller)
+@@ -6003,6 +6042,11 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32
+         percent *= repRate;
+     }
+ 
++    if (CheckRAFConditions())
++    {
++        percent *= sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_XP);
++    }
++
+     return int32(sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_GAIN) * rep * percent / 100.0f);
+ }
+ 
+@@ -14563,8 +14607,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
+     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
+     // 39           40                41                42                    43          44          45              46           47              48
+     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk,"
+-    // 49      50      51      52      53      54      55             56              57      58           59
+-    //"health, power1, power2, power3, power4, power5, exploredZones, equipmentCache, ammoId, knownTitles, actionBars  FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
++    // 49      50      51      52      53      54      55             56              57      58           59          60
++    //"health, power1, power2, power3, power4, power5, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels  FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
+     QueryResult* result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
+ 
+     if (!result)
+@@ -14971,7 +15015,17 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
+     _LoadMails(holder->GetResult(PLAYER_LOGIN_QUERY_LOADMAILS));
+     _LoadMailedItems(holder->GetResult(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS));
+     UpdateNextMailTimeAndUnreads();
+-
++     m_GrantableLevelsCount = fields[60].GetUInt32();
++ 
++     // refer-a-friend flag - maybe wrong and hacky
++     LoadAccountLinkedState();
++     if (GetAccountLinkedState() != STATE_NOT_LINKED)
++         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
++
++     // set grant flag
++     if (m_GrantableLevelsCount > 0)
++         SetByteValue(PLAYER_FIELD_BYTES, 1, 0x01);
++
+     _LoadAuras(holder->GetResult(PLAYER_LOGIN_QUERY_LOADAURAS), time_diff);
+ 
+     // add ghost flag (must be after aura load: PLAYER_FLAGS_GHOST set in aura)
+@@ -16180,7 +16234,7 @@ void Player::SaveToDB()
+                               "?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                               "?, ?, ?, ?, ?, ?, ?, "
+                               "?, ?, ?, ?, ?, ?, ?, ?, ?, "
+-                              "?, ?, ?, ?, ?, ?, ?) ");
++                              "?, ?, ?, ?, ?, ?, ?, ?) ");
+ 
+     uberInsert.addUInt32(GetGUIDLow());
+     uberInsert.addUInt32(GetSession()->GetAccountId());
+@@ -16306,7 +16360,8 @@ void Player::SaveToDB()
+     uberInsert.addString(ss);
+ 
+     uberInsert.addUInt32(uint32(GetByteValue(PLAYER_FIELD_BYTES, 2)));
+-
++    uberInsert.addUInt32(m_GrantableLevelsCount);
++ 
+     uberInsert.Execute();
+ 
+     if (m_mailsUpdated)                                     // save mails only when needed
+@@ -17578,7 +17633,15 @@ void Player::SetRestBonus(float rest_bonus_new)
+         SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_RESTED);
+     else if (m_rest_bonus <= 1)
+         SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_NORMAL);
+-
++    if (GetAccountLinkedState() != STATE_NOT_LINKED)
++        SetByteValue(PLAYER_BYTES_2, 3, 0x06);                              // Set Reststate = Refer-A-Friend
++    else
++    {
++        if (m_rest_bonus > 10)
++            SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_RESTED);             // Set Reststate = Rested
++        else if (m_rest_bonus<=1)
++            SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_NORMAL);             // Set Reststate = Normal
++    }
+     // RestTickUpdate
+     SetUInt32Value(PLAYER_REST_STATE_EXPERIENCE, uint32(m_rest_bonus));
+ }
+@@ -20940,3 +21003,165 @@ AreaLockStatus Player::GetAreaTriggerLockStatus(AreaTrigger const* at, uint32& m
+ 
+     return AREA_LOCKSTATUS_OK;
+ };
++
++// Refer-A-Friend
++void Player::SendReferFriendError(ReferAFriendError err, Player * target)
++{
++    WorldPacket data(SMSG_REFER_A_FRIEND_ERROR, 24);
++    data << uint32(err);
++    if (target && (err == ERR_REFER_A_FRIEND_NOT_IN_GROUP || err == ERR_REFER_A_FRIEND_SUMMON_OFFLINE_S))
++        data << target->GetName();
++
++    GetSession()->SendPacket(&data);
++}
++
++ReferAFriendError Player::GetReferFriendError(Player * target, bool summon)
++{
++    if (!target || target->GetTypeId() != TYPEID_PLAYER)
++        return summon ? ERR_REFER_A_FRIEND_SUMMON_OFFLINE_S : ERR_REFER_A_FRIEND_NO_TARGET;
++
++    if (!IsReferAFriendLinked(target))
++        return ERR_REFER_A_FRIEND_NOT_REFERRED_BY;
++
++    if (Group * gr1 = GetGroup())
++    {
++        Group * gr2 = target->GetGroup();
++
++        if (!gr2 || gr1->GetId() != gr2->GetId())
++            return ERR_REFER_A_FRIEND_NOT_IN_GROUP;
++    }
++
++    if (summon)
++    {
++        if (HasSpellCooldown(45927))
++            return ERR_REFER_A_FRIEND_SUMMON_COOLDOWN;
++        if (target->getLevel() > sWorld.getConfig(CONFIG_UINT32_RAF_MAXGRANTLEVEL))
++            return ERR_REFER_A_FRIEND_SUMMON_LEVEL_MAX_I;
++
++        if (MapEntry const* mEntry = sMapStore.LookupEntry(GetMapId()))
++            if (mEntry->Expansion() > target->GetSession()->Expansion())
++                return ERR_REFER_A_FRIEND_INSUF_EXPAN_LVL;
++    }
++    else
++    {
++        if (GetTeam() != target->GetTeam() && !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
++            return ERR_REFER_A_FRIEND_DIFFERENT_FACTION;
++        if (getLevel() <= target->getLevel())
++            return ERR_REFER_A_FRIEND_TARGET_TOO_HIGH;
++        if (!GetGrantableLevels())
++            return ERR_REFER_A_FRIEND_INSUFFICIENT_GRANTABLE_LEVELS;
++        if (GetDistance(target) > DEFAULT_VISIBILITY_DISTANCE || !target->IsVisibleGloballyFor(this))
++            return ERR_REFER_A_FRIEND_TOO_FAR;
++        if (target->getLevel() >= sWorld.getConfig(CONFIG_UINT32_RAF_MAXGRANTLEVEL))
++            return ERR_REFER_A_FRIEND_GRANT_LEVEL_MAX_I;
++    }
++
++    return ERR_REFER_A_FRIEND_NONE;
++}
++
++void Player::ChangeGrantableLevels(uint8 increase)
++{
++    if (increase)
++    {
++        if (m_GrantableLevelsCount <= uint32(sWorld.getConfig(CONFIG_UINT32_RAF_MAXGRANTLEVEL) * sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL)))
++            m_GrantableLevelsCount += increase;
++    }
++    else
++    {
++        m_GrantableLevelsCount -= 1;
++
++        if (m_GrantableLevelsCount < 0)
++            m_GrantableLevelsCount = 0;
++    }
++
++    // set/unset flag - granted levels
++    if (m_GrantableLevelsCount > 0)
++    {
++        if (!HasByteFlag(PLAYER_FIELD_BYTES, 1, 0x01))
++            SetByteFlag(PLAYER_FIELD_BYTES, 1, 0x01);
++    }
++    else
++    {
++        if (HasByteFlag(PLAYER_FIELD_BYTES, 1, 0x01))
++            RemoveByteFlag(PLAYER_FIELD_BYTES, 1, 0x01);
++    }
++
++}
++
++bool Player::CheckRAFConditions()
++{
++    if (Group * grp = GetGroup())
++    {
++        for(GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
++        {
++            Player* member = itr->getSource();
++
++            if (!member || !member->isAlive())
++                continue;
++
++            if (GetObjectGuid() == member->GetObjectGuid())
++                continue;
++
++            if (member->GetAccountLinkedState() == STATE_NOT_LINKED)
++                continue;
++
++            if (GetDistance(member) < 100 && (getLevel() <= member->getLevel() + 4))
++                return true;
++        }
++    }
++
++    return false;
++}
++
++AccountLinkedState Player::GetAccountLinkedState()
++{
++
++    if (!m_referredAccounts.empty() && !m_referalAccounts.empty())
++        return STATE_DUAL;
++
++    if (!m_referredAccounts.empty())
++        return STATE_REFER;
++
++    if (!m_referalAccounts.empty())
++        return STATE_REFERRAL;
++
++    return STATE_NOT_LINKED;
++}
++
++void Player::LoadAccountLinkedState()
++{
++    m_referredAccounts.clear();
++    m_referredAccounts = sAccountMgr.GetRAFAccounts(GetSession()->GetAccountId(), true);
++
++    if (m_referredAccounts.size() > sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERERS))
++        sLog.outError("Player:RAF:Warning: loaded %u referred accounts instead of %u for player %u",m_referredAccounts.size(),sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERERS),GetObjectGuid().GetCounter());
++    else
++        DEBUG_LOG("Player:RAF: loaded %u referred accounts for player %u",m_referredAccounts.size(),GetObjectGuid().GetCounter());
++
++    m_referalAccounts.clear();
++    m_referalAccounts  = sAccountMgr.GetRAFAccounts(GetSession()->GetAccountId(), false);
++
++    if (m_referalAccounts.size() > sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERALS))
++        sLog.outError("Player:RAF:Warning: loaded %u referal accounts instead of %u for player %u",m_referalAccounts.size(),sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERALS),GetObjectGuid().GetCounter());
++    else
++        DEBUG_LOG("Player:RAF: loaded %u referal accounts for player %u",m_referalAccounts.size(),GetObjectGuid().GetCounter());
++}
++
++bool Player::IsReferAFriendLinked(Player* target)
++{
++    // check link this(refer) - target(referral)
++    for (std::vector<uint32>::const_iterator itr = m_referalAccounts.begin(); itr != m_referalAccounts.end(); ++itr)
++    {
++        if ((*itr) == target->GetSession()->GetAccountId())
++            return true;
++    }
++
++    // check link target(refer) - this(referral)
++    for (std::vector<uint32>::const_iterator itr = m_referredAccounts.begin(); itr != m_referredAccounts.end(); ++itr)
++    {
++        if ((*itr) == target->GetSession()->GetAccountId())
++            return true;
++    }
++
++    return false;
++}
+diff --git a/src/game/Player.h b/src/game/Player.h
+index 8ecbac9..fdab1dc 100644
+--- a/src/game/Player.h
++++ b/src/game/Player.h
+@@ -643,6 +643,32 @@ enum TransferAbortReason
+     TRANSFER_ABORT_DIFFICULTY                   = 0x07,     // <Normal,Heroic,Epic> difficulty mode is not available for %s.
+ };
+ 
++enum ReferAFriendError
++ {
++     ERR_REFER_A_FRIEND_NONE                          = 0x00,
++     ERR_REFER_A_FRIEND_NOT_REFERRED_BY               = 0x01,
++     ERR_REFER_A_FRIEND_TARGET_TOO_HIGH               = 0x02,
++     ERR_REFER_A_FRIEND_INSUFFICIENT_GRANTABLE_LEVELS = 0x03,
++     ERR_REFER_A_FRIEND_TOO_FAR                       = 0x04,
++     ERR_REFER_A_FRIEND_DIFFERENT_FACTION             = 0x05,
++     ERR_REFER_A_FRIEND_NOT_NOW                       = 0x06,
++     ERR_REFER_A_FRIEND_GRANT_LEVEL_MAX_I             = 0x07,
++     ERR_REFER_A_FRIEND_NO_TARGET                     = 0x08,
++     ERR_REFER_A_FRIEND_NOT_IN_GROUP                  = 0x09,
++     ERR_REFER_A_FRIEND_SUMMON_LEVEL_MAX_I            = 0x0A,
++     ERR_REFER_A_FRIEND_SUMMON_COOLDOWN               = 0x0B,
++     ERR_REFER_A_FRIEND_INSUF_EXPAN_LVL               = 0x0C,
++     ERR_REFER_A_FRIEND_SUMMON_OFFLINE_S              = 0x0D
++ };
++ 
++ enum AccountLinkedState
++ {
++     STATE_NOT_LINKED = 0x00,
++     STATE_REFER      = 0x01,
++     STATE_REFERRAL   = 0x02,
++     STATE_DUAL       = 0x04,
++ };
++ 
+ enum InstanceResetWarningType
+ {
+     RAID_INSTANCE_WARNING_HOURS     = 1,                    // WARNING! %s is scheduled to reset in %d hour(s).
+@@ -1669,7 +1695,7 @@ class BLIZZLIKE_DLL_SPEC Player : public Unit
+ 
+         void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
+         void DestroyForPlayer(Player* target) const override;
+-        void SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP);
++        void SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool ReferAFriend);
+ 
+         uint8 LastSwingErrorMsg() const { return m_swingErrorMsg; }
+         void SwingErrorMsg(uint8 val) { m_swingErrorMsg = val; }
+@@ -1996,6 +2022,22 @@ class BLIZZLIKE_DLL_SPEC Player : public Unit
+         bool CanSpeak() const;
+         void ChangeSpeakTime(int utime);
+ 
++         /*********************************************************/
++         /***              REFER-A-FRIEND SYSTEM                ***/
++         /*********************************************************/
++         void SendReferFriendError(ReferAFriendError err, Player * target = NULL);
++         ReferAFriendError GetReferFriendError(Player * target, bool summon);
++         void AccessGrantableLevel(ObjectGuid guid) { m_curGrantLevelGiverGuid = guid; }
++         bool IsAccessGrantableLevel(ObjectGuid guid) { return m_curGrantLevelGiverGuid == guid; }
++         uint32 GetGrantableLevels() { return m_GrantableLevelsCount; }
++         void ChangeGrantableLevels(uint8 increase = 0);
++         bool CheckRAFConditions();
++         AccountLinkedState GetAccountLinkedState();
++         bool IsReferAFriendLinked(Player * target);
++         void LoadAccountLinkedState();
++         std::vector<uint32> m_referredAccounts;
++         std::vector<uint32> m_referalAccounts;
++ 
+         /*********************************************************/
+         /***                 VARIOUS SYSTEMS                   ***/
+         /*********************************************************/
+@@ -2350,6 +2392,11 @@ class BLIZZLIKE_DLL_SPEC Player : public Unit
+         float  m_summon_z;
+ 
+         DeclinedName* m_declinedname;
++
++        // Refer-A-Friend
++        ObjectGuid m_curGrantLevelGiverGuid;
++        int32 m_GrantableLevelsCount;
++ 
+     private:
+         // internal common parts for CanStore/StoreItem functions
+         InventoryResult _CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemPrototype const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
+diff --git a/src/game/SharedDefines.h b/src/game/SharedDefines.h
+index b647dd2..afc4903 100644
+--- a/src/game/SharedDefines.h
++++ b/src/game/SharedDefines.h
+@@ -718,7 +718,7 @@ enum SpellEffects
+     SPELL_EFFECT_CHARGE2                   = 149,
+     SPELL_EFFECT_150                       = 150,
+     SPELL_EFFECT_TRIGGER_SPELL_2           = 151,
+-    SPELL_EFFECT_152                       = 152,
++    SPELL_EFFECT_FRIEND_SUMMON             = 152,
+     SPELL_EFFECT_153                       = 153,
+     TOTAL_SPELL_EFFECTS                    = 154
+ };
+@@ -2172,6 +2172,7 @@ enum UnitDynFlags
+     UNIT_DYNFLAG_ROOTED                     = 0x0008,
+     UNIT_DYNFLAG_SPECIALINFO                = 0x0010,
+     UNIT_DYNFLAG_DEAD                       = 0x0020,
++    UNIT_DYNFLAG_REFER_A_FRIEND             = 0x0040,
+ };
+ 
+ enum CorpseDynFlags
+diff --git a/src/game/SocialMgr.cpp b/src/game/SocialMgr.cpp
+index eca9ffb..f3b9c2d 100644
+--- a/src/game/SocialMgr.cpp
++++ b/src/game/SocialMgr.cpp
+@@ -200,11 +200,11 @@ void SocialMgr::GetFriendInfo(Player* player, uint32 friend_lowguid, FriendInfo&
+              ((pFriend->GetTeam() == team || allowTwoSideWhoList) && (pFriend->GetSession()->GetSecurity() <= gmLevelInWhoList))) &&
+             pFriend->IsVisibleGloballyFor(player))
+     {
+-        friendInfo.Status = FRIEND_STATUS_ONLINE;
+-        if (pFriend->isAFK())
+-            friendInfo.Status = FRIEND_STATUS_AFK;
+-        if (pFriend->isDND())
+-            friendInfo.Status = FRIEND_STATUS_DND;
++        friendInfo.Status |= FRIEND_STATUS_ONLINE;
++        pFriend->isAFK() ? friendInfo.Status |= FRIEND_STATUS_AFK : friendInfo.Status &= ~FRIEND_STATUS_AFK;
++        pFriend->isDND() ? friendInfo.Status |= FRIEND_STATUS_DND : friendInfo.Status &= ~FRIEND_STATUS_DND;
++        pFriend->IsReferAFriendLinked(player) ? friendInfo.Status |= FRIEND_STATUS_RAF : friendInfo.Status &= ~FRIEND_STATUS_RAF;
++ 
+         friendInfo.Area = pFriend->GetZoneId();
+         friendInfo.Level = pFriend->getLevel();
+         friendInfo.Class = pFriend->getClass();
+diff --git a/src/game/SocialMgr.h b/src/game/SocialMgr.h
+index b91bc51..673f2a6 100644
+--- a/src/game/SocialMgr.h
++++ b/src/game/SocialMgr.h
+@@ -30,11 +30,11 @@
+ 
+ enum FriendStatus
+ {
+-    FRIEND_STATUS_OFFLINE   = 0,
+-    FRIEND_STATUS_ONLINE    = 1,
+-    FRIEND_STATUS_AFK       = 2,
+-    FRIEND_STATUS_UNK3      = 3,
+-    FRIEND_STATUS_DND       = 4
++    FRIEND_STATUS_OFFLINE   = 0x00,
++    FRIEND_STATUS_ONLINE    = 0x01,
++    FRIEND_STATUS_AFK       = 0x02,
++    FRIEND_STATUS_DND       = 0x04,
++    FRIEND_STATUS_RAF       = 0x08,
+ };
+ 
+ enum SocialFlag
+@@ -46,7 +46,7 @@ enum SocialFlag
+ 
+ struct FriendInfo
+ {
+-    FriendStatus Status;
++    uint8  Status;
+     uint32 Flags;
+     uint32 Area;
+     uint32 Level;
+diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
+index a1f92f5..48a9646 100644
+--- a/src/game/Spell.cpp
++++ b/src/game/Spell.cpp
+@@ -2493,6 +2493,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
+                     else if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_TRIGGER_SPELL)
+                         targetUnitMap.push_back(m_caster);
+                     break;
++                case SPELL_EFFECT_FRIEND_SUMMON:
+                 case SPELL_EFFECT_SUMMON_PLAYER:
+                     if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->GetSelectionGuid())
+                         if (Player* target = sObjectMgr.GetPlayer(((Player*)m_caster)->GetSelectionGuid()))
+@@ -5014,7 +5015,9 @@ SpellCastResult Spell::CheckCast(bool strict)
+                     return SPELL_FAILED_BAD_TARGETS;
+ 
+                 Player* target = sObjectMgr.GetPlayer(((Player*)m_caster)->GetSelectionGuid());
+-                if (!target || ((Player*)m_caster) == target || !target->IsInSameRaidWith((Player*)m_caster))
++                 if ( !target || ((Player*)m_caster) == target)
++                     return SPELL_FAILED_BAD_TARGETS;
++                 if (!target->IsInSameRaidWith((Player*)m_caster) && m_spellInfo->Id != 48955)
+                     return SPELL_FAILED_BAD_TARGETS;
+ 
+                 // check if our map is dungeon
+@@ -5030,6 +5033,17 @@ SpellCastResult Spell::CheckCast(bool strict)
+                 }
+                 break;
+             }
++            case SPELL_EFFECT_FRIEND_SUMMON:
++            {
++                if(m_caster->GetTypeId() != TYPEID_PLAYER)
++                    return SPELL_FAILED_BAD_TARGETS;
++                if(((Player*)m_caster)->GetSelectionGuid().IsEmpty())
++                    return SPELL_FAILED_BAD_TARGETS;
++                Player* target = sObjectMgr.GetPlayer(((Player*)m_caster)->GetSelectionGuid());
++                if (!target || !target->IsReferAFriendLinked(((Player*)m_caster)))
++                    return SPELL_FAILED_BAD_TARGETS;
++                break;
++            }
+             case SPELL_EFFECT_LEAP:
+             case SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER:
+             {
+@@ -6204,6 +6218,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
+     // Check targets for LOS visibility (except spells without range limitations )
+     switch (m_spellInfo->Effect[eff])
+     {
++        case SPELL_EFFECT_FRIEND_SUMMON:
+         case SPELL_EFFECT_SUMMON_PLAYER:                    // from anywhere
+             break;
+         case SPELL_EFFECT_DUMMY:
+diff --git a/src/game/Spell.h b/src/game/Spell.h
+index d331e95..008ca2e 100644
+--- a/src/game/Spell.h
++++ b/src/game/Spell.h
+@@ -314,6 +314,7 @@ class Spell
+         void EffectPlaySound(SpellEffectIndex eff_idx);
+         void EffectPlayMusic(SpellEffectIndex eff_idx);
+         void EffectKnockBackFromPosition(SpellEffectIndex eff_idx);
++        void EffectFriendSummon(SpellEffectIndex eff_idx);
+ 
+         Spell(Unit* caster, SpellEntry const* info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL);
+         ~Spell();
+diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
+index 6efdae4..90be778 100644
+--- a/src/game/SpellEffects.cpp
++++ b/src/game/SpellEffects.cpp
+@@ -207,7 +207,7 @@
+     &Spell::EffectCharge2,                                  //149 SPELL_EFFECT_CHARGE2                  swoop
+     &Spell::EffectUnused,                                   //150 SPELL_EFFECT_150                      unused
+     &Spell::EffectTriggerRitualOfSummoning,                 //151 SPELL_EFFECT_TRIGGER_SPELL_2
+-    &Spell::EffectNULL,                                     //152 SPELL_EFFECT_152                      summon Refer-a-Friend
++    &Spell::EffectFriendSummon,                             //152 SPELL_EFFECT_FRIEND_SUMMON            summon Refer-a-Friend
+     &Spell::EffectNULL,                                     //153 SPELL_EFFECT_CREATE_PET               misc value is creature entry
+ };
+ 
+@@ -7221,3 +7221,20 @@ void Spell::EffectKnockBackFromPosition(SpellEffectIndex eff_idx)
+     float verticalSpeed = damage * 0.1f;
+     ((Player*)unitTarget)->GetSession()->SendKnockBack(angle, horizontalSpeed, verticalSpeed);
+ }
++
++ void Spell::EffectFriendSummon(SpellEffectIndex eff_idx)
++ {
++    if (m_caster->GetTypeId() != TYPEID_PLAYER)
++        return;
++ 
++    if (((Player*)m_caster)->GetSelectionGuid().IsEmpty() || !((Player*)m_caster)->GetSelectionGuid().IsPlayer())
++    {
++        DEBUG_LOG( "Spell::EffectFriendSummon is called, but no selection or selection is not player");
++        return;
++    }
++ 
++    DEBUG_LOG( "Spell::EffectFriendSummon called for player %u", ((Player*)m_caster)->GetSelectionGuid().GetCounter());
++
++    m_caster->CastSpell(m_caster, m_spellInfo->EffectTriggerSpell[eff_idx], true);
++ 
++ }
+\ No newline at end of file
+diff --git a/src/game/World.cpp b/src/game/World.cpp
+index f3485bf..1eae37b 100644
+--- a/src/game/World.cpp
++++ b/src/game/World.cpp
+@@ -571,6 +571,12 @@ void World::LoadConfigSettings(bool reload)
+ 
+     setConfigMinMax(CONFIG_UINT32_START_PLAYER_LEVEL, "StartPlayerLevel", 1, 1, getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
+ 
++    setConfigMinMax(CONFIG_UINT32_RAF_MAXGRANTLEVEL, "RAF.MaxGrantLevel", 60, 1, 80);
++    setConfigMinMax(CONFIG_UINT32_RAF_MAXREFERALS, "RAF.MaxReferals", 5, 0, 15);
++    setConfigMinMax(CONFIG_UINT32_RAF_MAXREFERERS, "RAF.MaxReferers", 5, 0, 15);
++    setConfig(CONFIG_FLOAT_RATE_RAF_XP, "Rate.RAF.XP", 3.0f);
++    setConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL, "Rate.RAF.LevelPerLevel", 0.5f);
++ 
+     setConfigMinMax(CONFIG_UINT32_START_PLAYER_MONEY, "StartPlayerMoney", 0, 0, MAX_MONEY_AMOUNT);
+ 
+     setConfig(CONFIG_UINT32_MAX_HONOR_POINTS, "MaxHonorPoints", 75000);
+diff --git a/src/game/World.h b/src/game/World.h
+index 3210e78..e3c74ba 100644
+--- a/src/game/World.h
++++ b/src/game/World.h
+@@ -177,6 +177,9 @@ enum eConfigUInt32Values
+     CONFIG_UINT32_CHARDELETE_MIN_LEVEL,
+     CONFIG_UINT32_GUID_RESERVE_SIZE_CREATURE,
+     CONFIG_UINT32_GUID_RESERVE_SIZE_GAMEOBJECT,
++    CONFIG_UINT32_RAF_MAXGRANTLEVEL,
++    CONFIG_UINT32_RAF_MAXREFERALS,
++    CONFIG_UINT32_RAF_MAXREFERERS,
+     CONFIG_UINT32_VALUE_COUNT
+ };
+ 
+@@ -214,6 +217,8 @@ enum eConfigFloatValues
+     CONFIG_FLOAT_RATE_XP_PETKILL,
+     CONFIG_FLOAT_RATE_XP_QUEST,
+     CONFIG_FLOAT_RATE_XP_EXPLORE,
++    CONFIG_FLOAT_RATE_RAF_XP,
++    CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL,
+     CONFIG_FLOAT_RATE_REPUTATION_GAIN,
+     CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_KILL,
+     CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_QUEST,
+diff --git a/src/game/WorldSession.h b/src/game/WorldSession.h
+index abfd0db..3a82d92 100644
+--- a/src/game/WorldSession.h
++++ b/src/game/WorldSession.h
+@@ -739,6 +739,11 @@ class BLIZZLIKE_DLL_SPEC WorldSession
+         void HandleSetGuildBankTabText(WorldPacket& recv_data);
+ 
+         void HandleGetMirrorimageData(WorldPacket& recv_data);
++
++        // Refer-A-Friend
++        void HandleGrantLevel(WorldPacket& recv_data);
++        void HandleAcceptGrantLevel(WorldPacket& recv_data);
++ 
+     private:
+         // private trade methods
+         void moveItems(Item* myItems[], Item* hisItems[]);
+diff --git a/src/worldserver/worldserver.conf.dist.in b/src/worldserver/worldserver.conf.dist.in
+index c0c1224..80e815c 100644
+--- a/src/worldserver/worldserver.conf.dist.in
++++ b/src/worldserver/worldserver.conf.dist.in
+@@ -1642,4 +1642,20 @@ CharDelete.KeepDays = 30
+ #
+ ###################################################################################################################
+ 
+-PlayerToLeader.enable = 1
+\ No newline at end of file
++PlayerToLeader.enable = 1
++
++ ###################################################################################################################
++ #    Refer-A-Friend system by Mas0n
++ #    RAF.MaxGrantLevel       = 60  (max level for granting level bonuses)
++ #    RAF.MaxReferals         = 5   (max referals for one account)
++ #    RAF.MaxReferers         = 5   (max referred accounts for one account)
++ #    Rate.RAF.XP             = 3   (XP bonus for referred friends in party)
++ #    Rate.RAF.LevelPerLevel  = 0.5 (bonus levels per referal level)
++ #
++ ###################################################################################################################
++ 
++ RAF.MaxGrantLevel       = 60
++ RAF.MaxReferals         = 5
++ RAF.MaxReferers         = 5
++ Rate.RAF.XP             = 3
++ Rate.RAF.LevelPerLevel  = 0.5
+\ No newline at end of file
+-- 
+1.8.4

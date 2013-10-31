@@ -207,7 +207,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectCharge2,                                  //149 SPELL_EFFECT_CHARGE2                  swoop
     &Spell::EffectUnused,                                   //150 SPELL_EFFECT_150                      unused
     &Spell::EffectTriggerRitualOfSummoning,                 //151 SPELL_EFFECT_TRIGGER_SPELL_2
-    &Spell::EffectFriendSummon,                             //152 SPELL_EFFECT_FRIEND_SUMMON            summon Refer-a-Friend
+    &Spell::EffectNULL,                                     //152 SPELL_EFFECT_152                      summon Refer-a-Friend
     &Spell::EffectNULL,                                     //153 SPELL_EFFECT_CREATE_PET               misc value is creature entry
 };
 
@@ -7221,20 +7221,3 @@ void Spell::EffectKnockBackFromPosition(SpellEffectIndex eff_idx)
     float verticalSpeed = damage * 0.1f;
     ((Player*)unitTarget)->GetSession()->SendKnockBack(angle, horizontalSpeed, verticalSpeed);
 }
-
- void Spell::EffectFriendSummon(SpellEffectIndex eff_idx)
- {
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-        return;
- 
-    if (((Player*)m_caster)->GetSelectionGuid().IsEmpty() || !((Player*)m_caster)->GetSelectionGuid().IsPlayer())
-     {
-         DEBUG_LOG( "Spell::EffectFriendSummon is called, but no selection or selection is not player");
-         return;
-     }
- 
-     DEBUG_LOG( "Spell::EffectFriendSummon called for player %u", ((Player*)m_caster)->GetSelectionGuid().GetCounter());
- 
-     m_caster->CastSpell(m_caster, m_spellInfo->EffectTriggerSpell[eff_idx], true);
- 
- }
