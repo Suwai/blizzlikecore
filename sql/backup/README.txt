@@ -1,1 +1,0 @@
-The files in this folder aren't applied by sql installer.
