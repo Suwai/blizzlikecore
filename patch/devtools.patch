@@ -1,0 +1,83 @@
+﻿From 68eea54affcdf50d48a68ad3174672989d95ea13 Mon Sep 17 00:00:00 2001
+From: Vstar <vstar0v0@hotmail.com>
+Date: Sat, 12 Oct 2013 20:21:54 +0800
+Subject: [PATCH] Add: Reload Template Tables
+
+To debug the server easier
+---
+ src/game/Chat.cpp   |  5 +++++
+ src/game/Chat.h     |  6 +++++-
+ src/game/Level3.cpp | 25 +++++++++++++++++++++++++
+ 3 files changed, 35 insertions(+), 1 deletion(-)
+
+diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
+index 7205219..2e9e919 100644
+--- a/src/game/Chat.cpp
++++ b/src/game/Chat.cpp
+@@ -553,6 +553,11 @@ ChatCommand* ChatHandler::getCommandTable()
+         { "spell_script_target",         SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSpellScriptTargetCommand,       "", NULL },
+         { "spell_target_position",       SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSpellTargetPositionCommand,     "", NULL },
+         { "spell_threats",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSpellThreatsCommand,            "", NULL },
++        //To debug the server easier
++        { "gameobject_template",         SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadGameobjectTemplateCommand,      "", NULL },
++        { "item_template",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadItemTemplateCommand,            "", NULL },
++        { "creature_template",           SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadCreatureTemplateCommand,        "", NULL },
++        //End
+         { "spell_disabled",              SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSpellDisabledCommand,           "", NULL },
+ 
+         { NULL,                          0,                 false, NULL,                                                     "", NULL }
+diff --git a/src/game/Chat.h b/src/game/Chat.h
+index e94b9b3..908126d 100644
+--- a/src/game/Chat.h
++++ b/src/game/Chat.h
+@@ -449,6 +449,11 @@ class BLIZZLIKE_DLL_SPEC ChatHandler
+         bool HandleReloadSpellTargetPositionCommand(char* args);
+         bool HandleReloadSpellThreatsCommand(char* args);
+         bool HandleReloadSpellPetAurasCommand(char* args);
++        //To debug the server easier
++        bool HandleReloadGameobjectTemplateCommand(char* args);
++        bool HandleReloadItemTemplateCommand(char* args);
++        bool HandleReloadCreatureTemplateCommand(char* args);
++        //End
+         bool HandleReloadSpellDisabledCommand(char* args);
+ 
+         bool HandleResetAchievementsCommand(char* args);
+diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
+index d0a9365..0168245 100644
+--- a/src/game/Level3.cpp
++++ b/src/game/Level3.cpp
+@@ -1088,6 +1088,31 @@ bool ChatHandler::HandleLoadScriptsCommand(char* args)
+ 
+     return true;
+ }
++// These functions should only be used in development mode - not on a production server
++bool ChatHandler::HandleReloadGameobjectTemplateCommand( char*)
++{
++    sLog.outString( "WARNING: Reloading gameobject_template" );
++    sObjectMgr.LoadGameobjectInfo();
++    SendGlobalSysMessage("WARNING: DB table `gameobject_template` reloaded.");
++    return true;
++}
++
++bool ChatHandler::HandleReloadItemTemplateCommand( char*)
++{
++    sLog.outString( "WARNING: Reloading item_template" );
++    sObjectMgr.LoadItemPrototypes();
++    SendGlobalSysMessage("WARNIONG: DB table `item_template` reloaded.");
++    return true;
++}
++
++bool ChatHandler::HandleReloadCreatureTemplateCommand( char*)
++{
++    sLog.outString( "WARNING: Reloading creature_template" );
++    sObjectMgr.LoadCreatureTemplates();
++    SendGlobalSysMessage("WARNING: DB table `creature_template` reloaded.");
++    return true;
++}
++//End
+ 
+ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
+ {
+-- 
+1.8.4
+
