@@ -1,19 +1,6 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #ifndef __BLIZZLIKE_LANGUAGE_H
@@ -42,8 +29,8 @@ enum BlizzLikeStrings
     LANG_GMS_ON_SRV                     = 16,
     LANG_GMS_NOT_LOGGED                 = 17,
     LANG_YOU_IN_FLIGHT                  = 18,
-    // LANG_YOU_IN_BATTLEGROUND            = 19, not used
-    // LANG_TARGET_IN_FLIGHT               = 20, not used
+    //LANG_YOU_IN_BATTLEGROUND            = 19, not used
+    //LANG_TARGET_IN_FLIGHT               = 20, not used
     LANG_CHAR_IN_FLIGHT                 = 21,
     LANG_CHAR_NON_MOUNTED               = 22,
     LANG_YOU_IN_COMBAT                  = 23,
@@ -82,15 +69,7 @@ enum BlizzLikeStrings
     LANG_MOTD_CURRENT                   = 56,
     LANG_USING_WORLD_DB                 = 57,
     LANG_USING_SCRIPT_LIB               = 58,
-    LANG_USING_EVENT_AI                 = 59,
-    // LANG_RA_BUSY                      = 60, not used
-    LANG_RA_USER                        = 61,
-    LANG_RA_PASS                        = 62,
-    LANG_GM_ACCEPTS_WHISPER             = 63,
-    LANG_GM_NO_WHISPER                  = 64,
-    LANG_USING_SCRIPT_LIB_UNKNOWN       = 65,
-    LANG_USING_SCRIPT_LIB_NONE          = 66,
-    // Room for more level 0              67-99 not used
+    // Room for more level 0              59-99 not used
 
     // level 1 chat
     LANG_GLOBAL_NOTIFY                  = 100,
@@ -119,15 +98,15 @@ enum BlizzLikeStrings
     LANG_YOU_CHANGE_ENERGY              = 122,
     LANG_YOURS_ENERGY_CHANGED           = 123,
 
-    LANG_CURRENT_ENERGY                 = 124,              // log
+    LANG_CURRENT_ENERGY                 = 124,              //log
     LANG_YOU_CHANGE_RAGE                = 125,
     LANG_YOURS_RAGE_CHANGED             = 126,
     LANG_YOU_CHANGE_LVL                 = 127,
     LANG_CURRENT_FACTION                = 128,
     LANG_WRONG_FACTION                  = 129,
     LANG_YOU_CHANGE_FACTION             = 130,
-    LANG_YOU_CHANGE_SPELLMODS           = 131,
-    LANG_YOURS_SPELLMODS_CHANGED        = 132,
+    LANG_YOU_CHANGE_SPELLFLATID         = 131,
+    LANG_YOURS_SPELLFLATID_CHANGED      = 132,
     LANG_YOU_GIVE_TAXIS                 = 133,
     LANG_YOU_REMOVE_TAXIS               = 134,
     LANG_YOURS_TAXIS_ADDED              = 135,
@@ -172,10 +151,10 @@ enum BlizzLikeStrings
 
     LANG_MAIL_SENT                      = 169,
     LANG_SOUND_NOT_EXIST                = 170,
-    LANG_CANT_TELEPORT_SELF             = 171,
+    LANG_TELEPORTED_TO_BY_CONSOLE       = 171,
     LANG_CONSOLE_COMMAND                = 172,
-    //                                    173 used in master branch
-    //                                    174 used in master branch
+    //                                    173               // used in master
+    //                                    174               // used in master
     LANG_LIQUID_STATUS                  = 175,
     // Room for more level 1              176-199 not used
 
@@ -257,7 +236,7 @@ enum BlizzLikeStrings
     LANG_COMMAND_TARGETOBJNOTFOUND      = 266,
     LANG_COMMAND_GOOBJNOTFOUND          = 267,
     LANG_COMMAND_GOCREATNOTFOUND        = 268,
-    //                                    269, not used
+    LANG_COMMAND_GOCREATMULTIPLE        = 269,
     LANG_COMMAND_DELCREATMESSAGE        = 270,
     LANG_COMMAND_CREATUREMOVED          = 271,
     LANG_COMMAND_CREATUREATSAMEMAP      = 272,
@@ -271,20 +250,14 @@ enum BlizzLikeStrings
     LANG_COMMAND_ADDVENDORITEMITEMS     = 280,
     LANG_COMMAND_KICKSELF               = 281,
     LANG_COMMAND_KICKMESSAGE            = 282,
-    //                                    283, not used
+    LANG_COMMAND_KICKNOTFOUNDPLAYER     = 283,
     LANG_COMMAND_WHISPERACCEPTING       = 284,
     LANG_COMMAND_WHISPERON              = 285,
     LANG_COMMAND_WHISPEROFF             = 286,
     LANG_COMMAND_CREATGUIDNOTFOUND      = 287,
-    LANG_COMMAND_TICKETCOUNT            = 288,
-    LANG_COMMAND_TICKETNEW              = 289,
-    LANG_COMMAND_TICKETVIEW             = 290,
-    LANG_COMMAND_TICKETON               = 291,
-    LANG_COMMAND_TICKETOFF              = 292,
-    LANG_COMMAND_TICKETNOTEXIST         = 293,
-    LANG_COMMAND_ALLTICKETDELETED       = 294,
-    LANG_COMMAND_TICKETPLAYERDEL        = 295,
-    LANG_COMMAND_TICKETDEL              = 296,
+    // TICKET STRINGS NEED REWRITE // 288-296 FREE
+
+    // END
     LANG_COMMAND_SPAWNDIST              = 297,
     LANG_COMMAND_SPAWNTIME              = 298,
     LANG_COMMAND_MODIFY_HONOR           = 299,
@@ -335,10 +308,7 @@ enum BlizzLikeStrings
     LANG_CREATURE_NOT_FOLLOW_YOU_NOW    = 342,
     LANG_CREATURE_NON_TAMEABLE          = 343,
     LANG_YOU_ALREADY_HAVE_PET           = 344,
-    //                                    345 used in master branch
-    //                                    346 used in master branch
-    LANG_COMMAND_GOTAXINODENOTFOUND     = 347,
-    LANG_GAMEOBJECT_HAVE_INVALID_DATA   = 348,
+    // Room for more level 2              345-349 not used
     LANG_TITLE_LIST_CHAT                = 349,
     LANG_TITLE_LIST_CONSOLE             = 350,
     LANG_COMMAND_NOTITLEFOUND           = 351,
@@ -347,53 +317,10 @@ enum BlizzLikeStrings
     LANG_TITLE_REMOVE_RES               = 354,
     LANG_TITLE_CURRENT_RES              = 355,
     LANG_CURRENT_TITLE_RESET            = 356,
-    LANG_AREATRIGER_NOT_HAS_TARGET      = 357,
-    LANG_COMMAND_NOTRIGGERFOUND         = 358,
-    LANG_TRIGGER_TARGET_LIST_CHAT       = 359,
-    LANG_TRIGGER_TARGET_LIST_CONSOLE    = 360,
-    LANG_TRIGGER_LIST_CHAT              = 361,
-    LANG_TRIGGER_LIST_CONSOLE           = 362,
-    LANG_TRIGGER_DIST                   = 363,
-    LANG_TRIGGER_TAVERN                 = 364,
-    LANG_TRIGGER_QUEST                  = 365,
-    LANG_TRIGGER_EXPLORE_QUEST          = 366,
-    LANG_TRIGGER_REQ_LEVEL              = 367,
-    LANG_TRIGGER_REQ_ITEMS              = 368,
-    LANG_TRIGGER_REQ_QUEST              = 369,
-    LANG_TRIGGER_REQ_KEYS_HEROIC        = 370,
-    //                                    371 used in master branch
-    //                                    372 used in master branch
-    LANG_COMMAND_TICKETRESPONSE         = 373,
-    LANG_COMMAND_TICKETCOUNT_CONSOLE    = 374,
-    LANG_COMMAND_TICKETNOTEXIST_NAME    = 375,
-    LANG_POOL_ENTRY_LIST_CHAT           = 376,
-    LANG_NO_POOL_FOR_MAP                = 377,
-    LANG_POOL_LIST_NON_INSTANCE         = 378,
-    LANG_POOL_SPAWNS_NON_INSTANCE       = 379,
-    LANG_POOL_CHANCE_CREATURE_LIST_CHAT = 380,
-    LANG_POOL_CHANCE_CREATURE_LIST_CONSOLE = 381,
-    LANG_POOL_CREATURE_LIST_CHAT        = 382,
-    LANG_POOL_CREATURE_LIST_CONSOLE     = 383,
-    LANG_POOL_CHANCE_GO_LIST_CHAT       = 384,
-    LANG_POOL_CHANCE_GO_LIST_CONSOLE    = 385,
-    LANG_POOL_GO_LIST_CHAT              = 386,
-    LANG_POOL_GO_LIST_CONSOLE           = 387,
-    LANG_POOL_CHANCE_CREATURE_LIST_HEADER = 388,
-    LANG_POOL_CREATURE_LIST_HEADER      = 389,
-    LANG_POOL_CHANCE_GO_LIST_HEADER     = 390,
-    LANG_POOL_GO_LIST_HEADER            = 391,
-    LANG_POOL_INFO_HEADER_CHAT          = 392,
-    LANG_POOL_INFO_HEADER_CONSOLE       = 393,
-    LANG_POOL_INFO_HEADER               = 394,
-    LANG_NO_POOL                        = 395,
-    LANG_POOL_ENTRY_LIST_CONSOLE        = 396,
-    LANG_POOL_CHANCE_POOL_LIST_HEADER   = 397,
-    LANG_POOL_POOL_LIST_HEADER          = 398,
-    LANG_POOL_CHANCE_POOL_LIST_CHAT     = 399,
-    // End Level 2 list, continued at 1500
+    // Room for more level 2              357-399 not used
 
     // level 3 chat
-    LANG_SCRIPTS_RELOADED_ANNOUNCE      = 400,
+    LANG_SCRIPTS_RELOADED               = 400,
     LANG_YOU_CHANGE_SECURITY            = 401,
     LANG_YOURS_SECURITY_CHANGED         = 402,
     LANG_YOURS_SECURITY_IS_LOW          = 403,
@@ -465,7 +392,7 @@ enum BlizzLikeStrings
     LANG_COMMAND_TP_ADDED               = 463,
     LANG_COMMAND_TP_ADDEDERR            = 464,
     LANG_COMMAND_TP_DELETED             = 465,
-    LANG_COMMAND_NOTAXINODEFOUND        = 466,
+    //                                    466,              // not used
     LANG_COMMAND_TARGET_LISTAURAS       = 467,
     LANG_COMMAND_TARGET_AURADETAIL      = 468,
     LANG_COMMAND_TARGET_LISTAURATYPE    = 469,
@@ -501,8 +428,8 @@ enum BlizzLikeStrings
     LANG_REMOVEALL_COOLDOWN             = 492,
     LANG_REMOVE_COOLDOWN                = 493,
 
-    LANG_ADDITEM                        = 494,              // log
-    LANG_ADDITEMSET                     = 495,              // log
+    LANG_ADDITEM                        = 494,              //log
+    LANG_ADDITEMSET                     = 495,              //log
     LANG_REMOVEITEM                     = 496,
     LANG_ITEM_CANNOT_CREATE             = 497,
     LANG_INSERT_GUILD_NAME              = 498,
@@ -527,7 +454,7 @@ enum BlizzLikeStrings
     LANG_CREATURE_ENTRY_LIST_CHAT       = 514,
     LANG_CREATURE_LIST_CHAT             = 515,
     LANG_GO_ENTRY_LIST_CHAT             = 516,
-    LANG_GO_MIXED_LIST_CHAT             = 517,
+    LANG_GO_LIST_CHAT                   = 517,
     LANG_ITEMSET_LIST_CHAT              = 518,
     LANG_TELE_LIST                      = 519,
     LANG_SPELL_LIST                     = 520,
@@ -535,7 +462,7 @@ enum BlizzLikeStrings
 
     LANG_GAMEOBJECT_NOT_EXIST           = 522,
 
-    LANG_GAMEOBJECT_CURRENT             = 523,              // log
+    LANG_GAMEOBJECT_CURRENT             = 523,              //log
     LANG_GAMEOBJECT_DETAIL              = 524,
     LANG_GAMEOBJECT_ADD                 = 525,
 
@@ -545,9 +472,9 @@ enum BlizzLikeStrings
     LANG_MOVEGENS_WAYPOINT              = 529,
     LANG_MOVEGENS_ANIMAL_RANDOM         = 530,
     LANG_MOVEGENS_CONFUSED              = 531,
-    LANG_MOVEGENS_CHASE_PLAYER          = 532,
-    LANG_MOVEGENS_CHASE_CREATURE        = 533,
-    LANG_MOVEGENS_CHASE_NULL            = 534,
+    LANG_MOVEGENS_TARGETED_PLAYER       = 532,
+    LANG_MOVEGENS_TARGETED_CREATURE     = 533,
+    LANG_MOVEGENS_TARGETED_NULL         = 534,
     LANG_MOVEGENS_HOME_CREATURE         = 535,
     LANG_MOVEGENS_HOME_PLAYER           = 536,
     LANG_MOVEGENS_FLIGHT                = 537,
@@ -572,33 +499,33 @@ enum BlizzLikeStrings
     LANG_YOURS_EXPLORE_SET_ALL          = 553,
     LANG_YOURS_EXPLORE_SET_NOTHING      = 554,
 
-    //                                    555,              // not used
-    //                                    556,              // not used
+    LANG_HOVER_ENABLED                  = 555,
+    LANG_HOVER_DISABLED                 = 556,
     LANG_YOURS_LEVEL_UP                 = 557,
     LANG_YOURS_LEVEL_DOWN               = 558,
     LANG_YOURS_LEVEL_PROGRESS_RESET     = 559,
     LANG_EXPLORE_AREA                   = 560,
     LANG_UNEXPLORE_AREA                 = 561,
 
-    //                                    562,              // not used
-    //                                    563,              // not used
+    LANG_UPDATE                         = 562,
+    LANG_UPDATE_CHANGE                  = 563,
     LANG_TOO_BIG_INDEX                  = 564,
-    LANG_SET_UINT                       = 565,              // log
+    LANG_SET_UINT                       = 565,              //log
     LANG_SET_UINT_FIELD                 = 566,
-    LANG_SET_FLOAT                      = 567,              // log
+    LANG_SET_FLOAT                      = 567,              //log
     LANG_SET_FLOAT_FIELD                = 568,
-    LANG_GET_UINT                       = 569,              // log
+    LANG_GET_UINT                       = 569,              //log
     LANG_GET_UINT_FIELD                 = 570,
-    LANG_GET_FLOAT                      = 571,              // log
+    LANG_GET_FLOAT                      = 571,              //log
     LANG_GET_FLOAT_FIELD                = 572,
-    //                                    573,              // not used
-    //                                    574,              // not used
-    LANG_CHANGE_INT32                   = 575,              // log
-    LANG_CHANGE_INT32_FIELD             = 576,
+    LANG_SET_32BIT                      = 573,              //log
+    LANG_SET_32BIT_FIELD                = 574,
+    LANG_CHANGE_32BIT                   = 575,              //log
+    LANG_CHANGE_32BIT_FIELD             = 576,
 
-    LANG_INVISIBLE_INVISIBLE            = 577,
-    LANG_INVISIBLE_VISIBLE              = 578,
-    LANG_SELECTED_TARGET_NOT_HAVE_VICTIM = 579,
+    LANG_INVISIBLE_INVISIBLE              = 577,
+    LANG_INVISIBLE_VISIBLE                = 578,
+    LANG_SELECTED_TARGET_NOT_HAVE_VICTIM  = 579,
 
     LANG_COMMAND_LEARN_ALL_DEFAULT_AND_QUEST = 580,
     LANG_COMMAND_NEAROBJMESSAGE         = 581,
@@ -629,6 +556,7 @@ enum BlizzLikeStrings
     LANG_BG_A_WINS                      = 600,
     LANG_BG_H_WINS                      = 601,
 
+    LANG_BG_WS_START_TWO_MINUTES        = 753,
     LANG_BG_WS_START_ONE_MINUTE         = 602,
     LANG_BG_WS_START_HALF_MINUTE        = 603,
     LANG_BG_WS_HAS_BEGUN                = 604,
@@ -644,14 +572,14 @@ enum BlizzLikeStrings
     LANG_BG_WS_F_PLACED                 = 613,
     LANG_BG_WS_ALLIANCE_FLAG_RESPAWNED  = 614,
     LANG_BG_WS_HORDE_FLAG_RESPAWNED     = 615,
-    // 616 - 635 not used
+
+    LANG_BG_EY_START_TWO_MINUTES        = 755,
     LANG_BG_EY_START_ONE_MINUTE         = 636,
     LANG_BG_EY_START_HALF_MINUTE        = 637,
     LANG_BG_EY_HAS_BEGUN                = 638,
-    // 639 - 649 not used
-    LANG_BG_ALLY                        = 650,
-    LANG_BG_HORDE                       = 651,
 
+    LANG_BG_AB_ALLY                     = 650,
+    LANG_BG_AB_HORDE                    = 651,
     LANG_BG_AB_NODE_STABLES             = 652,
     LANG_BG_AB_NODE_BLACKSMITH          = 653,
     LANG_BG_AB_NODE_FARM                = 654,
@@ -662,6 +590,7 @@ enum BlizzLikeStrings
     LANG_BG_AB_NODE_ASSAULTED           = 659,
     LANG_BG_AB_NODE_CLAIMED             = 660,
 
+    LANG_BG_AB_START_TWO_MINUTES        = 754,
     LANG_BG_AB_START_ONE_MINUTE         = 661,
     LANG_BG_AB_START_HALF_MINUTE        = 662,
     LANG_BG_AB_HAS_BEGUN                = 663,
@@ -690,7 +619,7 @@ enum BlizzLikeStrings
     LANG_BG_EY_CAPTURED_FLAG_H          = 685,
     LANG_BG_EY_DROPPED_FLAG             = 686,
     LANG_BG_EY_RESETED_FLAG             = 687,
-    // 688 - 699 not used
+
     LANG_ARENA_ONE_TOOLOW               = 700,
     LANG_ARENA_ONE_MINUTE               = 701,
     LANG_ARENA_THIRTY_SECONDS           = 702,
@@ -710,10 +639,8 @@ enum BlizzLikeStrings
 //                                      = 714, not used
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
 //                                      = 716, not used
-    LANG_BG_STARTED_ANNOUNCE_WORLD      = 717,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN = 718,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT = 719,
-
+    LANG_BG_QUEUE_ANNOUNCE_START        = 717,
+//                                      = 718-719, not used
     LANG_BG_GROUP_TOO_LARGE             = 720,              // "Your group is too large for this battleground. Please regroup to join."
     LANG_ARENA_GROUP_TOO_LARGE          = 721,              // "Your group is too large for this arena. Please regroup to join."
     LANG_ARENA_YOUR_TEAM_ONLY           = 722,              // "Your group has members not in your arena team. Please regroup to join."
@@ -732,66 +659,21 @@ enum BlizzLikeStrings
     LANG_CANNOT_SUMMON_TO_BG            = 734,              // "You cannot summon players to a battleground or arena map."
     LANG_CANNOT_GO_TO_BG_GM             = 735,              // "You must be in GM mode to teleport to a player in a battleground."
     LANG_CANNOT_GO_TO_BG_FROM_BG        = 736,              // "You cannot teleport to a battleground from another battleground. Please leave the current battleground first."
-    LANG_DEBUG_ARENA_ON                 = 737,
-    LANG_DEBUG_ARENA_OFF                = 738,
-    LANG_DEBUG_BG_ON                    = 739,
-    LANG_DEBUG_BG_OFF                   = 740,
-    LANG_DIST_ARENA_POINTS_START        = 741,
-    LANG_DIST_ARENA_POINTS_ONLINE_START = 742,
-    LANG_DIST_ARENA_POINTS_ONLINE_END   = 743,
-    LANG_DIST_ARENA_POINTS_TEAM_START   = 744,
-    LANG_DIST_ARENA_POINTS_TEAM_END     = 745,
-    LANG_DIST_ARENA_POINTS_END          = 746,
-//                                      = 747, not used
-//                                      = 748, not used
-//                                      = 749, not used
-    LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING      = 750,  // "Not enough players. This game will close in %u mins."
+//                                      = 737-749, not used
+    LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING = 750,       // "Not enough players. This game will close in %u mins."
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
-    LANG_BATTLEGROUND_ONLY_ALLIANCE_USE = 752,              // "Only The Alliance can use that portal"
-    LANG_BATTLEGROUND_ONLY_HORDE_USE    = 753,              // "Only The Horde can use that portal"
-//                                      = 754, not used
-//                                      = 755, not used
-//                                      = 756, not used
-//                                      = 757, not used
-//                                      = 758, not used
-    LANG_BG_AV_TOWER_TAKEN              = 759,
-    LANG_BG_AV_TOWER_ASSAULTED          = 760,
-    LANG_BG_AV_TOWER_DEFENDED           = 761,
-    LANG_BG_AV_GRAVE_TAKEN              = 762,
-    LANG_BG_AV_GRAVE_DEFENDED           = 763,
-    LANG_BG_AV_GRAVE_ASSAULTED          = 764,
-    LANG_BG_AV_MINE_TAKEN               = 765,
-    LANG_BG_AV_MINE_NORTH               = 766,
-    LANG_BG_AV_MINE_SOUTH               = 767,
+//                                      = 752, not used
+//  LANG_BG_WS_START_TWO_MINUTES        = 753, - defined above
+//  LANG_BG_AB_START_TWO_MINUTES        = 754, - defined above
+//  LANG_BG_EY_START_TWO_MINUTES        = 755, - defined above
 
-    LANG_BG_AV_NODE_GRAVE_STORM_AID     = 768,
-    LANG_BG_AV_NODE_TOWER_DUN_S         = 769,
-    LANG_BG_AV_NODE_TOWER_DUN_N         = 770,
-    LANG_BG_AV_NODE_GRAVE_STORMPIKE     = 771,
-    LANG_BG_AV_NODE_TOWER_ICEWING       = 772,
-    LANG_BG_AV_NODE_GRAVE_STONE         = 773,
-    LANG_BG_AV_NODE_TOWER_STONE         = 774,
-    LANG_BG_AV_NODE_GRAVE_SNOW          = 775,
-    LANG_BG_AV_NODE_TOWER_ICE           = 776,
-    LANG_BG_AV_NODE_GRAVE_ICE           = 777,
-    LANG_BG_AV_NODE_TOWER_POINT         = 778,
-    LANG_BG_AV_NODE_GRAVE_FROST         = 779,
-    LANG_BG_AV_NODE_TOWER_FROST_E       = 780,
-    LANG_BG_AV_NODE_TOWER_FROST_W       = 781,
-    LANG_BG_AV_NODE_GRAVE_FROST_HUT     = 782,
-
-//                                      = 783, not used
-    LANG_BG_AV_START_ONE_MINUTE         = 784,
-    LANG_BG_AV_START_HALF_MINUTE        = 785,
-    LANG_BG_AV_HAS_BEGUN                = 786,
-    LANG_BG_AV_A_NEAR_LOSE              = 787,
-    LANG_BG_AV_H_NEAR_LOSE              = 788,
-    LANG_BG_AV_H_GENERAL_DEAD           = 789,
-    LANG_BG_AV_A_GENERAL_DEAD           = 790,
-    // Room for battleground/arena strings 791-799 not used
+    // Room for BG/ARENA                = 773-784, 788-799 not used
+    LANG_ARENA_TESTING                  = 785,
+    LANG_AUTO_ANN                       = 786,
+    LANG_ANNOUNCE_COLOR                 = 787,
 
     // in game strings
-    //                                  = 800, not used
+    LANG_PET_INVALID_NAME               = 800,
     LANG_NOT_ENOUGH_GOLD                = 801,
     LANG_NOT_FREE_TRADE_SLOTS           = 802,
     LANG_NOT_PARTNER_FREE_TRADE_SLOTS   = 803,
@@ -801,16 +683,14 @@ enum BlizzLikeStrings
     LANG_NEED_CHARACTER_NAME            = 807,
     LANG_PLAYER_NOT_EXIST_OR_OFFLINE    = 808,
     LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND   = 809,
-    //                                    810 used in master branch
+//                                      = 710, not used
     LANG_GUILD_MASTER                   = 811,
     LANG_GUILD_OFFICER                  = 812,
     LANG_GUILD_VETERAN                  = 813,
     LANG_GUILD_MEMBER                   = 814,
     LANG_GUILD_INITIATE                 = 815,
-    LANG_FAIL_ENTER_SPECTRAL_REALM      = 816,
-    //                                    817 used in master branch
-    LANG_TELEREQ_QUEST_BLACK_MORASS     = 818,
-    // Room for in-game strings           819-999 not used
+
+    // Room for in-game strings           816-999 not used
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,
@@ -824,26 +704,20 @@ enum BlizzLikeStrings
     LANG_ACCOUNT_NOT_CREATED            = 1008,
     LANG_CHARACTER_DELETED              = 1009,
     LANG_ACCOUNT_LIST_HEADER            = 1010,
-    //                                  = 1011, not used
-    LANG_ACCOUNT_LIST_BAR               = 1012,
-    LANG_ACCOUNT_LIST_LINE_CONSOLE      = 1013,
-    LANG_ACCOUNT_LIST_EMPTY             = 1014,
-    LANG_QUIT_WRONG_USE_ERROR           = 1015,
-    LANG_CHARACTER_DELETED_LIST_HEADER  = 1016,
-    LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE = 1017,
-    LANG_CHARACTER_DELETED_LIST_BAR     = 1018,
-    LANG_CHARACTER_DELETED_LIST_EMPTY   = 1019,
-    LANG_CHARACTER_DELETED_RESTORE      = 1020,
-    LANG_CHARACTER_DELETED_DELETE       = 1021,
-    LANG_CHARACTER_DELETED_ERR_RENAME   = 1022,
-    LANG_CHARACTER_DELETED_SKIP_ACCOUNT = 1023,
-    LANG_CHARACTER_DELETED_SKIP_FULL    = 1024,
-    LANG_CHARACTER_DELETED_SKIP_NAME    = 1025,
-    LANG_CHARACTER_DELETED_LIST_LINE_CHAT = 1026,
-    LANG_LOG_FILTERS_STATE_HEADER       = 1027,
-    LANG_ALL_LOG_FILTERS_SET_TO_S       = 1028,
-    LANG_RA_ONLY_COMMAND                = 1029,
-    // Room for more level 4              1030-1099 not used
+    LANG_ACCOUNT_LIST_ERROR             = 1011,
+    LANG_CHARACTER_DELETED_LIST_HEADER  = 1012,
+    LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE = 1013,
+    LANG_CHARACTER_DELETED_LIST_BAR     = 1014,
+    LANG_CHARACTER_DELETED_LIST_EMPTY   = 1015,
+    LANG_CHARACTER_DELETED_RESTORE      = 1016,
+    LANG_CHARACTER_DELETED_DELETE       = 1017,
+    LANG_CHARACTER_DELETED_ERR_RENAME   = 1018,
+    LANG_CHARACTER_DELETED_SKIP_ACCOUNT = 1019,
+    LANG_CHARACTER_DELETED_SKIP_FULL    = 1020,
+    LANG_CHARACTER_DELETED_SKIP_NAME    = 1021,
+    LANG_CHARACTER_DELETED_LIST_LINE_CHAT = 1022,
+    // Room for more level 4              1023-1099 not used
+
 
     // Level 3 (continue)
     LANG_ACCOUNT_SETADDON               = 1100,
@@ -868,159 +742,182 @@ enum BlizzLikeStrings
     LANG_MUST_MALE_OR_FEMALE            = 1119,
     LANG_YOU_CHANGE_GENDER              = 1120,
     LANG_YOUR_GENDER_CHANGED            = 1121,
-    LANG_SKILL_VALUES                   = 1122,
-    //                                    1123 used in master branch
-    //                                    1124 used in master branch
-    //                                    1125 used in master branch
-    //                                    1126 used in master branch
-    //                                    1127 used in master branch
-    LANG_TAXINODE_ENTRY_LIST_CHAT       = 1128,
-    LANG_TAXINODE_ENTRY_LIST_CONSOLE    = 1129,
-    LANG_EVENT_STARTED                  = 1130,
-    LANG_EVENT_STOPPED                  = 1131,
-    LANG_MOVEGENS_FOLLOW_PLAYER         = 1132,
-    LANG_MOVEGENS_FOLLOW_CREATURE       = 1133,
-    LANG_MOVEGENS_FOLLOW_NULL           = 1134,
-    LANG_LIST_TALENTS_TITLE             = 1135,
-    LANG_LIST_TALENTS_COUNT             = 1136,
-    LANG_GO_LIST_CHAT                   = 1137,
-    LANG_CHARACTERS_LIST_BAR            = 1138,
-    LANG_CHARACTERS_LIST_HEADER         = 1139,
-    LANG_CHARACTERS_LIST_LINE_CONSOLE   = 1140,
-    LANG_CHARACTERS_LIST_LINE_CHAT      = 1141,
-    LANG_ACCOUNT_LIST_LINE_CHAT         = 1142,
-    LANG_NPC_GO_INFO_GAME_EVENT_S       = 1143,
-    LANG_NPC_GO_INFO_GAME_EVENT_D       = 1144,
-    LANG_NPC_GO_INFO_POOL               = 1145,
-    LANG_NPC_GO_INFO_TOP_POOL           = 1146,
-    LANG_NPC_GO_INFO_POOL_GAME_EVENT_S  = 1147,
-    LANG_NPC_GO_INFO_POOL_GAME_EVENT_D  = 1148,
-    LANG_NPC_GO_INFO_POOL_STRING        = 1149,
-    LANG_NPC_GO_INFO_EVENT_STRING       = 1150,
-    LANG_NPC_GO_INFO_POOL_EVENT_STRING  = 1151,
-    LANG_COMMAND_ITEM_USABLE            = 1152,
-    LANG_GET_BITSTR                     = 1153,             // log
-    LANG_GET_BITSTR_FIELD               = 1154,
-    LANG_GET_HEX                        = 1155,             // log
-    LANG_GET_HEX_FIELD                  = 1156,
-    LANG_CHANGE_HEX                     = 1157,             // log
-    LANG_CHANGE_HEX_FIELD               = 1158,
-    LANG_CHANGE_FLOAT                   = 1159,             // log
-    LANG_CHANGE_FLOAT_FIELD             = 1160,
-    //                                    1161 used in master branch
-    //                                    1162 used in master branch
-    //                                    1163 used in master branch
-    //                                    1164 used in master branch
-    LANG_SPELL_NO_HAVE_AURAS            = 1165,
-    LANG_SCRIPTS_NOT_FOUND              = 1166,
-    LANG_SCRIPTS_WRONG_API              = 1167,
-    LANG_SCRIPTS_RELOADED_OK            = 1168,
-    LANG_SCRIPTS_OUTDATED               = 1169,
-    LANG_NPCINFO_CHAR_DIFFICULTY        = 1170,
-    LANG_AHBOT_RELOAD_OK                = 1171,
-    LANG_AHBOT_RELOAD_FAIL              = 1172,
-    LANG_AHBOT_STATUS_BAR_CONSOLE       = 1173,
-    LANG_AHBOT_STATUS_MIDBAR_CONSOLE    = 1174,
-    LANG_AHBOT_STATUS_TITLE1_CONSOLE    = 1175,
-    LANG_AHBOT_STATUS_TITLE1_CHAT       = 1176,
-    LANG_AHBOT_STATUS_FORMAT_CONSOLE    = 1177,
-    LANG_AHBOT_STATUS_FORMAT_CHAT       = 1178,
-    LANG_AHBOT_STATUS_ITEM_COUNT        = 1179,
-    LANG_AHBOT_STATUS_ITEM_RATIO        = 1180,
-    LANG_AHBOT_STATUS_TITLE2_CONSOLE    = 1181,
-    LANG_AHBOT_STATUS_TITLE2_CHAT       = 1182,
-    LANG_AHBOT_QUALITY_GREY             = 1183,
-    LANG_AHBOT_QUALITY_WHITE            = 1184,
-    LANG_AHBOT_QUALITY_GREEN            = 1185,
-    LANG_AHBOT_QUALITY_BLUE             = 1186,
-    LANG_AHBOT_QUALITY_PURPLE           = 1187,
-    LANG_AHBOT_QUALITY_ORANGE           = 1188,
-    LANG_AHBOT_QUALITY_YELLOW           = 1189,
-    LANG_AHBOT_ITEMS_AMOUNT             = 1190,
-    LANG_AHBOT_ITEMS_RATIO              = 1191,
-    LANG_MOVEGENS_EFFECT                = 1192,
-    //                                    1193 used in master branch
-    LANG_COMMAND_GO_STATUS              = 1194,
-    LANG_COMMAND_GO_STATUS_DOOR         = 1195,
-    // Room for more level 3              1196-1199 not used
+    // Room for more level 3              1122-1198 not used
+    LANG_NPCINFO_LINKGUID               = 1199,
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,
-    //                                    1201 used in master branch
-    LANG_SPELLCOEFS                     = 1202,
-    LANG_DIRECT_HEAL                    = 1203,
-    LANG_DIRECT_DAMAGE                  = 1204,
-    LANG_DOT_HEAL                       = 1205,
-    LANG_DOT_DAMAGE                     = 1206,
-    // Room for more debug                1207-1299 not used
+    // Room for more debug                1201-1299 not used
 
-    // Reserved for old client release branches specific strings
-    // Room for old clients 2.x           1300-1399 not used
-    // Room for old clients 1.x           1400-1499 not used
+    // AV
+    LANG_BG_AV_ALLY                     = 1300,
+    LANG_BG_AV_HORDE                    = 1301,
+    LANG_BG_AV_TOWER_TAKEN              = 1302,
+    LANG_BG_AV_TOWER_ASSAULTED          = 1303,
+    LANG_BG_AV_TOWER_DEFENDED           = 1304,
+    LANG_BG_AV_GRAVE_TAKEN              = 1305,
+    LANG_BG_AV_GRAVE_DEFENDED           = 1306,
+    LANG_BG_AV_GRAVE_ASSAULTED          = 1307,
 
-    // Level 2 (continue)
-    LANG_POOL_CHANCE_POOL_LIST_CONSOLE  = 1500,
-    LANG_POOL_POOL_LIST_CHAT            = 1501,
-    LANG_POOL_POOL_LIST_CONSOLE         = 1502,
-    LANG_NO_FREE_STATIC_GUID_FOR_SPAWN  = 1503,
-    LANG_NPC_AI_HEADER                  = 1504,
-    LANG_NPC_AI_NAMES                   = 1505,
-    LANG_NPC_EVENTAI_PHASE              = 1506,
-    LANG_NPC_EVENTAI_MOVE               = 1507,
-    LANG_NPC_EVENTAI_COMBAT             = 1508,
-    LANG_POOL_ENTRY_LOWER_MAX_POOL      = 1509,
-    // Room for more Level 2              1510-1599 not used
+    LANG_BG_AV_MINE_TAKEN               = 1308,
+    LANG_BG_AV_MINE_NORTH               = 1309,
+    LANG_BG_AV_MINE_SOUTH               = 1310,
 
-    // Outdoor PvP
-    LANG_OPVP_EP_CAPTURE_NPT_H          = 1600,
-    LANG_OPVP_EP_CAPTURE_NPT_A          = 1601,
-    LANG_OPVP_EP_CAPTURE_CGT_H          = 1602,
-    LANG_OPVP_EP_CAPTURE_CGT_A          = 1603,
-    LANG_OPVP_EP_CAPTURE_EWT_H          = 1604,
-    LANG_OPVP_EP_CAPTURE_EWT_A          = 1605,
-    LANG_OPVP_EP_CAPTURE_PWT_H          = 1606,
-    LANG_OPVP_EP_CAPTURE_PWT_A          = 1607,
+    LANG_BG_AV_NODE_GRAVE_STORM_AID     = 1311,
+    LANG_BG_AV_NODE_TOWER_DUN_S         = 1312,
+    LANG_BG_AV_NODE_TOWER_DUN_N         = 1313,
+    LANG_BG_AV_NODE_GRAVE_STORMPIKE     = 1314,
+    LANG_BG_AV_NODE_TOWER_ICEWING       = 1315,
+    LANG_BG_AV_NODE_GRAVE_STONE         = 1316,
+    LANG_BG_AV_NODE_TOWER_STONE         = 1317,
+    LANG_BG_AV_NODE_GRAVE_SNOW          = 1318,
+    LANG_BG_AV_NODE_TOWER_ICE           = 1319,
+    LANG_BG_AV_NODE_GRAVE_ICE           = 1320,
+    LANG_BG_AV_NODE_TOWER_POINT         = 1321,
+    LANG_BG_AV_NODE_GRAVE_FROST         = 1322,
+    LANG_BG_AV_NODE_TOWER_FROST_E       = 1323,
+    LANG_BG_AV_NODE_TOWER_FROST_W       = 1324,
+    LANG_BG_AV_NODE_GRAVE_FROST_HUT     = 1325,
 
-    LANG_OPVP_HP_CAPTURE_OVERLOOK_H     = 1608,
-    LANG_OPVP_HP_CAPTURE_OVERLOOK_A     = 1609,
-    LANG_OPVP_HP_CAPTURE_STADIUM_H      = 1610,
-    LANG_OPVP_HP_CAPTURE_STADIUM_A      = 1611,
-    LANG_OPVP_HP_CAPTURE_BROKENHILL_H   = 1612,
-    LANG_OPVP_HP_CAPTURE_BROKENHILL_A   = 1613,
+    LANG_BG_AV_START_ONE_MINUTE         = 1326,
+    LANG_BG_AV_START_HALF_MINUTE        = 1327,
+    LANG_BG_AV_HAS_BEGUN                = 1328,
+    LANG_BG_AV_A_NEAR_LOSE              = 1329,
+    LANG_BG_AV_H_NEAR_LOSE              = 1330,
+    LANG_BG_AV_H_CAPTAIN_DEAD           = 1331,
+    LANG_BG_AV_A_CAPTAIN_DEAD           = 1332,
+    LANG_BG_AV_START_TWO_MINUTES        = 1333,
+    // FREE IDS                           1334-1999
 
-    LANG_OPVP_ZM_CAPTURE_EAST_BEACON_H  = 1614,
-    LANG_OPVP_ZM_CAPTURE_EAST_BEACON_A  = 1615,
-    LANG_OPVP_ZM_CAPTURE_WEST_BEACON_H  = 1616,
-    LANG_OPVP_ZM_CAPTURE_WEST_BEACON_A  = 1617,
-    LANG_OPVP_ZM_CAPTURE_BOTH_BEACONS_H = 1618,
-    LANG_OPVP_ZM_CAPTURE_BOTH_BEACONS_A = 1619,
-    LANG_OPVP_ZM_SPAWN_FIELD_SCOUT_H    = 1620,
-    LANG_OPVP_ZM_SPAWN_FIELD_SCOUT_A    = 1621,
-    LANG_OPVP_ZM_CAPTURE_GRAVEYARD_H    = 1622,
-    LANG_OPVP_ZM_CAPTURE_GRAVEYARD_A    = 1623,
+    // Ticket Strings 2000-2029
+    LANG_COMMAND_TICKETNEW              = 2000,
+    LANG_COMMAND_TICKETUPDATED          = 2001,
+    LANG_COMMAND_TICKETPLAYERABANDON    = 2002,
+    LANG_COMMAND_TICKETCLOSED           = 2003,
+    LANG_COMMAND_TICKETDELETED          = 2004,
+    LANG_COMMAND_TICKETNOTEXIST         = 2005,
+    LANG_COMMAND_TICKETCLOSEFIRST       = 2006,
+    LANG_COMMAND_TICKETALREADYASSIGNED  = 2007,
+    LANG_COMMAND_TICKETRELOAD           = 2008,
+    LANG_COMMAND_TICKETSHOWLIST         = 2009,
+    LANG_COMMAND_TICKETSHOWONLINELIST   = 2010,
+    LANG_COMMAND_TICKETSHOWCLOSEDLIST   = 2011,
+    LANG_COMMAND_TICKETASSIGNERROR_A    = 2012,
+    LANG_COMMAND_TICKETASSIGNERROR_B    = 2013,
+    LANG_COMMAND_TICKETNOTASSIGNED      = 2014,
+    LANG_COMMAND_TICKETUNASSIGNSECURITY = 2015,
+    LANG_COMMAND_TICKETCANNOTCLOSE      = 2016,
+    LANG_COMMAND_TICKETLISTGUID         = 2017,
+    LANG_COMMAND_TICKETLISTNAME         = 2018,
+    LANG_COMMAND_TICKETLISTAGE          = 2019,
+    LANG_COMMAND_TICKETLISTASSIGNEDTO   = 2020,
+    LANG_COMMAND_TICKETLISTUNASSIGNED   = 2021,
+    LANG_COMMAND_TICKETLISTMESSAGE      = 2022,
+    LANG_COMMAND_TICKETLISTCOMMENT      = 2023,
+    LANG_COMMAND_TICKETLISTADDCOMMENT   = 2024,
+    LANG_COMMAND_TICKETLISTAGECREATE    = 2025,
 
-    LANG_OPVP_TF_CAPTURE_TOWER_H        = 1624,
-    LANG_OPVP_TF_CAPTURE_TOWER_A        = 1625,
-    LANG_OPVP_TF_LOSE_TOWER_H           = 1626,
-    LANG_OPVP_TF_LOSE_TOWER_A           = 1627,
-    LANG_OPVP_TF_CAPTURE_ALL_TOWERS_H   = 1628,
-    LANG_OPVP_TF_CAPTURE_ALL_TOWERS_A   = 1629,
+    // BlizzLike strings                     5000-9999
+    LANG_COMMAND_FREEZE                 = 5000,
+    LANG_COMMAND_FREEZE_ERROR           = 5001,
+    LANG_COMMAND_FREEZE_WRONG           = 5002,
+    LANG_COMMAND_UNFREEZE               = 5003,
+    LANG_COMMAND_NO_FROZEN_PLAYERS      = 5004,
+    LANG_COMMAND_LIST_FREEZE            = 5005,
+    LANG_COMMAND_FROZEN_PLAYERS         = 5006,
+    LANG_INSTANCE_MUST_RAID_GRP         = 5007,
+    LANG_INSTANCE_NOT_AS_GHOST          = 5008,
+    LANG_COMMAND_PLAYED_TO_ALL          = 5009,
+    // Room for more BlizzLike strings       5010-9999
+    // Used for GM Announcements
+    LANG_GM_BROADCAST                    = 6613,
+    LANG_GM_NOTIFY                       = 6614,
+    LANG_GM_ANNOUNCE_COLOR               = 6615,
 
-    LANG_OPVP_NA_PROGRESS_H             = 1630,
-    LANG_OPVP_NA_PROGRESS_A             = 1631,
-    LANG_OPVP_NA_CAPTURE_H              = 1632,
-    LANG_OPVP_NA_CAPTURE_A              = 1633,
-    LANG_OPVP_NA_DEFENSELESS            = 1634,
+    LANG_GM_SILENCE                      = 6616,              // GM Silenced Spell 1852
 
-    LANG_OPVP_SI_CAPTURE_H              = 1635,
-    LANG_OPVP_SI_CAPTURE_A              = 1636,
-
-    // FREE IDS                           1700-9999
-
-    // Use for not-in-official-sources patches
+    // Use for not-in-offcial-sources patches
     //                                    10000-10999
+    // opvp hp
+    LANG_OPVP_HP_CAPTURE_OVERLOOK_H     = 10001,
+    LANG_OPVP_HP_CAPTURE_OVERLOOK_A     = 10002,
+    LANG_OPVP_HP_CAPTURE_STADIUM_H      = 10003,
+    LANG_OPVP_HP_CAPTURE_STADIUM_A      = 10004,
+    LANG_OPVP_HP_CAPTURE_BROKENHILL_H   = 10005,
+    LANG_OPVP_HP_CAPTURE_BROKENHILL_A   = 10006,
+    LANG_OPVP_HP_LOOSE_OVERLOOK_H       = 10007,
+    LANG_OPVP_HP_LOOSE_OVERLOOK_A       = 10008,
+    LANG_OPVP_HP_LOOSE_STADIUM_H        = 10009,
+    LANG_OPVP_HP_LOOSE_STADIUM_A        = 10010,
+    LANG_OPVP_HP_LOOSE_BROKENHILL_H     = 10011,
+    LANG_OPVP_HP_LOOSE_BROKENHILL_A     = 10012,
+    // opvp zm
+    LANG_OPVP_ZM_CAPTURE_WEST_H         = 10013,
+    LANG_OPVP_ZM_CAPTURE_WEST_A         = 10014,
+    LANG_OPVP_ZM_CAPTURE_EAST_H         = 10015,
+    LANG_OPVP_ZM_CAPTURE_EAST_A         = 10016,
+    LANG_OPVP_ZM_CAPTURE_GY_H           = 10017,
+    LANG_OPVP_ZM_CAPTURE_GY_A           = 10018,
+    LANG_OPVP_ZM_LOOSE_WEST_H           = 10019,
+    LANG_OPVP_ZM_LOOSE_WEST_A           = 10020,
+    LANG_OPVP_ZM_LOOSE_EAST_H           = 10021,
+    LANG_OPVP_ZM_LOOSE_EAST_A           = 10022,
+    LANG_OPVP_ZM_LOOSE_GY_H             = 10023,
+    LANG_OPVP_ZM_LOOSE_GY_A             = 10024,
+    // opvp na
+    LANG_OPVP_NA_CAPTURE_H              = 10025,
+    LANG_OPVP_NA_CAPTURE_A              = 10026,
+    LANG_OPVP_NA_LOOSE_H                = 10027,
+    LANG_OPVP_NA_LOOSE_A                = 10028,
+    // opvp tf
+    LANG_OPVP_TF_CAPTURE_H              = 10029,
+    LANG_OPVP_TF_CAPTURE_A              = 10030,
+    LANG_OPVP_TF_LOOSE_H                = 10031,
+    LANG_OPVP_TF_LOOSE_A                = 10032,
+    // opvp ep
+    LANG_OPVP_EP_CAPTURE_NORTHPASS_H    = 10033,
+    LANG_OPVP_EP_CAPTURE_NORTHPASS_A    = 10034,
+    LANG_OPVP_EP_CAPTURE_EASTWALL_H     = 10035,
+    LANG_OPVP_EP_CAPTURE_EASTWALL_A     = 10036,
+    LANG_OPVP_EP_CAPTURE_CROWNGUARD_H   = 10037,
+    LANG_OPVP_EP_CAPTURE_CROWNGUARD_A   = 10038,
+    LANG_OPVP_EP_CAPTURE_PLAGUEWOOD_H   = 10039,
+    LANG_OPVP_EP_CAPTURE_PLAGUEWOOD_A   = 10040,
+    LANG_OPVP_EP_LOOSE_NORTHPASS_H      = 10041,
+    LANG_OPVP_EP_LOOSE_NORTHPASS_A      = 10042,
+    LANG_OPVP_EP_LOOSE_EASTWALL_H       = 10043,
+    LANG_OPVP_EP_LOOSE_EASTWALL_A       = 10044,
+    LANG_OPVP_EP_LOOSE_CROWNGUARD_H     = 10045,
+    LANG_OPVP_EP_LOOSE_CROWNGUARD_A     = 10046,
+    LANG_OPVP_EP_LOOSE_PLAGUEWOOD_H     = 10047,
+    LANG_OPVP_EP_LOOSE_PLAGUEWOOD_A     = 10048,
+    // opvp si
+    LANG_OPVP_SI_CAPTURE_H              = 10049,
+    LANG_OPVP_SI_CAPTURE_A              = 10050,
+    // opvp gossips
+    LANG_OPVP_EP_FLIGHT_NORTHPASS       = 10051,
+    LANG_OPVP_EP_FLIGHT_EASTWALL        = 10052,
+    LANG_OPVP_EP_FLIGHT_CROWNGUARD      = 10053,
+    LANG_OPVP_ZM_GOSSIP_ALLIANCE        = 10054,
+    LANG_OPVP_ZM_GOSSIP_HORDE           = 10055,
+
+    LANG_NO_ENTER_HALL_OF_LEGENDS       = 10056,
+    LANG_NO_ENTER_CHAMPIONS_HALL        = 10057,
 
     // Use for custom patches             11000-11999
+    LANG_AUTO_BROADCAST                 = 11000,
+    LANG_INVALID_REALMID                = 11001,
+
+    // ChatSpy
+    LANG_CHATSPY_APENDED                = 11600,
+    LANG_CHATSPY_CANCELLEDMASSIVE       = 11601,
+    LANG_CHATSPY_ALLRESET               = 11602,
+    LANG_CHATSPY_NOCHATSPY              = 11603,
+    LANG_CHATSPY_YOURCANCELLED          = 11604,
+    LANG_CHATSPY_SMBCANCELLED           = 11605,
+    LANG_CHATSPY_LISTOFSPYS             = 11606,
+    LANG_CHATSPY_TOTAL                  = 11607,
+    LANG_CHATSPY_ONESPYSANOTHER         = 11608,
 
     // NOT RESERVED IDS                   12000-1999999999
     // `db_script_string` table index     2000000000-2000009999 (MIN_DB_SCRIPT_STRING_ID-MAX_DB_SCRIPT_STRING_ID)

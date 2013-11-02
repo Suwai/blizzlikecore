@@ -1,24 +1,7 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
-
-/// \addtogroup u2w
-/// @{
-/// \file
 
 #ifndef _OPCODES_H
 #define _OPCODES_H
@@ -31,7 +14,7 @@
 //       table opcodeTable in source when Opcode.h included but WorldSession.h not included
 #include "WorldSession.h"
 
-/// List of Opcodes
+// List of Opcodes
 enum Opcodes
 {
     MSG_NULL_ACTION                                 = 0x000,
@@ -470,7 +453,7 @@ enum Opcodes
     SMSG_TRAINER_LIST                               = 0x1B1,
     CMSG_TRAINER_BUY_SPELL                          = 0x1B2,
     SMSG_TRAINER_BUY_SUCCEEDED                      = 0x1B3,
-    SMSG_TRAINER_BUY_FAILED                         = 0x1B4,// uint64, uint32, uint32 (0...2)
+    SMSG_TRAINER_BUY_FAILED                         = 0x1B4,
     CMSG_BINDER_ACTIVATE                            = 0x1B5,
     SMSG_PLAYERBINDERROR                            = 0x1B6,
     CMSG_BANKER_ACTIVATE                            = 0x1B7,
@@ -692,8 +675,8 @@ enum Opcodes
     CMSG_GROUP_ASSISTANT_LEADER                     = 0x28F,
     CMSG_BUYBACK_ITEM                               = 0x290,
     SMSG_SERVER_MESSAGE                             = 0x291,
-    CMSG_MEETINGSTONE_JOIN                          = 0x292,// lua: SetSavedInstanceExtend
-    SMSG_MEETINGSTONE_LEAVE                         = 0x293,
+    CMSG_MEETINGSTONE_JOIN                          = 0x292,
+    CMSG_MEETINGSTONE_LEAVE                         = 0x293,
     CMSG_MEETINGSTONE_CHEAT                         = 0x294,
     SMSG_MEETINGSTONE_SETQUEUE                      = 0x295,
     CMSG_MEETINGSTONE_INFO                          = 0x296,
@@ -1099,22 +1082,13 @@ enum Opcodes
 // Don't forget to change this value and add opcode name to Opcodes.cpp when you add new opcode!
 #define NUM_MSG_TYPES 0x424
 
-/// Player state
+// Player state
 enum SessionStatus
 {
-    STATUS_AUTHED = 0,                                      ///< Player authenticated (_player==NULL, m_playerRecentlyLogout = false or will be reset before handler call)
-    STATUS_LOGGEDIN,                                        ///< Player in game (_player!=NULL, inWorld())
-    STATUS_TRANSFER,                                        ///< Player transferring to another map (_player!=NULL, !inWorld())
-    STATUS_LOGGEDIN_OR_RECENTLY_LOGGEDOUT,                  ///< _player!= NULL or _player==NULL && m_playerRecentlyLogout)
-    STATUS_NEVER,                                           ///< Opcode not accepted from client (deprecated or server side only)
-    STATUS_UNHANDLED                                        ///< We don' handle this opcode yet
-};
-
-enum PacketProcessing
-{
-    PROCESS_INPLACE = 0,                                    // process packet whenever we receive it - mostly for non-handled or non-implemented packets
-    PROCESS_THREADUNSAFE,                                   // packet is not thread-safe - process it in World::UpdateSessions()
-    PROCESS_THREADSAFE                                      // packet is thread-safe - process it in Map::Update()
+    STATUS_AUTHED = 0,                                      // Player authenticated
+    STATUS_LOGGEDIN,                                        // Player in game
+    STATUS_TRANSFER_PENDING,                                // Player transferring to another map
+    STATUS_NEVER                                            // Opcode not accepted from client (deprecated or server side only)
 };
 
 class WorldPacket;
@@ -1123,13 +1097,12 @@ struct OpcodeHandler
 {
     char const* name;
     SessionStatus status;
-    PacketProcessing packetProcessing;
     void (WorldSession::*handler)(WorldPacket& recvPacket);
 };
 
 extern OpcodeHandler opcodeTable[NUM_MSG_TYPES];
 
-/// Lookup opcode name for human understandable logging
+// Lookup opcode name for human understandable logging
 inline const char* LookupOpcodeName(uint16 id)
 {
     if (id >= NUM_MSG_TYPES)
@@ -1137,4 +1110,4 @@ inline const char* LookupOpcodeName(uint16 id)
     return opcodeTable[id].name;
 }
 #endif
-/// @}
+

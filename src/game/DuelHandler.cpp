@@ -1,58 +1,66 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #include "Common.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "World.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "UpdateData.h"
+#include "MapManager.h"
 #include "Player.h"
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {
-    ObjectGuid guid;
+    uint64 guid;
+    Player* player;
+    Player* plTarget;
+
     recvPacket >> guid;
 
-    if (!GetPlayer()->duel)                                 // ignore accept from duel-sender
+    if (!GetPlayer()->duel)                                  // ignore accept from duel-sender
         return;
 
-    Player* pl       = GetPlayer();
-    Player* plTarget = pl->duel->opponent;
+    player   = GetPlayer();
+    plTarget = player->duel->opponent;
 
-    if (pl == pl->duel->initiator || !plTarget || pl == plTarget || pl->duel->startTime != 0 || plTarget->duel->startTime != 0)
+    if (player == player->duel->initiator || !plTarget || player == plTarget || player->duel->startTime != 0 || plTarget->duel->startTime != 0)
         return;
 
-    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "WORLD: received CMSG_DUEL_ACCEPTED");
-    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "Player 1 is: %u (%s)", pl->GetGUIDLow(), pl->GetName());
-    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName());
+    //sLog.outDebug("WORLD: Received CMSG_DUEL_ACCEPTED");
+    sLog.outDebug("Player 1 is: %u (%s)", player->GetGUIDLow(), player->GetName());
+    sLog.outDebug("Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName());
 
     time_t now = time(NULL);
-    pl->duel->startTimer = now;
+    player->duel->startTimer   = now;
     plTarget->duel->startTimer = now;
 
-    pl->SendDuelCountdown(3000);
-    plTarget->SendDuelCountdown(3000);
+    if (sWorld.getConfig(CONFIG_DUEL_MOD))
+    {
+        player->ResetAllPowers();
+        plTarget->ResetAllPowers();
+
+        if (sWorld.getConfig(CONFIG_DUEL_CD_RESET) && !player->GetMap()->IsDungeon())
+            player->RemoveArenaSpellCooldowns();
+
+        if (sWorld.getConfig(CONFIG_DUEL_CD_RESET) && !plTarget->GetMap()->IsDungeon())
+            plTarget->RemoveArenaSpellCooldowns();
+    }
+
+    WorldPacket data(SMSG_DUEL_COUNTDOWN, 4);
+    data << (uint32)3000;                                   // 3 seconds
+    player->GetSession()->SendPacket(&data);
+    plTarget->GetSession()->SendPacket(&data);
 }
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
-    DEBUG_LOG("WORLD: Received opcode CMSG_DUEL_CANCELLED");
+    sLog.outDebug("WORLD: received CMSG_DUEL_CANCELLED");
+    uint64 guid;
+    recvPacket >> guid;
 
     // no duel requested
     if (!GetPlayer()->duel)
@@ -72,8 +80,5 @@ void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 
     // player either discarded the duel using the "discard button"
     // or used "/forfeit" before countdown reached 0
-    ObjectGuid guid;
-    recvPacket >> guid;
-
-    GetPlayer()->DuelComplete(DUEL_INTERRUPTED);
+    GetPlayer()->DuelComplete(DUEL_INTERUPTED);
 }

@@ -1,19 +1,6 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #include "SkillExtraItems.h"
@@ -21,8 +8,6 @@
 #include "Log.h"
 #include "ProgressBar.h"
 #include "Player.h"
-#include "DBCStores.h"
-
 #include <map>
 
 // some type definitions
@@ -47,7 +32,7 @@ struct SkillExtraItemEntry
 };
 
 // map to store the extra item creation info, the key is the spellId of the creation spell, the mapped value is the assigned SkillExtraItemEntry
-typedef std::map<uint32, SkillExtraItemEntry> SkillExtraItemMap;
+typedef std::map<uint32,SkillExtraItemEntry> SkillExtraItemMap;
 
 SkillExtraItemMap SkillExtraItemStore;
 
@@ -58,44 +43,44 @@ void LoadSkillExtraItemTable()
 
     SkillExtraItemStore.clear();                            // need for reload
 
-    //                                                 0        1                       2                       3
-    QueryResult* result = WorldDatabase.Query("SELECT spellId, requiredSpecialization, additionalCreateChance, additionalMaxNum FROM skill_extra_item_template");
+    //                                                       0        1                       2                       3
+    QueryResult_AutoPtr result = WorldDatabase.Query("SELECT spellId, requiredSpecialization, additionalCreateChance, additionalMaxNum FROM skill_extra_item_template");
 
     if (result)
     {
-        BarGoLink bar(result->GetRowCount());
+        barGoLink bar(result->GetRowCount());
 
         do
         {
-            Field* fields = result->Fetch();
+            Field *fields = result->Fetch();
             bar.step();
 
             uint32 spellId = fields[0].GetUInt32();
 
             if (!sSpellStore.LookupEntry(spellId))
             {
-                sLog.outError("Skill specialization %u has nonexistent spell id in `skill_extra_item_template`!", spellId);
+                sLog.outError("Skill specialization %u has non-existent spell id in skill_extra_item_template!", spellId);
                 continue;
             }
 
             uint32 requiredSpecialization = fields[1].GetUInt32();
             if (!sSpellStore.LookupEntry(requiredSpecialization))
             {
-                sLog.outError("Skill specialization %u have nonexistent required specialization spell id %u in `skill_extra_item_template`!", spellId, requiredSpecialization);
+                sLog.outError("Skill specialization %u has invalid required specialization spell id %u in skill_extra_item_template!", spellId,requiredSpecialization);
                 continue;
             }
 
             float additionalCreateChance = fields[2].GetFloat();
             if (additionalCreateChance <= 0.0f)
             {
-                sLog.outError("Skill specialization %u has too low additional create chance in `skill_extra_item_template`!", spellId);
+                sLog.outError("Skill specialization %u has too low additional create chance in skill_extra_item_template!", spellId);
                 continue;
             }
 
             uint8 additionalMaxNum = fields[3].GetUInt8();
             if (!additionalMaxNum)
             {
-                sLog.outError("Skill specialization %u has 0 max number of extra items in `skill_extra_item_template`!", spellId);
+                sLog.outError("Skill specialization %u has 0 max number of extra items in skill_extra_item_template!", spellId);
                 continue;
             }
 
@@ -106,10 +91,7 @@ void LoadSkillExtraItemTable()
             skillExtraItemEntry.additionalMaxNum       = additionalMaxNum;
 
             ++count;
-        }
-        while (result->NextRow());
-
-        delete result;
+        } while (result->NextRow());
 
         sLog.outString();
         sLog.outString(">> Loaded %u spell specialization definitions", count);
@@ -117,11 +99,11 @@ void LoadSkillExtraItemTable()
     else
     {
         sLog.outString();
-        sLog.outString(">> Loaded 0 spell specialization definitions. DB table `skill_extra_item_template` is empty.");
+        sLog.outString(">> Loaded 0 spell specialization definitions. DB table skill_extra_item_template is empty.");
     }
 }
 
-bool canCreateExtraItems(Player* player, uint32 spellId, float& additionalChance, uint8& additionalMax)
+bool canCreateExtraItems(Player* player, uint32 spellId, float &additionalChance, uint8 &additionalMax)
 {
     // get the info for the specified spell
     SkillExtraItemMap::const_iterator ret = SkillExtraItemStore.find(spellId);
@@ -145,3 +127,4 @@ bool canCreateExtraItems(Player* player, uint32 spellId, float& additionalChance
     // enable extra item creation
     return true;
 }
+

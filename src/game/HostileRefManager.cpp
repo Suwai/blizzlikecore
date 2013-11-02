@@ -1,19 +1,6 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #include "HostileRefManager.h"
@@ -21,11 +8,6 @@
 #include "Unit.h"
 #include "DBCStructure.h"
 #include "SpellMgr.h"
-#include "Map.h"
-
-HostileRefManager::HostileRefManager(Unit* pOwner) : iOwner(pOwner)
-{
-}
 
 HostileRefManager::~HostileRefManager()
 {
@@ -37,15 +19,19 @@ HostileRefManager::~HostileRefManager()
 // The pVictim is hated than by them as well
 // use for buffs and healing threat functionality
 
-void HostileRefManager::threatAssist(Unit* pVictim, float pThreat, SpellEntry const* pThreatSpell, bool pSingleTarget)
+void HostileRefManager::threatAssist(Unit* pVictim, float pThreat, SpellEntry const *pThreatSpell, bool pSingleTarget)
 {
-    uint32 size = pSingleTarget ? 1 : getSize();            // if pSingleTarget do not devide threat
-    float threat = pThreat / size;
-    HostileReference* ref = getFirst();
-    while (ref)
-    {
-        ref->getSource()->addThreat(pVictim, threat, false, (pThreatSpell ? GetSpellSchoolMask(pThreatSpell) : SPELL_SCHOOL_MASK_NORMAL), pThreatSpell);
+    HostileReference* ref;
 
+    uint32 size = pSingleTarget ? 1 : getSize();            // if pSingleTarget do not devide threat
+    ref = getFirst();
+    while (ref != NULL)
+    {
+        float threat = ThreatCalcHelper::calcThreat(pVictim, iOwner, pThreat, (pThreatSpell ? GetSpellSchoolMask(pThreatSpell) : SPELL_SCHOOL_MASK_NORMAL), pThreatSpell);
+        if (pVictim == getOwner())
+            ref->addThreat(float (threat) / size);          // It is faster to modify the threat durectly if possible
+        else
+            ref->getSource()->addThreat(pVictim, float (threat) / size);
         ref = ref->next();
     }
 }
@@ -109,24 +95,6 @@ void HostileRefManager::deleteReferences()
 }
 
 //=================================================
-// delete one reference, defined by faction
-
-void HostileRefManager::deleteReferencesForFaction(uint32 faction)
-{
-    HostileReference* ref = getFirst();
-    while (ref)
-    {
-        HostileReference* nextRef = ref->next();
-        if (ref->getSource()->getOwner()->getFactionTemplateEntry()->faction == faction)
-        {
-            ref->removeReference();
-            delete ref;
-        }
-        ref = nextRef;
-    }
-}
-
-//=================================================
 // delete one reference, defined by Unit
 
 void HostileRefManager::deleteReference(Unit* pCreature)
@@ -148,7 +116,7 @@ void HostileRefManager::deleteReference(Unit* pCreature)
 //=================================================
 // set state for one reference, defined by Unit
 
-void HostileRefManager::setOnlineOfflineState(Unit* pCreature, bool pIsOnline)
+void HostileRefManager::setOnlineOfflineState(Unit* pCreature,bool pIsOnline)
 {
     HostileReference* ref = getFirst();
     while (ref)
@@ -163,10 +131,5 @@ void HostileRefManager::setOnlineOfflineState(Unit* pCreature, bool pIsOnline)
     }
 }
 
-Unit* HostileRefManager::GetThreatRedirectionTarget() const
-{
-    return m_redirectionTargetGuid ? iOwner->GetMap()->GetUnit(m_redirectionTargetGuid) : NULL;
-}
-
-
 //=================================================
+

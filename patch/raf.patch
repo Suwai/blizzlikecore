@@ -285,7 +285,7 @@ index 3cabb76..aa5e818 100644
      Powers powerType = player->getPowerType();
      data << uint32(mask1);                                  // group update mask
 -    data << uint16(MEMBER_STATUS_ONLINE);                   // member's online status
-+    data << uint16(online_status);                   // member's online status
++    data << uint16(online_status);                          // member's online status
      data << uint16(player->GetHealth());                    // GROUP_UPDATE_FLAG_CUR_HP
      data << uint16(player->GetMaxHealth());                 // GROUP_UPDATE_FLAG_MAX_HP
      data << uint8(powerType);                               // GROUP_UPDATE_FLAG_POWER_TYPE
@@ -438,7 +438,7 @@ index 082e398..236dc15 100644
 +     if (!guid.IsPlayer())
 +         return;
 + 
-+     Player * target = sObjectMgr.GetPlayer(guid);
++     Player* target = sObjectMgr.GetPlayer(guid);
 + 
 +     // cheating and other check
 +     ReferAFriendError err = _player->GetReferFriendError(target, false);
@@ -492,13 +492,13 @@ index 96400ee..0462e60 100644
                          *data << uint32(0);                 // disable quest object
                  }
 +                // hide RAF flag if need
-+                 else if (index == UNIT_DYNAMIC_FLAGS && GetTypeId() == TYPEID_PLAYER)
-+                 {
-+                     if (!((Player*)this)->IsReferAFriendLinked(target))
-+                         *data << (m_uint32Values[index] & ~UNIT_DYNFLAG_REFER_A_FRIEND);
-+                     else
-+                         *data << m_uint32Values[index];
-+                 }
++                else if (index == UNIT_DYNAMIC_FLAGS && GetTypeId() == TYPEID_PLAYER)
++                {
++                    if (!((Player*)this)->IsReferAFriendLinked(target))
++                        *data << (m_uint32Values[index] & ~UNIT_DYNFLAG_REFER_A_FRIEND);
++                    else
++                        *data << m_uint32Values[index];
++                }
                  else
                      *data << m_uint32Values[index];         // other cases
              }
@@ -753,7 +753,7 @@ index 98b3657..6198d80 100644
  };
 +
 +// Refer-A-Friend
-+void Player::SendReferFriendError(ReferAFriendError err, Player * target)
++void Player::SendReferFriendError(ReferAFriendError err, Player* target)
 +{
 +    WorldPacket data(SMSG_REFER_A_FRIEND_ERROR, 24);
 +    data << uint32(err);
@@ -763,7 +763,7 @@ index 98b3657..6198d80 100644
 +    GetSession()->SendPacket(&data);
 +}
 +
-+ReferAFriendError Player::GetReferFriendError(Player * target, bool summon)
++ReferAFriendError Player::GetReferFriendError(Player* target, bool summon)
 +{
 +    if (!target || target->GetTypeId() != TYPEID_PLAYER)
 +        return summon ? ERR_REFER_A_FRIEND_SUMMON_OFFLINE_S : ERR_REFER_A_FRIEND_NO_TARGET;
@@ -966,15 +966,15 @@ index 8ecbac9..fdab1dc 100644
 +         /*********************************************************/
 +         /***              REFER-A-FRIEND SYSTEM                ***/
 +         /*********************************************************/
-+         void SendReferFriendError(ReferAFriendError err, Player * target = NULL);
-+         ReferAFriendError GetReferFriendError(Player * target, bool summon);
++         void SendReferFriendError(ReferAFriendError err, Player* target = NULL);
++         ReferAFriendError GetReferFriendError(Player* target, bool summon);
 +         void AccessGrantableLevel(ObjectGuid guid) { m_curGrantLevelGiverGuid = guid; }
 +         bool IsAccessGrantableLevel(ObjectGuid guid) { return m_curGrantLevelGiverGuid == guid; }
 +         uint32 GetGrantableLevels() { return m_GrantableLevelsCount; }
 +         void ChangeGrantableLevels(uint8 increase = 0);
 +         bool CheckRAFConditions();
 +         AccountLinkedState GetAccountLinkedState();
-+         bool IsReferAFriendLinked(Player * target);
++         bool IsReferAFriendLinked(Player* target);
 +         void LoadAccountLinkedState();
 +         std::vector<uint32> m_referredAccounts;
 +         std::vector<uint32> m_referalAccounts;
@@ -1083,9 +1083,9 @@ index a1f92f5..48a9646 100644
  
                  Player* target = sObjectMgr.GetPlayer(((Player*)m_caster)->GetSelectionGuid());
 -                if (!target || ((Player*)m_caster) == target || !target->IsInSameRaidWith((Player*)m_caster))
-+                 if ( !target || ((Player*)m_caster) == target)
-+                     return SPELL_FAILED_BAD_TARGETS;
-+                 if (!target->IsInSameRaidWith((Player*)m_caster) && m_spellInfo->Id != 48955)
++                if ( !target || ((Player*)m_caster) == target)
++                    return SPELL_FAILED_BAD_TARGETS;
++                if (!target->IsInSameRaidWith((Player*)m_caster) && m_spellInfo->Id != 48955)
                      return SPELL_FAILED_BAD_TARGETS;
  
                  // check if our map is dungeon
@@ -1214,7 +1214,7 @@ index abfd0db..3a82d92 100644
 +        // Refer-A-Friend
 +        void HandleGrantLevel(WorldPacket& recv_data);
 +        void HandleAcceptGrantLevel(WorldPacket& recv_data);
-+ 
++
      private:
          // private trade methods
          void moveItems(Item* myItems[], Item* hisItems[]);

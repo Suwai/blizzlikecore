@@ -1,75 +1,44 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #ifndef BLIZZLIKE_MAPMANAGER_H
 #define BLIZZLIKE_MAPMANAGER_H
 
-#include "Common.h"
 #include "Platform/Define.h"
 #include "Policies/Singleton.h"
-#include "ace/Recursive_Thread_Mutex.h"
+#include "ace/Thread_Mutex.h"
+#include "Common.h"
 #include "Map.h"
 #include "GridStates.h"
+#include "MapUpdater.h"
 
 class Transport;
-class BattleGround;
 
-struct BLIZZLIKE_DLL_DECL MapID
+class MapManager : public BlizzLike::Singleton<MapManager, BlizzLike::ClassLevelLockable<MapManager, ACE_Thread_Mutex> >
 {
-    explicit MapID(uint32 id) : nMapId(id), nInstanceId(0) {}
-    MapID(uint32 id, uint32 instid) : nMapId(id), nInstanceId(instid) {}
 
-    bool operator<(const MapID& val) const
-    {
-        if (nMapId == val.nMapId)
-            return nInstanceId < val.nInstanceId;
-
-        return nMapId < val.nMapId;
-    }
-
-    bool operator==(const MapID& val) const { return nMapId == val.nMapId && nInstanceId == val.nInstanceId; }
-
-    uint32 nMapId;
-    uint32 nInstanceId;
-};
-
-class BLIZZLIKE_DLL_DECL MapManager : public BlizzLike::Singleton<MapManager, BlizzLike::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> >
-{
-        friend class BlizzLike::OperatorNew<MapManager>;
-
-        typedef ACE_Recursive_Thread_Mutex LOCK_TYPE;
-        typedef ACE_Guard<LOCK_TYPE> LOCK_TYPE_GUARD;
-        typedef BlizzLike::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex>::Lock Guard;
+    friend class BlizzLike::OperatorNew<MapManager>;
+    typedef UNORDERED_MAP<uint32, Map*> MapMapType;
+    typedef std::pair<UNORDERED_MAP<uint32, Map*>::iterator, bool>  MapMapPair;
 
     public:
-        typedef std::map<MapID, Map* > MapMapType;
 
-        Map* CreateMap(uint32, const WorldObject* obj);
-        Map* CreateBgMap(uint32 mapid, BattleGround* bg);
+        Map* CreateMap(uint32, const WorldObject* obj, uint32 instanceId);
+        Map const* CreateBaseMap(uint32 id) const { return const_cast<MapManager*>(this)->_createBaseMap(id); }
         Map* FindMap(uint32 mapid, uint32 instanceId = 0) const;
 
-        void UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid, GridInfo& ginfo, const uint32& x, const uint32& y, const uint32& t_diff);
-
-        // only const version for outer users
-        void DeleteInstance(uint32 mapid, uint32 instanceId);
+        uint16 GetAreaFlag(uint32 mapid, float x, float y, float z) const
+        {
+            Map const* m = CreateBaseMap(mapid);
+            return m->GetAreaFlag(x, y, z);
+        }
+        uint32 GetAreaId(uint32 mapid, float x, float y, float z) { return Map::GetAreaId(GetAreaFlag(mapid, x, y, z),mapid); }
+        uint32 GetZoneId(uint32 mapid, float x, float y, float z) { return Map::GetZoneId(GetAreaFlag(mapid, x, y, z),mapid); }
 
         void Initialize(void);
-        void Update(uint32);
+        void Update(time_t);
 
         void SetGridCleanUpDelay(uint32 t)
         {
@@ -88,30 +57,30 @@ class BLIZZLIKE_DLL_DECL MapManager : public BlizzLike::Singleton<MapManager, Bl
             i_timer.Reset();
         }
 
-        // void LoadGrid(int mapid, int instId, float x, float y, const WorldObject* obj, bool no_unload = false);
+        //void LoadGrid(int mapid, float x, float y, const WorldObject* obj, bool no_unload = false);
         void UnloadAll();
 
         static bool ExistMapAndVMap(uint32 mapid, float x, float y);
         static bool IsValidMAP(uint32 mapid);
 
-        static bool IsValidMapCoord(uint32 mapid, float x, float y)
+        static bool IsValidMapCoord(uint32 mapid, float x,float y)
         {
-            return IsValidMAP(mapid) && BlizzLike::IsValidMapCoord(x, y);
+            return IsValidMAP(mapid) && BlizzLike::IsValidMapCoord(x,y);
         }
 
-        static bool IsValidMapCoord(uint32 mapid, float x, float y, float z)
+        static bool IsValidMapCoord(uint32 mapid, float x,float y,float z)
         {
-            return IsValidMAP(mapid) && BlizzLike::IsValidMapCoord(x, y, z);
+            return IsValidMAP(mapid) && BlizzLike::IsValidMapCoord(x,y,z);
         }
 
-        static bool IsValidMapCoord(uint32 mapid, float x, float y, float z, float o)
+        static bool IsValidMapCoord(uint32 mapid, float x,float y,float z,float o)
         {
-            return IsValidMAP(mapid) && BlizzLike::IsValidMapCoord(x, y, z, o);
+            return IsValidMAP(mapid) && BlizzLike::IsValidMapCoord(x,y,z,o);
         }
 
         static bool IsValidMapCoord(WorldLocation const& loc)
         {
-            return IsValidMapCoord(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
+            return IsValidMapCoord(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation());
         }
 
         // modulos a radian orientation to the range of 0..2PI
@@ -121,24 +90,25 @@ class BLIZZLIKE_DLL_DECL MapManager : public BlizzLike::Singleton<MapManager, Bl
             // to emulate negative numbers
             if (o < 0)
             {
-                float mod = o * -1;
-                mod = fmod(mod, 2.0f * M_PI_F);
-                mod = -mod + 2.0f * M_PI_F;
+                float mod = o *-1;
+                mod = fmod(mod, 2.0f * static_cast<float>(M_PI));
+                mod = -mod + 2.0f * M_PI;
                 return mod;
             }
-            return fmod(o, 2.0f * M_PI_F);
+            return fmod(o, 2.0f * static_cast<float>(M_PI));
         }
 
-        void RemoveAllObjectsInRemoveList();
+        void DoDelayedMovesAndRemoves();
 
         void LoadTransports();
 
-        typedef std::set<Transport*> TransportSet;
+        typedef std::set<Transport *> TransportSet;
         TransportSet m_Transports;
 
         typedef std::map<uint32, TransportSet> TransportMap;
         TransportMap m_TransportsByMap;
 
+        bool CanPlayerEnter(uint32 mapid, Player* player);
         uint32 GenerateInstanceId() { return ++i_MaxInstanceId; }
         void InitMaxInstanceId();
         void InitializeVisibilityDistanceInfo();
@@ -147,50 +117,32 @@ class BLIZZLIKE_DLL_DECL MapManager : public BlizzLike::Singleton<MapManager, Bl
         uint32 GetNumInstances();
         uint32 GetNumPlayersInInstances();
 
-
-        // get list of all maps
-        const MapMapType& Maps() const { return i_maps; }
-
-        template<typename Do>
-        void DoForAllMapsWithMapId(uint32 mapId, Do& _do);
-
     private:
-
         // debugging code, should be deleted some day
-        GridState* si_GridStates[MAX_GRID_STATE];
+        void checkAndCorrectGridStatesArray();              // just for debugging to find some memory overwrites
+        GridState* i_GridStates[MAX_GRID_STATE];            // shadow entries to the global array in Map.cpp
         int i_GridStateErrorCount;
-
     private:
-
         MapManager();
         ~MapManager();
 
-        MapManager(const MapManager&);
-        MapManager& operator=(const MapManager&);
+        MapManager(const MapManager &);
+        MapManager& operator=(const MapManager &);
 
-        void InitStateMachine();
-        void DeleteStateMachine();
+        Map* _createBaseMap(uint32 id);
+        Map* _findMap(uint32 id) const
+        {
+            MapMapType::const_iterator iter = i_maps.find(id);
+            return (iter == i_maps.end() ? NULL : iter->second);
+        }
 
-        Map* CreateInstance(uint32 id, Player* player);
-        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, Difficulty difficulty, DungeonPersistentState* save = NULL);
-        BattleGroundMap* CreateBattleGroundMap(uint32 id, uint32 InstanceId, BattleGround* bg);
-
+        typedef BlizzLike::ClassLevelLockable<MapManager, ACE_Thread_Mutex>::Lock Guard;
         uint32 i_gridCleanUpDelay;
         MapMapType i_maps;
         IntervalTimer i_timer;
 
         uint32 i_MaxInstanceId;
+        MapUpdater m_updater;
 };
-
-template<typename Do>
-inline void MapManager::DoForAllMapsWithMapId(uint32 mapId, Do& _do)
-{
-    MapMapType::const_iterator start = i_maps.lower_bound(MapID(mapId, 0));
-    MapMapType::const_iterator end   = i_maps.lower_bound(MapID(mapId + 1, 0));
-    for (MapMapType::const_iterator itr = start; itr != end; ++itr)
-        _do(itr->second);
-}
-
-#define sMapMgr MapManager::Instance()
-
 #endif
+

@@ -1,231 +1,150 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #include "Totem.h"
 #include "WorldPacket.h"
+#include "MapManager.h"
 #include "Log.h"
 #include "Group.h"
 #include "Player.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
-#include "DBCStores.h"
-#include "CreatureAI.h"
-#include "InstanceData.h"
 
-Totem::Totem() : Creature(CREATURE_SUBTYPE_TOTEM)
+Totem::Totem(SummonPropertiesEntry const *properties, Unit* owner) : Minion(properties, owner)
 {
+    m_summonMask |= SUMMON_MASK_TOTEM;
     m_duration = 0;
     m_type = TOTEM_PASSIVE;
 }
 
-bool Totem::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, Unit* owner)
+void Totem::Update(uint32 time)
 {
-    SetMap(cPos.GetMap());
-
-    Team team = owner->GetTypeId() == TYPEID_PLAYER ? ((Player*)owner)->GetTeam() : TEAM_NONE;
-
-    if (!CreateFromProto(guidlow, cinfo, team))
-        return false;
-
-    // special model selection case for totems
-    if (owner->GetTypeId() == TYPEID_PLAYER)
-    {
-        if (uint32 modelid_race = sObjectMgr.GetModelForRace(GetNativeDisplayId(), owner->getRaceMask()))
-            SetDisplayId(modelid_race);
-    }
-
-    cPos.SelectFinalPoint(this);
-
-    // totem must be at same Z in case swimming caster and etc.
-    if (fabs(cPos.m_pos.z - owner->GetPositionZ()) > 5.0f)
-        cPos.m_pos.z = owner->GetPositionZ();
-
-    if (!cPos.Relocate(this))
-        return false;
-
-    // Notify the map's instance data.
-    // Only works if you create the object in it, not if it is moves to that map.
-    // Normally non-players do not teleport to other maps.
-    if (InstanceData* iData = GetMap()->GetInstanceData())
-        iData->OnCreatureCreate(this);
-
-    LoadCreatureAddon(false);
-
-    return true;
-}
-
-void Totem::Update(uint32 update_diff, uint32 time)
-{
-    Unit* owner = GetOwner();
-    if (!owner || !owner->isAlive() || !isAlive())
+    if (!m_owner->isAlive() || !isAlive())
     {
         UnSummon();                                         // remove self
         return;
     }
 
-    if (m_duration <= update_diff)
+    if (m_duration <= time)
     {
         UnSummon();                                         // remove self
         return;
     }
     else
-        m_duration -= update_diff;
+        m_duration -= time;
 
-    Creature::Update(update_diff, time);
+    Creature::Update(time);
 }
 
-void Totem::Summon(Unit* owner)
+void Totem::InitStats(uint32 duration)
 {
-    AIM_Initialize();
-    owner->GetMap()->Add((Creature*)this);
+    Minion::InitStats(duration);
 
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
-    data << GetObjectGuid();
-    SendMessageToSet(&data, true);
-
-    if (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->AI())
-        ((Creature*)owner)->AI()->JustSummoned((Creature*)this);
-
-    // there are some totems, which exist just for their visual appeareance
-    if (!GetSpell())
-        return;
-
-    switch (m_type)
+    CreatureInfo const *cinfo = GetCreatureInfo();
+    if (m_owner->GetTypeId() == TYPEID_PLAYER && cinfo)
     {
-        case TOTEM_PASSIVE:
-            CastSpell(this, GetSpell(), true);
-            break;
-        case TOTEM_STATUE:
-            CastSpell(GetOwner(), GetSpell(), true);
-            break;
-        default: break;
-    }
-}
-
-void Totem::UnSummon()
-{
-    SendObjectDeSpawnAnim(GetObjectGuid());
-
-    CombatStop();
-    RemoveAurasDueToSpell(GetSpell());
-
-    if (Unit* owner = GetOwner())
-    {
-        owner->_RemoveTotem(this);
-        owner->RemoveAurasDueToSpell(GetSpell());
-
-        // remove aura all party members too
-        if (owner->GetTypeId() == TYPEID_PLAYER)
+        uint32 modelid = 0;
+        if (m_owner->ToPlayer()->GetTeam() == HORDE)
         {
-            // Not only the player can summon the totem (scripted AI)
-            if (Group* pGroup = ((Player*)owner)->GetGroup())
-            {
-                for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
-                {
-                    Player* Target = itr->getSource();
-                    if (Target && pGroup->SameSubGroup((Player*)owner, Target))
-                        Target->RemoveAurasDueToSpell(GetSpell());
-                }
-            }
+            if (cinfo->Modelid_H1)
+                modelid = cinfo->Modelid_H1;
+            else if (cinfo->Modelid_H2)
+                modelid = cinfo->Modelid_H2;
         }
-
-        if (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->AI())
-            ((Creature*)owner)->AI()->SummonedCreatureDespawn((Creature*)this);
+        else
+        {
+            if (cinfo->Modelid_A1)
+                modelid = cinfo->Modelid_A1;
+            else if (cinfo->Modelid_A2)
+                modelid = cinfo->Modelid_A2;
+        }
+        if (modelid)
+            SetDisplayId(modelid);
+        else
+            sLog.outErrorDb("Totem::Summon: Missing modelid information for entry %u, team %u, totem will use default values.",GetEntry(),m_owner->ToPlayer()->GetTeam());
     }
 
-    // any totem unsummon look like as totem kill, req. for proper animation
-    if (isAlive())
-        SetDeathState(DEAD);
-
-    AddObjectToRemoveList();
-}
-
-void Totem::SetOwner(Unit* owner)
-{
-    SetCreatorGuid(owner->GetObjectGuid());
-    SetOwnerGuid(owner->GetObjectGuid());
-    setFaction(owner->getFaction());
-    SetLevel(owner->getLevel());
-}
-
-Unit* Totem::GetOwner()
-{
-    if (ObjectGuid ownerGuid = GetOwnerGuid())
-        return ObjectAccessor::GetUnit(*this, ownerGuid);
-
-    return NULL;
-}
-
-void Totem::SetTypeBySummonSpell(SpellEntry const* spellProto)
-{
     // Get spell casted by totem
-    SpellEntry const* totemSpell = sSpellStore.LookupEntry(GetSpell());
+    SpellEntry const * totemSpell = sSpellStore.LookupEntry(GetSpell());
     if (totemSpell)
     {
         // If spell have cast time -> so its active totem
         if (GetSpellCastTime(totemSpell))
             m_type = TOTEM_ACTIVE;
     }
-    if (spellProto->SpellIconID == 2056)
-        m_type = TOTEM_STATUE;                              // Jewelery statue
+
+    if (GetEntry() == SENTRY_TOTEM_ENTRY)
+        SetReactState(REACT_AGGRESSIVE);
+
+    m_duration = duration;
+
+    SetLevel(m_owner->getLevel());
 }
 
-bool Totem::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const
+void Totem::InitSummon()
 {
-    // Check for Mana Spring & Healing Stream totems
-    switch (spellInfo->SpellFamilyName)
-    {
-        case SPELLFAMILY_SHAMAN:
-            if (spellInfo->IsFitToFamilyMask(UI64LIT(0x00000002000)) ||
-                    spellInfo->IsFitToFamilyMask(UI64LIT(0x00000004000)))
-                return false;
-            break;
-        default:
-            break;
-    }
+    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
+    data << GetGUID();
+    SendMessageToSet(&data, true);
 
-    switch (spellInfo->Effect[index])
-    {
-        case SPELL_EFFECT_ATTACK_ME:
-            // immune to any type of regeneration effects hp/mana etc.
-        case SPELL_EFFECT_HEAL:
-        case SPELL_EFFECT_HEAL_MAX_HEALTH:
-        case SPELL_EFFECT_HEAL_MECHANICAL:
-        case SPELL_EFFECT_HEAL_PCT:
-        case SPELL_EFFECT_ENERGIZE:
-        case SPELL_EFFECT_ENERGIZE_PCT:
-            return true;
-        default:
-            break;
-    }
-
-    if (!IsPositiveSpell(spellInfo))
-    {
-        // immune to all negative auras
-        if (IsAuraApplyEffect(spellInfo, index))
-            return true;
-    }
-    else
-    {
-        // immune to any type of regeneration auras hp/mana etc.
-        if (IsPeriodicRegenerateEffect(spellInfo, index))
-            return true;
-    }
-
-    return Creature::IsImmuneToSpellEffect(spellInfo, index, castOnSelf);
+    if (m_type == TOTEM_PASSIVE)
+        CastSpell(this, GetSpell(), true);
 }
+
+void Totem::UnSummon()
+{
+    SendObjectDeSpawnAnim(GetGUID());
+
+    CombatStop();
+    RemoveAurasDueToSpell(GetSpell());
+
+    // clear owner's totem slot
+    for (int i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
+    {
+        if (m_owner->m_SummonSlot[i] == GetGUID())
+        {
+            m_owner->m_SummonSlot[i] = 0;
+            break;
+        }
+    }
+
+    m_owner->RemoveAurasDueToSpell(GetSpell());
+
+    //remove aura all party members too
+    Group *pGroup = NULL;
+    if (m_owner->GetTypeId() == TYPEID_PLAYER)
+    {
+        // Not only the player can summon the totem (scripted AI)
+        pGroup = m_owner->ToPlayer()->GetGroup();
+        if (pGroup)
+        {
+            for (GroupReference* itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+            {
+                Player* Target = itr->getSource();
+                if (Target && pGroup->SameSubGroup(m_owner->ToPlayer(), Target))
+                    Target->RemoveAurasDueToSpell(GetSpell());
+            }
+        }
+    }
+
+    AddObjectToRemoveList();
+}
+
+bool Totem::IsImmunedToSpellEffect(SpellEntry const* spellInfo, uint32 index) const
+{
+    // TODO: possibly all negative auras immuned?
+    switch (spellInfo->EffectApplyAuraName[index])
+    {
+        case SPELL_AURA_PERIODIC_DAMAGE:
+        case SPELL_AURA_PERIODIC_LEECH:
+        case SPELL_AURA_MOD_FEAR:
+        case SPELL_AURA_TRANSFORM:
+            return true;
+        default:
+            break;
+    }
+    return Creature::IsImmunedToSpellEffect(spellInfo, index);
+}
+

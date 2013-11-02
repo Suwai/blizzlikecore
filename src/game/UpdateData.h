@@ -1,27 +1,12 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #ifndef __UPDATEDATA_H
 #define __UPDATEDATA_H
 
 #include "ByteBuffer.h"
-#include "ObjectGuid.h"
-
 class WorldPacket;
 
 enum ObjectUpdateType
@@ -51,20 +36,21 @@ class UpdateData
     public:
         UpdateData();
 
-        void AddOutOfRangeGUID(GuidSet& guids);
-        void AddOutOfRangeGUID(ObjectGuid const& guid);
-        void AddUpdateBlock(const ByteBuffer& block);
+        void AddOutOfRangeGUID(std::set<uint64>& guids);
+        void AddOutOfRangeGUID(const uint64 &guid);
+        void AddUpdateBlock(const ByteBuffer &block);
         bool BuildPacket(WorldPacket* packet, bool hasTransport = false);
         bool HasData() { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
         void Clear();
 
-        GuidSet const& GetOutOfRangeGUIDs() const { return m_outOfRangeGUIDs; }
+        std::set<uint64> const& GetOutOfRangeGUIDs() const { return m_outOfRangeGUIDs; }
 
     protected:
         uint32 m_blockCount;
-        GuidSet m_outOfRangeGUIDs;
+        std::set<uint64> m_outOfRangeGUIDs;
         ByteBuffer m_data;
 
-        void Compress(void* dst, uint32* dst_size, void* src, int src_size);
+        void Compress(void* dst, uint32 *dst_size, void* src, int src_size);
 };
 #endif
+

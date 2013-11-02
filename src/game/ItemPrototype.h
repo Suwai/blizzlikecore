@@ -1,19 +1,6 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #ifndef _ITEMPROTOTYPE_H
@@ -66,7 +53,7 @@ enum ItemSpelltriggerType
     ITEM_SPELLTRIGGER_ON_EQUIP        = 1,
     ITEM_SPELLTRIGGER_CHANCE_ON_HIT   = 2,
     ITEM_SPELLTRIGGER_SOULSTONE       = 4,
-    ITEM_SPELLTRIGGER_ON_STORE        = 5,                  // casted at add item to inventory/equip, applied aura removed at remove item, item deleted at aura cancel/expire/etc
+    ITEM_SPELLTRIGGER_ON_NO_DELAY_USE = 5,                  // no equip cooldown
     ITEM_SPELLTRIGGER_LEARN_SPELL_ID  = 6                   // used in item_template.spell_2 with spell_id with SPELL_GENERIC_LEARN in spell_1
 };
 
@@ -76,7 +63,7 @@ enum ItemBondingType
 {
     NO_BIND                                     = 0,
     BIND_WHEN_PICKED_UP                         = 1,
-    BIND_WHEN_EQUIPPED                          = 2,
+    BIND_WHEN_EQUIPED                           = 2,
     BIND_WHEN_USE                               = 3,
     BIND_QUEST_ITEM                             = 4,
     BIND_QUEST_ITEM1                            = 5         // not used in game
@@ -84,38 +71,26 @@ enum ItemBondingType
 
 #define MAX_BIND_TYPE                             6
 
-// Mask for ItemPrototype.Flags field
-enum ItemPrototypeFlags
+// masks for ITEM_FIELD_FLAGS field
+enum ITEM_FLAGS
 {
-    ITEM_FLAG_UNK0                            = 0x00000001, // not used
-    ITEM_FLAG_CONJURED                        = 0x00000002,
-    ITEM_FLAG_LOOTABLE                        = 0x00000004, // affect only non container items that can be "open" for loot. It or lockid set enable for client show "Right click to open". See also ITEM_DYNFLAG_UNLOCKED
-    ITEM_FLAG_UNK3                            = 0x00000008, // not used in pre-3.x
-    ITEM_FLAG_UNK4                            = 0x00000010, // can't repeat old note: appears red icon (like when item durability==0)
-    ITEM_FLAG_INDESTRUCTIBLE                  = 0x00000020, // used for totem. Item can not be destroyed, except by using spell (item can be reagent for spell and then allowed)
-    ITEM_FLAG_UNK6                            = 0x00000040, // ? old note: usable
-    ITEM_FLAG_NO_EQUIP_COOLDOWN               = 0x00000080,
-    ITEM_FLAG_UNK8                            = 0x00000100, // saw this on item 47115, 49295...
-    ITEM_FLAG_WRAPPER                         = 0x00000200, // used or not used wrapper
-    ITEM_FLAG_IGNORE_BAG_SPACE                = 0x00000400, // ignore bag space at new item creation?
-    ITEM_FLAG_PARTY_LOOT                      = 0x00000800, // determines if item is party loot or not
-    ITEM_FLAG_UNK12                           = 0x00001000, // not used in pre-3.x
-    ITEM_FLAG_CHARTER                         = 0x00002000, // arena/guild charter
-    ITEM_FLAG_UNK14                           = 0x00004000,
-    ITEM_FLAG_UNK15                           = 0x00008000, // a lot of items have this
-    ITEM_FLAG_UNK16                           = 0x00010000, // a lot of items have this
-    ITEM_FLAG_UNK17                           = 0x00020000,
-    ITEM_FLAG_PROSPECTABLE                    = 0x00040000, // item can have prospecting loot (in fact some items expected have empty loot)
-    ITEM_FLAG_UNIQUE_EQUIPPED                 = 0x00080000,
-    ITEM_FLAG_UNK20                           = 0x00100000,
-    ITEM_FLAG_USEABLE_IN_ARENA                = 0x00200000,
-    ITEM_FLAG_THROWABLE                       = 0x00400000, // Only items of ITEM_SUBCLASS_WEAPON_THROWN have it but not all, so can't be used as in game check
-    ITEM_FLAG_SPECIALUSE                      = 0x00800000, // last used flag in 2.3.0
+    ITEM_FLAGS_BINDED                         = 0x00000001, // set in game at binding, not set in template
+    ITEM_FLAGS_CONJURED                       = 0x00000002,
+    ITEM_FLAGS_OPENABLE                       = 0x00000004,
+    ITEM_FLAGS_WRAPPED                        = 0x00000008,
+    ITEM_FLAGS_WRAPPER                        = 0x00000200, // used or not used wrapper
+    ITEM_FLAGS_PARTY_LOOT                     = 0x00000800, // determines if item is party loot or not
+    ITEM_FLAGS_CHARTER                        = 0x00002000, // arena/guild charter
+    ITEM_FLAGS_UNIQUE_EQUIPPED                = 0x00080000,
+    ITEM_FLAGS_USEABLE_IN_ARENA               = 0x00200000,
+    ITEM_FLAGS_THROWABLE                      = 0x00400000, // not used in game for check trow possibility, only for item in game tooltip
+    ITEM_FLAGS_SPECIALUSE                     = 0x00800000, // last used flag in 2.3.0
+    ITEM_FLAGS_BOA                            = 0x08000000, // bind on account (set in template for items that can binded in like way)
+    ITEM_FLAGS_MILLABLE                       = 0x20000000
 };
 
-enum BagFamilyMask
+enum BAG_FAMILY_MASK
 {
-    BAG_FAMILY_MASK_NONE                      = 0x00000000,
     BAG_FAMILY_MASK_ARROWS                    = 0x00000001,
     BAG_FAMILY_MASK_BULLETS                   = 0x00000002,
     BAG_FAMILY_MASK_SOUL_SHARDS               = 0x00000004,
@@ -195,7 +170,7 @@ enum ItemClass
     ITEM_CLASS_QUEST                            = 12,
     ITEM_CLASS_KEY                              = 13,
     ITEM_CLASS_PERMANENT                        = 14,
-    ITEM_CLASS_MISC                             = 15
+    ITEM_CLASS_JUNK                             = 15
 };
 
 #define MAX_ITEM_CLASS                            16
@@ -446,16 +421,8 @@ inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemS
     return 0;
 }
 
-enum ItemExtraFlags
-{
-    ITEM_EXTRA_NON_CONSUMABLE     = 0x01,                   // use as additional flag to spellcharges_N negative values, item not expire at no chanrges
-    ITEM_EXTRA_REAL_TIME_DURATION = 0x02,                   // if set and have Duration time, then offline time included in counting, if not set then counted only in game time
-
-    ITEM_EXTRA_ALL                = 0x03                    // all used flags, used for check DB data (mask all above flags)
-};
-
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -490,11 +457,6 @@ struct _Socket
     uint32 Content;
 };
 
-#define MAX_ITEM_PROTO_DAMAGES 5
-#define MAX_ITEM_PROTO_SOCKETS 3
-#define MAX_ITEM_PROTO_SPELLS  5
-#define MAX_ITEM_PROTO_STATS  10
-
 struct ItemPrototype
 {
     uint32 ItemId;
@@ -523,8 +485,8 @@ struct ItemPrototype
     uint32 MaxCount;
     uint32 Stackable;
     uint32 ContainerSlots;
-    _ItemStat ItemStat[MAX_ITEM_PROTO_STATS];
-    _Damage Damage[MAX_ITEM_PROTO_DAMAGES];
+    _ItemStat ItemStat[10];
+    _Damage Damage[5];
     uint32 Armor;
     uint32 HolyRes;
     uint32 FireRes;
@@ -535,7 +497,7 @@ struct ItemPrototype
     uint32 Delay;
     uint32 AmmoType;
     float  RangedModRange;
-    _Spell Spells[MAX_ITEM_PROTO_SPELLS];
+    _Spell Spells[5];
     uint32 Bonding;
     char*  Description;
     uint32 PageText;
@@ -552,20 +514,19 @@ struct ItemPrototype
     uint32 MaxDurability;
     uint32 Area;                                            // id from AreaTable.dbc
     uint32 Map;                                             // id from Map.dbc
-    uint32 BagFamily;                                       // bit mask (1 << id from ItemBagFamily.dbc)
+    uint32 BagFamily;                                       // id from ItemBagFamily.dbc
     uint32 TotemCategory;                                   // id from TotemCategory.dbc
-    _Socket Socket[MAX_ITEM_PROTO_SOCKETS];
+    _Socket Socket[3];
     uint32 socketBonus;                                     // id from SpellItemEnchantment.dbc
     uint32 GemProperties;                                   // id from GemProperties.dbc
-    int32 RequiredDisenchantSkill;
+    uint32 RequiredDisenchantSkill;
     float  ArmorDamageModifier;
     uint32 ScriptId;
     uint32 DisenchantID;
     uint32 FoodType;
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
-    uint32 Duration;
-    uint32 ExtraFlags;                                      // see ItemExtraFlags
+    int32 Duration;                                         // negative = realtime, positive = ingame time
 
     // helpers
     bool CanChangeEquipStateInCombat() const
@@ -587,19 +548,7 @@ struct ItemPrototype
 
         return false;
     }
-
-    uint32 GetMaxStackSize() const { return Stackable; }
-
-    bool IsPotion() const { return Class == ITEM_CLASS_CONSUMABLE && SubClass == ITEM_SUBCLASS_POTION; }
-    bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
 };
-
-// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
 
 struct ItemLocale
 {
@@ -607,4 +556,11 @@ struct ItemLocale
     std::vector<std::string> Description;
 };
 
+// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
+#if defined(__GNUC__)
+#pragma pack()
+#else
+#pragma pack(pop)
 #endif
+#endif
+

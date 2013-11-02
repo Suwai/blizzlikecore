@@ -1,19 +1,6 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #ifndef _THREATMANAGER
@@ -23,7 +10,7 @@
 #include "SharedDefines.h"
 #include "Utilities/LinkedReference/Reference.h"
 #include "UnitEvents.h"
-#include "ObjectGuid.h"
+
 #include <list>
 
 //==============================================================
@@ -39,33 +26,29 @@ struct SpellEntry;
 class ThreatCalcHelper
 {
     public:
-        static float CalcThreat(Unit* pHatedUnit, Unit* pHatingUnit, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* threatSpell);
+        static float calcThreat(Unit* pHatedUnit, Unit* pHatingUnit, float threat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellEntry const *threatSpell = NULL);
 };
 
 //==============================================================
-class BLIZZLIKE_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
+class HostileReference : public Reference<Unit, ThreatManager>
 {
     public:
-        HostileReference(Unit* pUnit, ThreatManager* pThreatManager, float pThreat);
+        HostileReference(Unit* pUnit, ThreatManager *pThreatManager, float pThreat);
 
         //=================================================
         void addThreat(float pMod);
 
         void setThreat(float pThreat) { addThreat(pThreat - getThreat()); }
 
-        void addThreatPercent(int32 pPercent)
-        {
-            // for special -100 case avoid rounding
-            addThreat(pPercent == -100 ? -iThreat : iThreat * pPercent / 100.0f);
-        }
+        void addThreatPercent(int32 pPercent) { float tmpThreat = iThreat; tmpThreat = tmpThreat * (pPercent+100) / 100; addThreat(tmpThreat-iThreat); }
 
         float getThreat() const { return iThreat; }
 
         bool isOnline() const { return iOnline; }
 
         // The Unit might be in water and the creature can not enter the water, but has range attack
-        // in this case online = true, but accessable = false
-        bool isAccessable() const { return iAccessible; }
+        // in this case online = true, but accessible = false
+        bool isAccessible() const { return iAccessible; }
 
         // used for temporary setting a threat and reducting it later again.
         // the threat modification is stored
@@ -90,11 +73,11 @@ class BLIZZLIKE_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager
         void setAccessibleState(bool pIsAccessible);
         //=================================================
 
-        bool operator ==(const HostileReference& pHostileReference) const { return pHostileReference.getUnitGuid() == getUnitGuid(); }
+        bool operator == (const HostileReference& pHostileReference) const { return pHostileReference.getUnitGuid() == getUnitGuid(); }
 
         //=================================================
 
-        ObjectGuid const& getUnitGuid() const { return iUnitGuid; }
+        uint64 getUnitGuid() const { return iUnitGuid; }
 
         //=================================================
         // reference is not needed anymore. realy delete it !
@@ -108,13 +91,13 @@ class BLIZZLIKE_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager
         //=================================================
 
         // Tell our refTo (target) object that we have a link
-        void targetObjectBuildLink() override;
+        void targetObjectBuildLink();
 
         // Tell our refTo (taget) object, that the link is cut
-        void targetObjectDestroyLink() override;
+        void targetObjectDestroyLink();
 
         // Tell our refFrom (source) object, that the link is cut (Target destroyed)
-        void sourceObjectDestroyLink() override;
+        void sourceObjectDestroyLink();
     private:
         // Inform the source, that the status of that reference was changed
         void fireStatusChanged(ThreatRefStatusChangeEvent& pThreatRefStatusChangeEvent);
@@ -123,7 +106,7 @@ class BLIZZLIKE_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager
     private:
         float iThreat;
         float iTempThreatModifyer;                          // used for taunt
-        ObjectGuid iUnitGuid;
+        uint64 iUnitGuid;
         bool iOnline;
         bool iAccessible;
 };
@@ -131,13 +114,10 @@ class BLIZZLIKE_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager
 //==============================================================
 class ThreatManager;
 
-typedef std::list<HostileReference*> ThreatList;
-
-
-class BLIZZLIKE_DLL_SPEC ThreatContainer
+class ThreatContainer
 {
     private:
-        ThreatList iThreatList;
+        std::list<HostileReference*> iThreatList;
         bool iDirty;
     protected:
         friend class ThreatManager;
@@ -159,20 +139,20 @@ class BLIZZLIKE_DLL_SPEC ThreatContainer
 
         void setDirty(bool pDirty) { iDirty = pDirty; }
 
-        bool isDirty() const { return iDirty; }
+        bool isDirty() { return iDirty; }
 
-        bool empty() const { return iThreatList.empty(); }
+        bool empty() { return(iThreatList.empty()); }
 
         HostileReference* getMostHated() { return iThreatList.empty() ? NULL : iThreatList.front(); }
 
         HostileReference* getReferenceByTarget(Unit* pVictim);
 
-        ThreatList const& getThreatList() const { return iThreatList; }
+        std::list<HostileReference*>& getThreatList() { return iThreatList; }
 };
 
 //=================================================
 
-class BLIZZLIKE_DLL_SPEC ThreatManager
+class ThreatManager
 {
     public:
         friend class HostileReference;
@@ -183,23 +163,18 @@ class BLIZZLIKE_DLL_SPEC ThreatManager
 
         void clearReferences();
 
-        void addThreat(Unit* pVictim, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* threatSpell);
-        void addThreat(Unit* pVictim, float threat) { addThreat(pVictim, threat, false, SPELL_SCHOOL_MASK_NONE, NULL); }
-
-        // add threat as raw value (ignore redirections and expection all mods applied already to it
-        void addThreatDirectly(Unit* pVictim, float threat);
-
+        void addThreat(Unit* pVictim, float threat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellEntry const *threatSpell = NULL);
         void modifyThreatPercent(Unit* pVictim, int32 pPercent);
 
         float getThreat(Unit* pVictim, bool pAlsoSearchOfflineList = false);
 
-        bool isThreatListEmpty() const { return iThreatContainer.empty(); }
+        bool isThreatListEmpty() { return iThreatContainer.empty();}
 
         void processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent);
 
         HostileReference* getCurrentVictim() { return iCurrentVictim; }
 
-        Unit*  getOwner() const { return iOwner; }
+        Unit* getOwner() { return iOwner; }
 
         Unit* getHostileTarget();
 
@@ -210,8 +185,14 @@ class BLIZZLIKE_DLL_SPEC ThreatManager
 
         void setDirty(bool pDirty) { iThreatContainer.setDirty(pDirty); }
 
-        // Don't must be used for explicit modify threat values in iterator return pointers
-        ThreatList const& getThreatList() const { return iThreatContainer.getThreatList(); }
+        // methods to access the lists from the outside to do sume dirty manipulation (scriping and such)
+        // I hope they are used as little as possible.
+        inline std::list<HostileReference*>& getThreatList() { return iThreatContainer.getThreatList(); }
+        inline std::list<HostileReference*>& getOfflieThreatList() { return iThreatOfflineContainer.getThreatList(); }
+        inline ThreatContainer& getOnlineContainer() { return iThreatContainer; }
+        inline ThreatContainer& getOfflineContainer() { return iThreatOfflineContainer; }
+
+        void _addThreat(Unit* target, float threat);
     private:
         HostileReference* iCurrentVictim;
         Unit* iOwner;
@@ -221,3 +202,4 @@ class BLIZZLIKE_DLL_SPEC ThreatManager
 
 //=================================================
 #endif
+

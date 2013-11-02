@@ -1,19 +1,6 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #ifndef _PLAYER_DUMP_H
@@ -25,35 +12,29 @@
 
 enum DumpTableType
 {
-    DTT_CHARACTER,      //    -> guid, name                 // characters
+    DTT_CHARACTER,      //                                  // characters
 
-    DTT_CHAR_TABLE,     //                                  // character_action,
-    // character_aura
-    // character_homebind, character_queststatus,
-    // character_reputation, character_spell,
-    // character_spell_cooldown, character_ticket
-
-    DTT_CHAR_NAME_TABLE,// <- guid, name                    // character_declinedname
+    DTT_CHAR_TABLE,     //                                  // character_action, character_aura, character_homebind,
+                                                            // character_queststatus, character_reputation,
+                                                            // character_spell, character_spell_cooldown, character_ticket,
+                                                            // character_tutorial
 
     DTT_INVENTORY,      //    -> item guids collection      // character_inventory
 
     DTT_MAIL,           //    -> mail ids collection        // mail
-    //    -> item_text
+                        //    -> item_text
 
     DTT_MAIL_ITEM,      // <- mail ids                      // mail_items
-    //    -> item guids collection
+                        //    -> item guids collection
 
     DTT_ITEM,           // <- item guids                    // item_instance
-    //    -> item_text
+                        //    -> item_text
 
     DTT_ITEM_GIFT,      // <- item guids                    // character_gifts
-
-    DTT_ITEM_LOOT,      // <- item guids                    // item_loot
 
     DTT_PET,            //    -> pet guids collection       // character_pet
     DTT_PET_TABLE,      // <- pet guids                     // pet_aura, pet_spell, pet_spell_cooldown
     DTT_ITEM_TEXT,      // <- item_text                     // item_text
-    DTT_PET_DECL,       // <- pet guids                     // character_pet_declinedname
 };
 
 enum DumpReturn
@@ -81,7 +62,7 @@ class PlayerDumpWriter : public PlayerDump
     private:
         typedef std::set<uint32> GUIDs;
 
-        void DumpTableContent(std::string& dump, uint32 guid, char const* tableFrom, char const* tableTo, DumpTableType type);
+        void DumpTable(std::string& dump, uint32 guid, char const*tableFrom, char const*tableTo, DumpTableType type);
         std::string GenerateWhereStr(char const* field, GUIDs const& guids, GUIDs::const_iterator& itr);
         std::string GenerateWhereStr(char const* field, uint32 guid);
 
@@ -100,3 +81,4 @@ class PlayerDumpReader : public PlayerDump
 };
 
 #endif
+

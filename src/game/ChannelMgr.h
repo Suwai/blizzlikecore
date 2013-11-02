@@ -1,26 +1,14 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
-#ifndef BLIZZLIKESERVER_CHANNELMGR_H
-#define BLIZZLIKESERVER_CHANNELMGR_H
 
-#include "Common.h"
+#ifndef BLIZZLIKECORE_CHANNELMGR_H
+#define BLIZZLIKECORE_CHANNELMGR_H
+
 #include "Channel.h"
 #include "Policies/Singleton.h"
+#include "World.h"
 
 #include <map>
 #include <string>
@@ -28,21 +16,75 @@
 class ChannelMgr
 {
     public:
-        typedef std::map<std::wstring, Channel*> ChannelMap;
+        typedef std::map<std::string,Channel *> ChannelMap;
         ChannelMgr() {}
-        ~ChannelMgr();
+        ~ChannelMgr()
+        {
+            for (ChannelMap::iterator itr = channels.begin();itr != channels.end(); ++itr)
+                delete itr->second;
+            channels.clear();
+        }
+        Channel *GetJoinChannel(const std::string& name, uint32 channel_id)
+        {
+            if (channels.count(name) == 0)
+            {
+                Channel *nchan = new Channel(name,channel_id);
+                channels[name] = nchan;
+            }
+            return channels[name];
+        }
+        Channel *GetChannel(const std::string& name, Player* p)
+        {
+            ChannelMap::const_iterator i = channels.find(name);
 
-        Channel* GetJoinChannel(std::string name, uint32 channel_id);
-        Channel* GetChannel(std::string name, Player* p, bool pkt = true);
-        void LeftChannel(std::string name);
+            if (i == channels.end())
+            {
+                WorldPacket data;
+                MakeNotOnPacket(&data,name);
+                p->GetSession()->SendPacket(&data);
+                return NULL;
+            }
+            else
+                return i->second;
+        }
+        void LeftChannel(const std::string& name)
+        {
+            ChannelMap::const_iterator i = channels.find(name);
+
+            if (i == channels.end())
+                return;
+
+            Channel* channel = i->second;
+
+            if (channel->GetNumPlayers() == 0 && !channel->IsConstant())
+            {
+                channels.erase(name);
+                delete channel;
+            }
+        }
     private:
         ChannelMap channels;
-        void MakeNotOnPacket(WorldPacket* data, std::string name);
+        void MakeNotOnPacket(WorldPacket* data, const std::string& name)
+        {
+            data->Initialize(SMSG_CHANNEL_NOTIFY, (1+10));  // we guess size
+            (*data) << (uint8)0x05 << name;
+        }
 };
 
 class AllianceChannelMgr : public ChannelMgr {};
 class HordeChannelMgr    : public ChannelMgr {};
 
-ChannelMgr* channelMgr(Team team);
+inline ChannelMgr* channelMgr(uint32 team)
+{
+    if (sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+                                                            //For Test,No Seprate Faction
+        return &BlizzLike::Singleton<AllianceChannelMgr>::Instance();
 
+    if (team == ALLIANCE)
+        return &BlizzLike::Singleton<AllianceChannelMgr>::Instance();
+    if (team == HORDE)
+        return &BlizzLike::Singleton<HordeChannelMgr>::Instance();
+    return NULL;
+}
 #endif
+

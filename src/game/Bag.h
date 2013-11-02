@@ -1,30 +1,16 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #ifndef BLIZZLIKE_BAG_H
 #define BLIZZLIKE_BAG_H
 
-#include "Common.h"
-#include "ItemPrototype.h"
-#include "Item.h"
-
-// Maximum 36 Slots ( (CONTAINER_END - CONTAINER_FIELD_SLOT_1)/2
+// Maximum 36 Slots ((CONTAINER_END - CONTAINER_FIELD_SLOT_1)/2
 #define MAX_BAG_SIZE 36                                     // 2.0.12
+
+#include "Item.h"
+#include "ItemPrototype.h"
 
 class Bag : public Item
 {
@@ -33,33 +19,32 @@ class Bag : public Item
         Bag();
         ~Bag();
 
-        void AddToWorld() override;
-        void RemoveFromWorld() override;
+        void AddToWorld();
+        void RemoveFromWorld();
 
-        bool Create(uint32 guidlow, uint32 itemid, Player const* owner) override;
+        bool Create(uint32 guidlow, uint32 itemid, Player const* owner);
 
         void Clear();
-        void StoreItem(uint8 slot, Item* pItem, bool update);
+        void StoreItem(uint8 slot, Item *pItem, bool update);
         void RemoveItem(uint8 slot, bool update);
 
         Item* GetItemByPos(uint8 slot) const;
-        Item* GetItemByEntry(uint32 item) const;
         uint32 GetItemCount(uint32 item, Item* eItem = NULL) const;
 
-        uint8 GetSlotByItemGUID(ObjectGuid guid) const;
+        uint8 GetSlotByItemGUID(uint64 guid) const;
         bool IsEmpty() const;
         uint32 GetFreeSlots() const;
         uint32 GetBagSize() const { return GetUInt32Value(CONTAINER_FIELD_NUM_SLOTS); }
 
         // DB operations
         // overwrite virtual Item::SaveToDB
-        void SaveToDB() override;
+        void SaveToDB();
         // overwrite virtual Item::LoadFromDB
-        bool LoadFromDB(uint32 guidLow, Field* fields, ObjectGuid ownerGuid = ObjectGuid()) override;
+        bool LoadFromDB(uint32 guid, uint64 owner_guid, QueryResult_AutoPtr result);
         // overwrite virtual Item::DeleteFromDB
-        void DeleteFromDB() override;
+        void DeleteFromDB();
 
-        void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
+        void BuildCreateUpdateBlockForPlayer(UpdateData *data, Player* target) const;
 
     protected:
 
@@ -67,12 +52,9 @@ class Bag : public Item
         Item* m_bagslot[MAX_BAG_SIZE];
 };
 
-inline Item* NewItemOrBag(ItemPrototype const* proto)
+inline Item* NewItemOrBag(ItemPrototype const * proto)
 {
-    if (proto->InventoryType == INVTYPE_BAG)
-        return new Bag;
-
-    return new Item;
+    return (proto->InventoryType == INVTYPE_BAG) ? new Bag : new Item;
 }
-
 #endif
+

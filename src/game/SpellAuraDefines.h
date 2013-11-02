@@ -1,26 +1,7 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
-/**
- * \addtogroup game
- * @{
- * \file
- */
-
 
 #ifndef BLIZZLIKE_SPELLAURADEFINES_H
 #define BLIZZLIKE_SPELLAURADEFINES_H
@@ -28,139 +9,49 @@
 #define MAX_AURAS 56
 #define MAX_POSITIVE_AURAS 40
 
-enum AuraFlags
+enum AURA_FLAGS
 {
     AFLAG_NEGATIVE          = 0x09,
     AFLAG_POSITIVE          = 0x1F,
     AFLAG_MASK              = 0xFF
 };
 
-/**
- * This is what's used in a Modifier by the Aura class
- * to tell what the Aura should modify.
- */
+//m_schoolAbsorb
+enum DAMAGE_ABSORB_TYPE
+{
+    ALL_DAMAGE_ABSORB       = -2,
+    ONLY_MAGIC_ABSORB       = -1,
+};
+
 enum AuraType
 {
     SPELL_AURA_NONE = 0,
     SPELL_AURA_BIND_SIGHT = 1,
     SPELL_AURA_MOD_POSSESS = 2,
-    /**
-     * The aura should do periodic damage, the function that handles
-     * this is Aura::HandlePeriodicDamage, the amount is usually decided
-     * by the Unit::SpellDamageBonusDone or Unit::MeleeDamageBonusDone
-     * which increases/decreases the Modifier::m_amount
-     */
     SPELL_AURA_PERIODIC_DAMAGE = 3,
-    /**
-     * Used by Aura::HandleAuraDummy
-     */
     SPELL_AURA_DUMMY = 4,
-    /**
-     * Used by Aura::HandleModConfuse, will either confuse or unconfuse
-     * the target depending on whether the apply flag is set
-     */
     SPELL_AURA_MOD_CONFUSE = 5,
     SPELL_AURA_MOD_CHARM = 6,
     SPELL_AURA_MOD_FEAR = 7,
-    /**
-     * The aura will do periodic heals of a target, handled by
-     * Aura::HandlePeriodicHeal, uses Unit::SpellHealingBonusDone
-     * to calculate whether to increase or decrease Modifier::m_amount
-     */
     SPELL_AURA_PERIODIC_HEAL = 8,
-    /**
-     * Changes the attackspeed, the Modifier::m_amount decides
-     * how much we change in percent, ie, if the m_amount is
-     * 50 the attackspeed will increase by 50%
-     */
     SPELL_AURA_MOD_ATTACKSPEED = 9,
-    /**
-     * Modifies the threat that the Aura does in percent,
-     * the Modifier::m_miscvalue decides which of the SpellSchools
-     * it should affect threat for.
-     * \see SpellSchoolMask
-     */
     SPELL_AURA_MOD_THREAT = 10,
-    /**
-     * Just applies a taunt which will change the threat a mob has
-     * Taken care of in Aura::HandleModThreat
-     */
     SPELL_AURA_MOD_TAUNT = 11,
-    /**
-     * Stuns targets in different ways, taken care of in
-     * Aura::HandleAuraModStun
-     */
     SPELL_AURA_MOD_STUN = 12,
-    /**
-     * Changes the damage done by a weapon in any hand, the Modifier::m_miscvalue
-     * will tell what school the damage is from, it's used as a bitmask
-     * \see SpellSchoolMask
-     */
     SPELL_AURA_MOD_DAMAGE_DONE = 13,
-    /**
-     * Not handled by the Aura class but instead this is implemented in
-     * Unit::MeleeDamageBonusTaken and Unit::SpellBaseDamageBonusTaken
-     */
     SPELL_AURA_MOD_DAMAGE_TAKEN = 14,
-    /**
-     * Not handled by the Aura class, implemented in Unit::DealMeleeDamage
-     */
     SPELL_AURA_DAMAGE_SHIELD = 15,
-    /**
-     * Taken care of in Aura::HandleModStealth, take note that this
-     * is not the same thing as invisibility
-     */
     SPELL_AURA_MOD_STEALTH = 16,
-    /**
-     * Not handled by the Aura class, implemented in Unit::isVisibleForOrDetect
-     * which does a lot of checks to determine whether the person is visible or not,
-     * the SPELL_AURA_MOD_STEALTH seems to determine how in/visible ie a rogue is.
-     */
     SPELL_AURA_MOD_STEALTH_DETECT = 17,
-    /**
-     * Handled by Aura::HandleInvisibility, the Modifier::m_miscvalue in the struct
-     * seems to decide what kind of invisibility it is with a bitflag. the miscvalue
-     * decides which bit is set, ie: 3 would make the 3rd bit be set.
-     */
     SPELL_AURA_MOD_INVISIBILITY = 18,
-    /**
-     * Adds one of the kinds of detections to the possible detections.
-     * As in SPEALL_AURA_MOD_INVISIBILITY the Modifier::m_miscvalue seems to decide
-     * what kind of invisibility the Unit should be able to detect.
-     */
     SPELL_AURA_MOD_INVISIBILITY_DETECTION = 19,
-    SPELL_AURA_OBS_MOD_HEALTH = 20,                         // 20,21 unofficial
+    SPELL_AURA_OBS_MOD_HEALTH = 20,                         //20,21 unofficial
     SPELL_AURA_OBS_MOD_MANA = 21,
-    /**
-     * Handled by Aura::HandleAuraModResistance, changes the resistance for a unit
-     * the field Modifier::m_miscvalue decides which kind of resistance that should
-     * be changed, for possible values see SpellSchools.
-     * \see SpellSchools
-     */
     SPELL_AURA_MOD_RESISTANCE = 22,
-    /**
-     * Currently just sets Aura::m_isPeriodic to apply and has a special case
-     * for Curse of the Plaguebringer.
-     */
     SPELL_AURA_PERIODIC_TRIGGER_SPELL = 23,
-    /**
-     * Just sets Aura::m_isPeriodic to apply
-     */
     SPELL_AURA_PERIODIC_ENERGIZE = 24,
-    /**
-     * Changes whether the target is pacified or not depending on the apply flag.
-     * Pacify makes the target silenced and have all it's attack skill disabled.
-     * See: http://www.wowhead.com/spell=6462/pacified
-     */
     SPELL_AURA_MOD_PACIFY = 25,
-    /**
-     * Roots or unroots the target
-     */
     SPELL_AURA_MOD_ROOT = 26,
-    /**
-     * Silences the target and stops and spell casts that should be stopped,
-     * they have the flag SpellPreventionType::SPELL_PREVENTION_TYPE_SILENCE
-     */
     SPELL_AURA_MOD_SILENCE = 27,
     SPELL_AURA_REFLECT_SPELLS = 28,
     SPELL_AURA_MOD_STAT = 29,
@@ -180,9 +71,9 @@ enum AuraType
     SPELL_AURA_PROC_TRIGGER_DAMAGE = 43,
     SPELL_AURA_TRACK_CREATURES = 44,
     SPELL_AURA_TRACK_RESOURCES = 45,
-    SPELL_AURA_46 = 46,                                     // Ignore all Gear test spells
+    SPELL_AURA_MOD_PARRY_SKILL = 46,
     SPELL_AURA_MOD_PARRY_PERCENT = 47,
-    SPELL_AURA_48 = 48,                                     // One periodic spell
+    SPELL_AURA_MOD_DODGE_SKILL = 48,
     SPELL_AURA_MOD_DODGE_PERCENT = 49,
     SPELL_AURA_MOD_BLOCK_SKILL = 50,
     SPELL_AURA_MOD_BLOCK_PERCENT = 51,
@@ -199,7 +90,7 @@ enum AuraType
     SPELL_AURA_PERIODIC_HEALTH_FUNNEL = 62,
     SPELL_AURA_PERIODIC_MANA_FUNNEL = 63,
     SPELL_AURA_PERIODIC_MANA_LEECH = 64,
-    SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK = 65,
+    SPELL_AURA_MOD_CASTING_SPEED = 65,
     SPELL_AURA_FEIGN_DEATH = 66,
     SPELL_AURA_MOD_DISARM = 67,
     SPELL_AURA_MOD_STALKED = 68,
@@ -272,7 +163,7 @@ enum AuraType
     SPELL_AURA_MOD_HEALING_DONE = 135,
     SPELL_AURA_MOD_HEALING_DONE_PERCENT = 136,
     SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE = 137,
-    SPELL_AURA_MOD_MELEE_HASTE = 138,
+    SPELL_AURA_MOD_HASTE = 138,
     SPELL_AURA_FORCE_REACTION = 139,
     SPELL_AURA_MOD_RANGED_HASTE = 140,
     SPELL_AURA_MOD_RANGED_AMMO_HASTE = 141,
@@ -297,7 +188,7 @@ enum AuraType
     SPELL_AURA_MOD_AOE_AVOIDANCE = 160,
     SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT = 161,
     SPELL_AURA_POWER_BURN_MANA = 162,
-    SPELL_AURA_MOD_CRIT_DAMAGE_BONUS = 163,
+    SPELL_AURA_MOD_CRIT_DAMAGE_BONUS_MELEE = 163,
     SPELL_AURA_164 = 164,
     SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS = 165,
     SPELL_AURA_MOD_ATTACK_POWER_PCT = 166,
@@ -308,7 +199,7 @@ enum AuraType
     SPELL_AURA_MOD_SPEED_NOT_STACK = 171,
     SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK = 172,
     SPELL_AURA_ALLOW_CHAMPION_SPELLS = 173,
-    SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT = 174,      // by defeult intelect, dependent from SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT
+    SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT = 174,      // by default intellect, dependent from SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT
     SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT = 175,
     SPELL_AURA_SPIRIT_OF_REDEMPTION = 176,
     SPELL_AURA_AOE_CHARM = 177,
@@ -319,15 +210,15 @@ enum AuraType
     SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT = 182,
     SPELL_AURA_MOD_CRITICAL_THREAT = 183,
     SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE = 184,
-    SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE = 185,
+    SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE= 185,
     SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE = 186,
     SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE = 187,
     SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_CHANCE = 188,
     SPELL_AURA_MOD_RATING = 189,
     SPELL_AURA_MOD_FACTION_REPUTATION_GAIN = 190,
     SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED = 191,
-    SPELL_AURA_MOD_MELEE_RANGED_HASTE = 192,
-    SPELL_AURA_HASTE_ALL = 193,
+    SPELL_AURA_HASTE_MELEE = 192,
+    SPELL_AURA_MELEE_SLOW = 193,
     SPELL_AURA_MOD_DEPRICATED_1  = 194,                     // not used now, old SPELL_AURA_MOD_SPELL_DAMAGE_OF_INTELLECT
     SPELL_AURA_MOD_DEPRICATED_2  = 195,                     // not used now, old SPELL_AURA_MOD_SPELL_HEALING_OF_INTELLECT
     SPELL_AURA_MOD_COOLDOWN = 196,                          // only 24818 Noxious Breath
@@ -339,7 +230,7 @@ enum AuraType
     SPELL_AURA_IGNORE_COMBAT_RESULT = 202,
     SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE = 203,
     SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE = 204,
-    SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_DAMAGE = 205,
+    SPELL_AURA_205 = 205,                                   // unused
     SPELL_AURA_MOD_FLIGHT_SPEED = 206,
     SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED = 207,
     SPELL_AURA_MOD_FLIGHT_SPEED_STACKING = 208,
@@ -376,12 +267,12 @@ enum AuraType
     SPELL_AURA_MOD_SCALE_2 = 239,
     SPELL_AURA_MOD_EXPERTISE = 240,
     SPELL_AURA_FORCE_MOVE_FORWARD = 241,
-    SPELL_AURA_242 = 242,
+    SPELL_AURA_MOD_SPELL_DAMAGE_FROM_HEALING = 242,
     SPELL_AURA_243 = 243,
     SPELL_AURA_COMPREHEND_LANGUAGE = 244,
-    SPELL_AURA_245 = 245,
+    SPELL_AURA_MOD_DURATION_OF_MAGIC_EFFECTS = 245,
     SPELL_AURA_246 = 246,
-    SPELL_AURA_MIRROR_IMAGE = 247,
+    SPELL_AURA_247 = 247,
     SPELL_AURA_MOD_COMBAT_RESULT_CHANCE = 248,
     SPELL_AURA_249 = 249,
     SPELL_AURA_MOD_INCREASE_HEALTH_2 = 250,
@@ -396,7 +287,7 @@ enum AuraType
     SPELL_AURA_259 = 259,
     SPELL_AURA_260 = 260,
     SPELL_AURA_261 = 261,
-    TOTAL_AURAS = 262
+    TOTAL_AURAS=262
 };
 
 enum AreaAuraType
@@ -407,5 +298,5 @@ enum AreaAuraType
     AREA_AURA_PET,
     AREA_AURA_OWNER
 };
-/** @} */
 #endif
+

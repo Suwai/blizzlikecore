@@ -2,10 +2,10 @@
 cls
 color 0b
 echo.
-echo ======================================
-echo *           BlizzLikeCore            *
-echo *  Compilers supported: VC11, VC10   *
-echo ======================================
+echo =====================================
+echo *           BlizzLikeCore           *
+echo *  Compilers supported: VC11, VC10  *
+echo =====================================
 echo.
 set /p BUILD_TYPE=What build type use?		[Release]: 
 if %BUILD_TYPE%. == . set BUILD_TYPE=Release

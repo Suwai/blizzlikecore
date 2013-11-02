@@ -1,28 +1,14 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
-#ifndef BLIZZLIKESERVER_GOSSIP_H
-#define BLIZZLIKESERVER_GOSSIP_H
+#ifndef BLIZZLIKECORE_GOSSIP_H
+#define BLIZZLIKECORE_GOSSIP_H
 
 #include "Common.h"
 #include "QuestDef.h"
 #include "NPCHandler.h"
-#include "ObjectGuid.h"
 
 class WorldSession;
 
@@ -31,64 +17,55 @@ class WorldSession;
 
 enum Gossip_Option
 {
-    GOSSIP_OPTION_NONE              = 0,                    // UNIT_NPC_FLAG_NONE               (0)
-    GOSSIP_OPTION_GOSSIP            = 1,                    // UNIT_NPC_FLAG_GOSSIP             (1)
-    GOSSIP_OPTION_QUESTGIVER        = 2,                    // UNIT_NPC_FLAG_QUESTGIVER         (2)
-    GOSSIP_OPTION_VENDOR            = 3,                    // UNIT_NPC_FLAG_VENDOR             (128)
-    GOSSIP_OPTION_TAXIVENDOR        = 4,                    // UNIT_NPC_FLAG_TAXIVENDOR         (8192)
-    GOSSIP_OPTION_TRAINER           = 5,                    // UNIT_NPC_FLAG_TRAINER            (16)
-    GOSSIP_OPTION_SPIRITHEALER      = 6,                    // UNIT_NPC_FLAG_SPIRITHEALER       (16384)
-    GOSSIP_OPTION_SPIRITGUIDE       = 7,                    // UNIT_NPC_FLAG_SPIRITGUIDE        (32768)
-    GOSSIP_OPTION_INNKEEPER         = 8,                    // UNIT_NPC_FLAG_INNKEEPER          (65536)
-    GOSSIP_OPTION_BANKER            = 9,                    // UNIT_NPC_FLAG_BANKER             (131072)
-    GOSSIP_OPTION_PETITIONER        = 10,                   // UNIT_NPC_FLAG_PETITIONER         (262144)
-    GOSSIP_OPTION_TABARDDESIGNER    = 11,                   // UNIT_NPC_FLAG_TABARDDESIGNER     (524288)
-    GOSSIP_OPTION_BATTLEFIELD       = 12,                   // UNIT_NPC_FLAG_BATTLEFIELDPERSON  (1048576)
-    GOSSIP_OPTION_AUCTIONEER        = 13,                   // UNIT_NPC_FLAG_AUCTIONEER         (2097152)
-    GOSSIP_OPTION_STABLEPET         = 14,                   // UNIT_NPC_FLAG_STABLE             (4194304)
-    GOSSIP_OPTION_ARMORER           = 15,                   // UNIT_NPC_FLAG_ARMORER            (4096)
-    GOSSIP_OPTION_UNLEARNTALENTS    = 16,                   // UNIT_NPC_FLAG_TRAINER            (16) (bonus option for GOSSIP_OPTION_TRAINER)
-    GOSSIP_OPTION_UNLEARNPETSKILLS  = 17,                   // UNIT_NPC_FLAG_TRAINER            (16) (bonus option for GOSSIP_OPTION_TRAINER)
+    GOSSIP_OPTION_NONE              = 0,                    //UNIT_NPC_FLAG_NONE              = 0,
+    GOSSIP_OPTION_GOSSIP            = 1,                    //UNIT_NPC_FLAG_GOSSIP            = 1,
+    GOSSIP_OPTION_QUESTGIVER        = 2,                    //UNIT_NPC_FLAG_QUESTGIVER        = 2,
+    GOSSIP_OPTION_VENDOR            = 3,                    //UNIT_NPC_FLAG_VENDOR            = 4,
+    GOSSIP_OPTION_TAXIVENDOR        = 4,                    //UNIT_NPC_FLAG_TAXIVENDOR        = 8,
+    GOSSIP_OPTION_TRAINER           = 5,                    //UNIT_NPC_FLAG_TRAINER           = 16,
+    GOSSIP_OPTION_SPIRITHEALER      = 6,                    //UNIT_NPC_FLAG_SPIRITHEALER      = 32,
+    GOSSIP_OPTION_SPIRITGUIDE       = 7,                    //UNIT_NPC_FLAG_SPIRITGUIDE       = 64,
+    GOSSIP_OPTION_INNKEEPER         = 8,                    //UNIT_NPC_FLAG_INNKEEPER         = 128,
+    GOSSIP_OPTION_BANKER            = 9,                    //UNIT_NPC_FLAG_BANKER            = 256,
+    GOSSIP_OPTION_PETITIONER        = 10,                   //UNIT_NPC_FLAG_PETITIONER        = 512,
+    GOSSIP_OPTION_TABARDDESIGNER    = 11,                   //UNIT_NPC_FLAG_TABARDDESIGNER    = 1024,
+    GOSSIP_OPTION_BATTLEFIELD       = 12,                   //UNIT_NPC_FLAG_BATTLEFIELDPERSON = 2048,
+    GOSSIP_OPTION_AUCTIONEER        = 13,                   //UNIT_NPC_FLAG_AUCTIONEER        = 4096,
+    GOSSIP_OPTION_STABLEPET         = 14,                   //UNIT_NPC_FLAG_STABLE            = 8192,
+    GOSSIP_OPTION_ARMORER           = 15,                   //UNIT_NPC_FLAG_ARMORER           = 16384,
+    GOSSIP_OPTION_UNLEARNTALENTS    = 16,                   //UNIT_NPC_FLAG_TRAINER (bonus option for GOSSIP_OPTION_TRAINER)
+    GOSSIP_OPTION_UNLEARNPETSKILLS  = 17,                   //UNIT_NPC_FLAG_TRAINER (bonus option for GOSSIP_OPTION_TRAINER)
+    GOSSIP_OPTION_OUTDOORPVP        = 18,                   //added by code (option for outdoor pvp creatures)
     GOSSIP_OPTION_MAX
 };
 
 enum GossipOptionIcon
 {
-    GOSSIP_ICON_CHAT                = 0,                    // white chat bubble
-    GOSSIP_ICON_VENDOR              = 1,                    // brown bag
-    GOSSIP_ICON_TAXI                = 2,                    // flight
-    GOSSIP_ICON_TRAINER             = 3,                    // book
-    GOSSIP_ICON_INTERACT_1          = 4,                    // interaction wheel
-    GOSSIP_ICON_INTERACT_2          = 5,                    // interaction wheel
-    GOSSIP_ICON_MONEY_BAG           = 6,                    // brown bag with yellow dot
-    GOSSIP_ICON_TALK                = 7,                    // white chat bubble with black dots
-    GOSSIP_ICON_TABARD              = 8,                    // tabard
-    GOSSIP_ICON_BATTLE              = 9,                    // two swords
-    GOSSIP_ICON_DOT                 = 10,                   // yellow dot
-    GOSSIP_ICON_CHAT_11             = 11,                   // This and below are most the same visual as GOSSIP_ICON_CHAT
-    GOSSIP_ICON_CHAT_12             = 12,                   // but are still used for unknown reasons.
-    GOSSIP_ICON_CHAT_13             = 13,
-    GOSSIP_ICON_CHAT_14             = 14,                   // probably invalid
-    GOSSIP_ICON_CHAT_15             = 15,                   // probably invalid
-    GOSSIP_ICON_CHAT_16             = 16,
-    GOSSIP_ICON_CHAT_17             = 17,
-    GOSSIP_ICON_CHAT_18             = 18,
-    GOSSIP_ICON_CHAT_19             = 19,
-    GOSSIP_ICON_CHAT_20             = 20,
+    GOSSIP_ICON_CHAT                = 0,                    //white chat bubble
+    GOSSIP_ICON_VENDOR              = 1,                    //brown bag
+    GOSSIP_ICON_TAXI                = 2,                    //flight
+    GOSSIP_ICON_TRAINER             = 3,                    //book
+    GOSSIP_ICON_INTERACT_1          = 4,                    //interaction wheel
+    GOSSIP_ICON_INTERACT_2          = 5,                    //interaction wheel
+    GOSSIP_ICON_MONEY_BAG           = 6,                    //brown bag with yellow dot
+    GOSSIP_ICON_TALK                = 7,                    //white chat bubble with black dots
+    GOSSIP_ICON_TABARD              = 8,                    //tabard
+    GOSSIP_ICON_BATTLE              = 9,                    //two swords
+    GOSSIP_ICON_DOT                 = 10,                   //yellow dot
     GOSSIP_ICON_MAX
 };
 
-// POI icons. Many more exist, list not complete.
+//POI defines
 enum Poi_Icon
 {
-    ICON_POI_GREY_AV_MINE       =   0,                      // Grey mine lorry
-    ICON_POI_RED_AV_MINE        =   1,                      // Red mine lorry
-    ICON_POI_BLUE_AV_MINE       =   2,                      // Blue mine lorry
+    ICON_POI_0                  =   0,                      // Grey ?
+    ICON_POI_1                  =   1,                      // Red ?
+    ICON_POI_2                  =   2,                      // Blue ?
     ICON_POI_BWTOMB             =   3,                      // Blue and White Tomb Stone
-    ICON_POI_SMALL_HOUSE        =   4,                      // Small house
-    ICON_POI_GREYTOWER          =   5,                      // Grey Tower
-    ICON_POI_REDFLAG            =   6,                      // Red Flag w/Yellow !
-    ICON_POI_TOMBSTONE          =   7,                      // Normal tomb stone (brown)
+    ICON_POI_HOUSE              =   4,                      // House
+    ICON_POI_TOWER              =   5,                      // Tower
+    ICON_POI_REDFLAG            =   6,                      // Red Flag with Yellow !
+    ICON_POI_TOMB               =   7,                      // Tomb Stone
     ICON_POI_BWTOWER            =   8,                      // Blue and White Tower
     ICON_POI_REDTOWER           =   9,                      // Red Tower
     ICON_POI_BLUETOWER          =   10,                     // Blue Tower
@@ -96,9 +73,9 @@ enum Poi_Icon
     ICON_POI_REDTOMB            =   12,                     // Red Tomb Stone
     ICON_POI_RWTOMB             =   13,                     // Red and White Tomb Stone
     ICON_POI_BLUETOMB           =   14,                     // Blue Tomb Stone
-    ICON_POI_BLANK              =   15,                     // Blank (not visible)
-    ICON_POI_16                 =   16,                     // Grey ?
-    ICON_POI_17                 =   17,                     // Blue/White ?
+    ICON_POI_NOTHING            =   15,                     // NOTHING
+    ICON_POI_16                 =   16,                     // Red ?
+    ICON_POI_17                 =   17,                     // Grey ?
     ICON_POI_18                 =   18,                     // Blue ?
     ICON_POI_19                 =   19,                     // Red and White ?
     ICON_POI_20                 =   20,                     // Red ?
@@ -139,7 +116,7 @@ typedef std::vector<GossipMenuItem> GossipMenuItemList;
 
 struct GossipMenuItemData
 {
-    int32  m_gAction_menu;                                  // negative for close gossip
+    uint32 m_gAction_menu;
     uint32 m_gAction_poi;
     uint32 m_gAction_script;
 };
@@ -154,10 +131,10 @@ struct QuestMenuItem
 
 typedef std::vector<QuestMenuItem> QuestMenuItemList;
 
-class BLIZZLIKE_DLL_SPEC GossipMenu
+class GossipMenu
 {
     public:
-        explicit GossipMenu(WorldSession* session);
+        GossipMenu();
         ~GossipMenu();
 
         void AddMenuItem(uint8 Icon, const std::string& Message, bool Coded = false);
@@ -167,12 +144,10 @@ class BLIZZLIKE_DLL_SPEC GossipMenu
         void AddMenuItem(uint8 Icon, char const* Message, bool Coded = false);
         void AddMenuItem(uint8 Icon, char const* Message, uint32 dtSender, uint32 dtAction, char const* BoxMessage, uint32 BoxMoney, bool Coded = false);
 
-        void AddMenuItem(uint8 Icon, int32 itemText, uint32 dtSender, uint32 dtAction, int32 boxText, uint32 BoxMoney, bool Coded = false);
-
         void SetMenuId(uint32 menu_id) { m_gMenuId = menu_id; }
         uint32 GetMenuId() { return m_gMenuId; }
 
-        void AddGossipMenuItemData(int32 action_menu, uint32 action_poi, uint32 action_script);
+        void AddGossipMenuItemData(uint32 action_menu, uint32 action_poi, uint32 action_script);
 
         unsigned int MenuItemCount() const
         {
@@ -200,16 +175,11 @@ class BLIZZLIKE_DLL_SPEC GossipMenu
 
         void ClearMenu();
 
-        WorldSession* GetMenuSession() const { return m_session; }
-
     protected:
         GossipMenuItemList      m_gItems;
         GossipMenuItemDataList  m_gItemsData;
 
         uint32 m_gMenuId;
-
-    private:
-        WorldSession* m_session;
 };
 
 class QuestMenu
@@ -242,20 +212,19 @@ class QuestMenu
         QuestMenuItemList m_qItems;
 };
 
-class BLIZZLIKE_DLL_SPEC PlayerMenu
+class PlayerMenu
 {
     private:
         GossipMenu mGossipMenu;
         QuestMenu  mQuestMenu;
+        WorldSession* pSession;
 
     public:
-        explicit PlayerMenu(WorldSession* Session);
+        PlayerMenu(WorldSession *Session);
         ~PlayerMenu();
 
         GossipMenu& GetGossipMenu() { return mGossipMenu; }
         QuestMenu& GetQuestMenu() { return mQuestMenu; }
-
-        WorldSession* GetMenuSession() const { return mGossipMenu.GetMenuSession(); }
 
         bool Empty() const { return mGossipMenu.Empty() && mQuestMenu.Empty(); }
 
@@ -264,24 +233,24 @@ class BLIZZLIKE_DLL_SPEC PlayerMenu
         uint32 GossipOptionAction(unsigned int Selection);
         bool GossipOptionCoded(unsigned int Selection);
 
-        void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGuid);
+        void SendGossipMenu(uint32 TitleTextId, uint64 npcGUID);
         void CloseGossip();
-        void SendPointOfInterest(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* locName);
-        void SendPointOfInterest(uint32 poi_id);
+        void SendPointOfInterest(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char * locName);
         void SendTalking(uint32 textID);
-        void SendTalking(char const* title, char const* text);
+        void SendTalking(char const * title, char const * text);
 
         /*********************************************************/
         /***                    QUEST SYSTEM                   ***/
         /*********************************************************/
-        void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID);
+        void SendQuestGiverStatus(uint8 questStatus, uint64 npcGUID);
 
-        void SendQuestGiverQuestList(QEmote eEmote, const std::string& Title, ObjectGuid npcGUID);
+        void SendQuestGiverQuestList(QEmote eEmote, const std::string& Title, uint64 npcGUID);
 
-        void SendQuestQueryResponse(Quest const* pQuest);
-        void SendQuestGiverQuestDetails(Quest const* pQuest, ObjectGuid npcGUID, bool ActivateAccept);
+        void SendQuestQueryResponse (Quest const *pQuest);
+        void SendQuestGiverQuestDetails(Quest const *pQuest, uint64 npcGUID, bool ActivateAccept);
 
-        void SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGUID, bool EnbleNext);
-        void SendQuestGiverRequestItems(Quest const* pQuest, ObjectGuid npcGUID, bool Completable, bool CloseOnCancel);
+        void SendQuestGiverOfferReward(Quest const* pQuest, uint64 npcGUID, bool EnbleNext);
+        void SendQuestGiverRequestItems(Quest const *pQuest, uint64 npcGUID, bool Completable, bool CloseOnCancel);
 };
 #endif
+

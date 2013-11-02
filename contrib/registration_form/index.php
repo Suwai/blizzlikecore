@@ -46,7 +46,8 @@ if (!$con) {
 };
 
 if (!empty($_POST)) {
-        if ((empty($_POST["username"]))||(empty($_POST["password"]))||(empty($_POST["email"]))||(empty($_POST["tbc"])) ) {
+//      if ((empty($_POST["username"]))||(empty($_POST["password"]))||(empty($_POST["email"]))||(empty($_POST["tbc"])) ) {
+        if ((empty($_POST["username"]))||(empty($_POST["password"]))||(empty($_POST["email"])) ) {
                 error_s("You did not enter all the required information.");
 				exit();
         } else {
@@ -89,7 +90,7 @@ if (!empty($_POST)) {
                         error_s("Email was in an incorrect format.");
                         exit();
                 };
-                if ($_POST['tbc'] != "on") {
+                if (empty($_POST["tbc"])) {
                         $tbc = "0";
                 } else {
                         $tbc = "1";
@@ -121,7 +122,8 @@ if (!empty($_POST)) {
                                 $existing_email = $value;
                         };
                 };
-                if ($existing_email == $_POST['email']) {
+                $existing_email = strtoupper($existing_email);
+                if ($existing_email == strtoupper($_POST['email'])) {
                         error_s("That email is already in use.");
                         exit();
                 };

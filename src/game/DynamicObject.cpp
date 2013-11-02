@@ -1,38 +1,28 @@
 /*
- * This file is part of the BlizzLikeCore Project. See CREDITS and LICENSE files
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of the BlizzLikeCore Project.
+ * See CREDITS and LICENSE files for Copyright information.
  */
 
 #include "Common.h"
+#include "GameObject.h"
 #include "UpdateMask.h"
 #include "Opcodes.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 #include "World.h"
 #include "ObjectAccessor.h"
 #include "Database/DatabaseEnv.h"
+#include "SpellAuras.h"
+#include "MapManager.h"
 #include "GridNotifiers.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
-#include "SpellMgr.h"
-#include "DBCStores.h"
 
 DynamicObject::DynamicObject() : WorldObject()
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
-    // 2.3.2 - 0x58
+                                                            // 2.3.2 - 0x58
     m_updateFlag = (UPDATEFLAG_LOWGUID | UPDATEFLAG_HIGHGUID | UPDATEFLAG_HAS_POSITION);
 
     m_valuesCount = DYNAMICOBJECT_END;
@@ -40,74 +30,74 @@ DynamicObject::DynamicObject() : WorldObject()
 
 void DynamicObject::AddToWorld()
 {
-    ///- Register the dynamicObject for guid lookup
+    // Register the dynamicObject for guid lookup
     if (!IsInWorld())
-        GetMap()->GetObjectsStore().insert<DynamicObject>(GetObjectGuid(), (DynamicObject*)this);
-
-    Object::AddToWorld();
+    {
+        ObjectAccessor::Instance().AddObject(this);
+        WorldObject::AddToWorld();
+    }
 }
 
 void DynamicObject::RemoveFromWorld()
 {
-    ///- Remove the dynamicObject from the accessor
+    // Remove the dynamicObject from the accessor
     if (IsInWorld())
     {
-        GetMap()->GetObjectsStore().erase<DynamicObject>(GetObjectGuid(), (DynamicObject*)NULL);
-        GetViewPoint().Event_RemovedFromWorld();
+        if (m_isWorldObject)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (caster->GetTypeId() == TYPEID_PLAYER)
+                    ((Player*)caster)->SetViewpoint(this, false);
+            }
+            else
+            {
+                sLog.outCrash("DynamicObject::RemoveFromWorld cannot find viewpoint owner");
+            }
+        }
+        WorldObject::RemoveFromWorld();
+        ObjectAccessor::Instance().RemoveObject(this);
     }
-
-    Object::RemoveFromWorld();
 }
 
-bool DynamicObject::Create(uint32 guidlow, Unit* caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type)
+bool DynamicObject::Create(uint32 guidlow, Unit* caster, uint32 spellId, uint32 effIndex, const Position &pos, int32 duration, float radius)
 {
-    WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT);
     SetMap(caster->GetMap());
-    Relocate(x, y, z, 0);
-
+    Relocate(pos);
     if (!IsPositionValid())
     {
-        sLog.outError("DynamicObject (spell %u eff %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", spellId, effIndex, GetPositionX(), GetPositionY());
+        sLog.outError("DynamicObject (spell %u eff %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",spellId,effIndex,GetPositionX(),GetPositionY());
         return false;
     }
+
+    WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT);
 
     SetEntry(spellId);
-    SetObjectScale(DEFAULT_OBJECT_SCALE);
+    SetFloatValue(OBJECT_FIELD_SCALE_X, 1);
+    SetUInt64Value(DYNAMICOBJECT_CASTER, caster->GetGUID());
 
-    SetGuidValue(DYNAMICOBJECT_CASTER, caster->GetObjectGuid());
-
-    /* Bytes field, so it's really 4 bit fields. These flags are unknown, but we do know that 0x00000001 is set for most.
-       Farsight for example, does not have this flag, instead it has 0x80000002.
-       Flags are set dynamically with some conditions, so one spell may have different flags set, depending on those conditions.
-       The size of the visual may be controlled to some degree with these flags.
-
-    uint32 bytes = 0x00000000;
-    bytes |= 0x01;
-    bytes |= 0x00 << 8;
-    bytes |= 0x00 << 16;
-    bytes |= 0x00 << 24;
-    */
-    SetByteValue(DYNAMICOBJECT_BYTES, 0, type);
-
+    // The lower word of DYNAMICOBJECT_BYTES must be 0x0001. This value means that the visual radius will be overriden
+    // by client for most of the "ground patch" visual effect spells and a few "skyfall" ones like Hurricane.
+    // If any other value is used, the client will _always_ use the radius provided in DYNAMICOBJECT_RADIUS, but
+    // precompensation is necessary (eg radius *= 2) for many spells. Anyway, blizz sends 0x0001 for all the spells
+    // I saw sniffed...
+    SetUInt32Value(DYNAMICOBJECT_BYTES, 0x00000001);
     SetUInt32Value(DYNAMICOBJECT_SPELLID, spellId);
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
-    SetFloatValue(DYNAMICOBJECT_POS_X, x);
-    SetFloatValue(DYNAMICOBJECT_POS_Y, y);
-    SetFloatValue(DYNAMICOBJECT_POS_Z, z);
-    SetUInt32Value(DYNAMICOBJECT_CASTTIME, WorldTimer::getMSTime());    // new 2.4.0
-
-    SpellEntry const* spellProto = sSpellStore.LookupEntry(spellId);
-    if (!spellProto)
-    {
-        sLog.outError("DynamicObject (spell %u) not created. Spell not exist!", spellId);
-        return false;
-    }
+    SetFloatValue(DYNAMICOBJECT_POS_X, pos.m_positionX);
+    SetFloatValue(DYNAMICOBJECT_POS_Y, pos.m_positionY);
+    SetFloatValue(DYNAMICOBJECT_POS_Z, pos.m_positionZ);
+    SetUInt32Value(DYNAMICOBJECT_CASTTIME, getMSTime());
 
     m_aliveDuration = duration;
     m_radius = radius;
     m_effIndex = effIndex;
     m_spellId = spellId;
-    m_positive = IsPositiveEffect(spellProto, m_effIndex);
+    m_casterGuid = caster->GetGUID();
+    m_updateTimer = 0;
+
+    if (m_effIndex == 4)
+        m_isWorldObject = true;
 
     return true;
 }
@@ -115,10 +105,10 @@ bool DynamicObject::Create(uint32 guidlow, Unit* caster, uint32 spellId, SpellEf
 Unit* DynamicObject::GetCaster() const
 {
     // can be not found in some cases
-    return ObjectAccessor::GetUnit(*this, GetCasterGuid());
+    return ObjectAccessor::GetUnit(*this, GetCasterGUID());
 }
 
-void DynamicObject::Update(uint32 /*update_diff*/, uint32 p_time)
+void DynamicObject::Update(uint32 p_time)
 {
     // caster can be not in world at time dynamic object update, but dynamic object not yet deleted in Unit destructor
     Unit* caster = GetCaster();
@@ -135,91 +125,41 @@ void DynamicObject::Update(uint32 /*update_diff*/, uint32 p_time)
     else
         deleteThis = true;
 
-    // have radius and work as persistent effect
-    if (m_radius)
+    if (m_effIndex < 4)
     {
-        // TODO: make a timer and update this in larger intervals
-        BlizzLike::DynamicObjectUpdater notifier(*this, caster, m_positive);
-        Cell::VisitAllObjects(this, notifier, m_radius);
+        if (m_updateTimer < p_time)
+        {
+            BlizzLike::DynamicObjectUpdater notifier(*this,caster);
+            VisitNearbyObject(GetRadius(), notifier);
+            m_updateTimer = 500; // is this official-like?
+        }else m_updateTimer -= p_time;
     }
 
     if (deleteThis)
     {
-        caster->RemoveDynObjectWithGUID(GetObjectGuid());
+        caster->RemoveDynObjectWithGUID(GetGUID());
         Delete();
     }
 }
 
 void DynamicObject::Delete()
 {
-    SendObjectDeSpawnAnim(GetObjectGuid());
+    SendObjectDeSpawnAnim(GetGUID());
+    RemoveFromWorld();
     AddObjectToRemoveList();
 }
 
 void DynamicObject::Delay(int32 delaytime)
 {
     m_aliveDuration -= delaytime;
-    for (GuidSet::iterator iter = m_affected.begin(); iter != m_affected.end();)
-    {
-        Unit* target = GetMap()->GetUnit((*iter));
-        if (target)
-        {
-            SpellAuraHolder* holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid());
-            if (!holder)
-            {
-                ++iter;
-                continue;
-            }
-
-            bool foundAura = false;
-            for (int32 i = m_effIndex + 1; i < MAX_EFFECT_INDEX; ++i)
-            {
-                if ((holder->GetSpellProto()->Effect[i] == SPELL_EFFECT_PERSISTENT_AREA_AURA || holder->GetSpellProto()->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT) && holder->m_auras[i])
-                {
-                    foundAura = true;
-                    break;
-                }
-            }
-
-            if (foundAura)
-            {
-                ++iter;
-                continue;
-            }
-
-            target->DelaySpellAuraHolder(m_spellId, delaytime, GetCasterGuid());
-            ++iter;
-        }
-        else
-            m_affected.erase(iter++);
-    }
+    for (AffectedSet::iterator iunit= m_affected.begin();iunit != m_affected.end();++iunit)
+        if (*iunit)
+            (*iunit)->DelayAura(m_spellId, m_effIndex, delaytime);
 }
 
-bool DynamicObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
+bool DynamicObject::isVisibleForInState(Player const* u, bool inVisibleList) const
 {
-    if (!IsInWorld() || !u->IsInWorld())
-        return false;
-
-    // always seen by owner
-    if (GetCasterGuid() == u->GetObjectGuid())
-        return true;
-
-    // normal case
-    return IsWithinDistInMap(viewPoint, GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
+    return IsInWorld() && u->IsInWorld()
+        && (IsWithinDistInMap(u->m_seer, World::GetMaxVisibleDistanceForObject() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false));
 }
 
-bool DynamicObject::IsHostileTo(Unit const* unit) const
-{
-    if (Unit* owner = GetCaster())
-        return owner->IsHostileTo(unit);
-    else
-        return false;
-}
-
-bool DynamicObject::IsFriendlyTo(Unit const* unit) const
-{
-    if (Unit* owner = GetCaster())
-        return owner->IsFriendlyTo(unit);
-    else
-        return true;
-}
