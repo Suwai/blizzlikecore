@@ -1,0 +1,6 @@
+ImportACE.cmake
+*.bat
+*.sh
+*.txt
+*.orig
+*.rej
