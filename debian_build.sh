@@ -18,6 +18,8 @@ function buildcore(){
   echo
   read -p "Cores [4] " CORES
   if [ -z "$CORES" ]; then CORES=4; fi
+  read -p "Debug [0] " DEBUG
+  if [ -z "$DEBUG" ]; then DEBUG=0; fi
   read -p "Scripts [1] " SCRIPTS
   if [ -z "$SCRIPTS" ]; then SCRIPTS=1; fi
   read -p "Tools [0] " TOOLS
@@ -25,7 +27,7 @@ function buildcore(){
   rm -Rf build
   mkdir build
   cd build
-  cmake ../ -DPREFIX=/home/$(id -un)/server -DSCRIPTS=${SCRIPTS} -DTOOLS=${TOOLS}
+  cmake ../ -DPREFIX=/home/$(id -un)/server -DSCRIPTS=${SCRIPTS} -DTOOLS=${TOOLS} -DDEBUG=${DEBUG}
   pause 'Press [any] key to continue...'
   make -j ${CORES}
   make install
