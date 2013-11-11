@@ -28,6 +28,9 @@ EndContentData */
 #include "precompiled.h"
 #include "zulaman.h"
 #include "escort_ai.h"
+#include "ObjectMgr.h"
+#include "ObjectGuid.h"
+#include "GameObject.h"
 
 /*######
 ## npc_forest_frog
@@ -238,6 +241,48 @@ bool GOUse_go_strange_gong(Player* /*pPlayer*/, GameObject* pGo)
     return false;
 }
 
+/*######
+## npc_zulaman_Harkor
+######*/
+struct BLIZZLIKE_DLL_DECL npc_zulaman_HarkorAI : public ScriptedAI
+{
+	npc_zulaman_HarkorAI(Creature* pCreature) : ScriptedAI(pCreature){}
+void Reset() {}
+};
+
+#define GOSSIP_HOSTAGE        "I am glad to have helped you."
+
+bool GossipHello_npc_zulaman_Harkor(Player* pPlayer, Creature* pCreature)
+  {
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HOSTAGE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->SEND_GOSSIP_MENU(1,pCreature->GetObjectGuid());
+    return true;
+   
+}
+bool GossipSelect_npc_zulaman_Harkor(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
+{
+	if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
+	{
+		pPlayer->CLOSE_GOSSIP_MENU();
+	
+Map* map = pCreature->GetMap();
+const GameObjectInfo* gob = ObjectMgr::GetGameObjectInfo(GO_KRAZS_PACKAGE);
+uint32 gguid = sObjectMgr.GenerateStaticGameObjectLowGuid();
+GameObject* pGOB = new GameObject;
+pGOB->Create(gguid, 0, map, 297.225006, 1469.349976, 82.589302, 0);
+pGOB->SetRespawnTime(300);
+pGOB->SaveToDB();
+pGOB->LoadFromDB(gguid, map);
+map->Add(pGOB);
+sObjectMgr.AddGameobjectToGrid(gguid, sObjectMgr.GetGOData(gguid ));
+	}
+	  return true;
+}
+CreatureAI* GetAI_npc_zulaman_Harkor(Creature* pCreature)
+{
+    return new npc_zulaman_HarkorAI(pCreature);
+}
+
 void AddSC_zulaman()
 {
     Script* pNewScript;
@@ -257,5 +302,13 @@ void AddSC_zulaman()
     pNewScript = new Script;
     pNewScript->Name = "go_strange_gong";
     pNewScript->pGOUse = &GOUse_go_strange_gong;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_zulaman_Harkor";
+    pNewScript->GetAI = &GetAI_npc_zulaman_Harkor;
+    pNewScript->pGossipHello = &GossipHello_npc_zulaman_Harkor;
+    
+    pNewScript->pGossipSelect = &GossipSelect_npc_zulaman_Harkor;
     pNewScript->RegisterSelf();
 }
